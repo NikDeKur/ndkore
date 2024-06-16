@@ -18,7 +18,7 @@ class ModulesManager<A> {
     var isUnloading = false
 
 
-    fun register(module: Module<A>) {
+    fun addModule(module: Module<A>) {
         modules.addById(module)
     }
 

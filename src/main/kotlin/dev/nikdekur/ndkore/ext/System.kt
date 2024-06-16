@@ -3,6 +3,8 @@
 package dev.nikdekur.ndkore.ext
 
 import kotlinx.coroutines.runBlocking
+import java.lang.Runtime
+import java.lang.Thread
 
 inline val runtime: Runtime
     get() = Runtime.getRuntime()
@@ -10,6 +12,12 @@ inline val runtime: Runtime
 @JvmInline
 value class ShutdownHook(val thread: Thread) {
     fun remove() = runtime.removeShutdownHook(thread)
+    fun tryRemove() = try {
+        remove()
+        true
+    } catch (e: IllegalStateException ) {
+        false
+    }
 }
 
 inline fun addShutdownHook(hook: Thread): ShutdownHook {

@@ -2,6 +2,7 @@ package dev.nikdekur.ndkore.cooldown
 
 import java.util.concurrent.TimeUnit
 
+
 data class Cooldown(val duration: Long, val unit: TimeUnit) {
     fun toMillis(): Long {
         return unit.toMillis(duration)

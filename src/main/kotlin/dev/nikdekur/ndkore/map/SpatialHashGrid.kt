@@ -6,7 +6,7 @@ import dev.nikdekur.ndkore.spatial.Point
 
 abstract class SpatialHashGrid<T>(val cellSize: Int) {
 
-    val grid = FullHashedMap<Point, HashSet<T>>()
+    val grid = HashMap<Point, HashSet<T>>()
     private val newSetGen = { _: Point -> HashSet<T>()}
     private val reusablePoint = Point(0, 0, 0)
 

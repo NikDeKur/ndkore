@@ -2,14 +2,14 @@
 
 package dev.nikdekur.ndkore.scheduler.impl
 
+import dev.nikdekur.ndkore.scheduler.AbstractScheduler
+import dev.nikdekur.ndkore.scheduler.Scheduler
+import dev.nikdekur.ndkore.scheduler.SchedulerTask
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
-import dev.nikdekur.ndkore.scheduler.AbstractScheduler
-import dev.nikdekur.ndkore.scheduler.Scheduler
-import dev.nikdekur.ndkore.scheduler.SchedulerTask
 import kotlin.coroutines.CoroutineContext
 
 class CoroutineScheduler(val scope: CoroutineScope) : AbstractScheduler(), CoroutineScope by scope {
@@ -24,6 +24,7 @@ class CoroutineScheduler(val scope: CoroutineScope) : AbstractScheduler(), Corou
     }
 
 
+    @OptIn(ObsoleteCoroutinesApi::class)
     override fun runTaskTimer(delay: Long, interval: Long, task: suspend () -> Unit): SchedulerTask {
         val taskId = nextId()
         val flow = flow {
@@ -33,9 +34,12 @@ class CoroutineScheduler(val scope: CoroutineScope) : AbstractScheduler(), Corou
                 delay(interval)
                 emit(Unit)
             }
-        }.onEach { task() }
-        .onCompletion { unregisterTask(taskId) }
-        .launchIn(scope)
+        }.onEach {
+            scope.launch {
+                task()
+            }}
+            .onCompletion { unregisterTask(taskId) }
+            .launchIn(scope)
 
         return newTask(taskId, flow)
     }
@@ -46,7 +50,10 @@ class CoroutineScheduler(val scope: CoroutineScope) : AbstractScheduler(), Corou
         val job = scope.launch {
             delay(delay)
             task()
-            unregisterTask(taskId)
+        }.also {
+            it.invokeOnCompletion {
+                unregisterTask(taskId)
+            }
         }
 
         return newTask(taskId, job)
@@ -57,8 +64,11 @@ class CoroutineScheduler(val scope: CoroutineScope) : AbstractScheduler(), Corou
             override val scheduler: Scheduler = this@CoroutineScheduler
 
             override fun cancel() {
-                job.cancel()
-                unregisterTask(id)
+                try {
+                    job.cancel()
+                } finally {
+                    unregisterTask(id)
+                }
             }
 
             override fun isCancelled() = job.isCancelled

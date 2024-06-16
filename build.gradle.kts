@@ -42,6 +42,8 @@ dependencies {
     compileOnly("com.google.guava:guava:32.1.3-jre")
     compileOnly("com.google.code.gson:gson:2.10.1")
     compileOnly("org.slf4j:slf4j-api:2.0.13")
+    compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.0")
+
 
     testImplementation(kotlin("test"))
 }

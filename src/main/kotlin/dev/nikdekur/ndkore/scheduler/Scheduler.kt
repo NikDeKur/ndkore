@@ -1,6 +1,20 @@
 package dev.nikdekur.ndkore.scheduler
 
+import dev.nikdekur.ndkore.scheduler.impl.CoroutineScheduler
+import dev.nikdekur.ndkore.scheduler.impl.ExecutorScheduler
+import java.util.concurrent.ScheduledExecutorService
 
+/**
+ * The scheduler interface is used to run tasks in different thread pools.
+ *
+ * There are several implementations of this interface, such as
+ * - [CoroutineScheduler] - runs tasks in the kotlin coroutines context
+ * - [ExecutorScheduler] - runs tasks using the java [ScheduledExecutorService]
+ *
+ * Different implementations can be used depending on the requirements of the project.
+ * For example, [CoroutineScheduler] allows to run very big number of tasks in a single thread pool,
+ * while [ExecutorScheduler] is precise in millisecond's timings (while coroutines are not).
+ */
 interface Scheduler {
 
     /**

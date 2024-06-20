@@ -34,10 +34,12 @@ class CoroutineScheduler(val scope: CoroutineScope) : AbstractScheduler(), Corou
                 delay(interval)
                 emit(Unit)
             }
-        }.onEach {
-            scope.launch {
-                task()
-            }}
+        }
+            .onEach {
+                scope.launch {
+                    task()
+                }
+            }
             .onCompletion { unregisterTask(taskId) }
             .launchIn(scope)
 

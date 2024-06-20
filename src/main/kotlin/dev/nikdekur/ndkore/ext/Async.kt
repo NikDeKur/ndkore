@@ -89,6 +89,6 @@ inline fun <T, R> CoroutineScope.parallel(
                 block(it)
             }
         }
-    }
+    } as List<Deferred<R>>
 
 }

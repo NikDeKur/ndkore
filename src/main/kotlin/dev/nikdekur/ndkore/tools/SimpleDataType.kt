@@ -39,6 +39,22 @@ enum class SimpleDataType : Placeholder {
         }
     }
 
+    fun convertOrNull(string: String): Any? {
+        return when (this) {
+            STRING -> string
+            INT -> string.toIntOrNull()
+            LONG -> string.toLongOrNull()
+            FLOAT -> string.toFloatOrNull()
+            DOUBLE -> string.toDoubleOrNull()
+            BOOLEAN -> string.toBooleanStrictOrNull()
+            CHAR -> string.singleOrNull()
+            BYTE -> string.toByteOrNull()
+            SHORT -> string.toShortOrNull()
+            BIG_INTEGER -> string.toBigIntegerOrNull()
+            BIG_DECIMAL -> string.toBigDecimalOrNull()
+        }
+    }
+
 
     companion object {
 

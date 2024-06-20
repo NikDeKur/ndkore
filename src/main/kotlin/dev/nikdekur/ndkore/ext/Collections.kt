@@ -6,6 +6,8 @@ import dev.nikdekur.ndkore.interfaces.Prioritizable
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.function.Predicate
+import java.util.concurrent.ConcurrentHashMap
+import java.util.Collections
 
 
 fun <T> newArrayList() = ArrayList<T>()
@@ -289,3 +291,6 @@ fun <T> Collection<T>.randomUnique(random: Random, amount: Int): Collection<T> {
 
     return list
 }
+
+
+inline fun <T> ConcurrentHashSet(): MutableSet<T> = Collections.newSetFromMap(ConcurrentHashMap())

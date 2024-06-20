@@ -2,7 +2,6 @@
 
 package dev.nikdekur.ndkore.ext
 
-import java.lang.Math.pow
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
@@ -106,7 +105,7 @@ val DECIMAL_FORMAT_SYMBOLS = DecimalFormatSymbols().apply {
 fun <T : Number> T.format(places: Int): String {
     require(places >= 0) { "Places must be positive" }
     val format = if (places > 0) {
-        "#,##0." + kotlin.text.buildString { repeat(places) { append('0') } }
+        "#,##0." + buildString { repeat(places) { append('0') } }
     } else {
         "#,##0"
     }

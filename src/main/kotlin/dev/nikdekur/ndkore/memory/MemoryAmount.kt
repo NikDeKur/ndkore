@@ -1,5 +1,6 @@
 package dev.nikdekur.ndkore.memory
 
+
 open class MemoryAmount(val unit: MemoryUnit, val amount: Long) {
     class AmountBytes(amount: Long) : MemoryAmount(MemoryUnit.Byte, amount)
     class AmountKB(amount: Long) : MemoryAmount(MemoryUnit.KB, amount)

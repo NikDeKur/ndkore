@@ -26,7 +26,8 @@ inline fun <T> Logger.recordTiming(level: Level = Level.INFO, name: String, bloc
     val result = block()
     val end = System.nanoTime()
 
-    val ms = ((end - start) / 1_000_000).format(2)
+    // Round to 2dp
+    val ms = ((end - start) / 1_000_000.0).format(2)
     atLevel(level)
         .log("$name took ${ms}ms")
 

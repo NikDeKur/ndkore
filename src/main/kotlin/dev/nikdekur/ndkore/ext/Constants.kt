@@ -22,6 +22,7 @@ object Patterns {
     val REMOVE_DIGITS = Regex("[\\d.]")
 
     val UUID = Regex("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$")
+    val WORD_SPLIT: Regex = Regex("\\s+")
 
     val REMOVE_TRAILING_COMA = Regex("0*$")
     val NEXT_LINE_PATTERN: Pattern = Pattern.compile("\n")

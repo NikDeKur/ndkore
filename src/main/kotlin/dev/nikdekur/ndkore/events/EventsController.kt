@@ -5,10 +5,10 @@ import java.lang.reflect.Method
 import java.util.concurrent.CopyOnWriteArrayList
 
 @Suppress("unused")
-class EventsController<EventClass : Any> {
+class EventsController<E : Any> {
     val registeredListeners = CopyOnWriteArrayList<InstanceMethodsBound>()
 
-    fun invoke(event: EventClass) {
+    fun invoke(event: E) {
         for (bound in registeredListeners) {
             bound.invoke(event)
         }
@@ -20,7 +20,7 @@ class EventsController<EventClass : Any> {
     }
 
     inner class InstanceMethodsBound(val instance: Any) {
-        val map = SetsHashMap<Class<out EventClass>, Method>()
+        val map = SetsHashMap<Class<out E>, Method>()
 
         init {
             for (method in instance.javaClass.methods) {
@@ -33,11 +33,11 @@ class EventsController<EventClass : Any> {
             val annotation: Annotation? = method.getAnnotation(EventHandler::class.java)
             if (annotation == null || method.parameterCount != 1) return
 
-            val argType = method.parameterTypes[0] as? Class<out EventClass> ?: return
+            val argType = method.parameterTypes[0] as? Class<out E> ?: return
             map.add(argType, method)
         }
 
-        fun invoke(event: EventClass) {
+        fun invoke(event: E) {
             val clazz = event::class.java
             val methods: Collection<Method> = map[clazz]
             for (method in methods) {

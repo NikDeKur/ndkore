@@ -23,6 +23,7 @@ annotation class EventHandler(
      * @return the priority
      */
     val priority: EventPriority = EventPriority.NORMAL,
+
     /**
      * Define if the handler ignores a cancelled event.
      *
@@ -32,5 +33,5 @@ annotation class EventHandler(
      *
      * @return whether cancelled events should be ignored
      */
-    val ignoreCancelled: Boolean = false
+    val ignoreCancelled: Boolean = false,
 )

@@ -67,7 +67,7 @@ inline fun buildRepresentation(obj: Any): String {
             try {
                 val publicGetter = clazz.getMethod(getterName)
                 var value: Any? = publicGetter.invoke(obj)
-                if (value is String && value != null) {
+                if (value is String) {
                     value = "\"$value\""
                 }
                 values[field.name] = value
@@ -85,3 +85,6 @@ inline fun buildRepresentation(obj: Any): String {
         "${it.key}=${it.value}"
     }
 }
+
+
+inline infix fun <K, V> K.singleMap(value: V): Map<K, V> = mapOf(this to value)

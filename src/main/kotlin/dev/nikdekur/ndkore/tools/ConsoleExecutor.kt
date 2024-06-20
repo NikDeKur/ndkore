@@ -1,53 +1,38 @@
 package dev.nikdekur.ndkore.tools
 
 import dev.nikdekur.ndkore.ext.*
-import java.util.concurrent.CompletableFuture
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 
-object ConsoleExecutor {
+class ConsoleExecutor(val dispatcher: CoroutineDispatcher) {
 
-    @JvmStatic
-    fun run(command: List<String>): CompletableFuture<CommandResult> {
-        val future = CompletableFuture<CommandResult>()
+    suspend fun run(command: List<String>): CommandResult {
+        return withContext(dispatcher) {
+            val process = ProcessBuilder(command)
+                .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                .redirectError(ProcessBuilder.Redirect.PIPE)
+                .start()
 
-        Thread {
-            val processBuilder = ProcessBuilder(command)
-            val process = processBuilder.start()
-
-            val output: MutableList<String> = mutableListOf()
-            process.inputStream.bufferedReader().useLines { lines ->
-                lines.forEach { line -> output.add(line) }
-            }
+            val output = process.inputStream.bufferedReader().readLines()
+            val error = process.errorStream.bufferedReader().readLines()
 
             val exitCode = process.waitFor()
-            future.complete(CommandResult(command, output, exitCode))
-        }.start()
 
-        return future
-    }
-
-    @JvmStatic
-    val PATTERN_WORD_SPLIT: Regex = Regex("\\s+")
-
-    @JvmStatic
-    fun run(command: String): CompletableFuture<CommandResult> {
-        val commandsList = command.split(PATTERN_WORD_SPLIT)
-        return run(commandsList)
-    }
-
-    @JvmStatic
-    fun runGroup(commands: List<String>): CompletableFuture<List<CommandResult>> {
-        val firstCommand = run(commands.first())
-        return commands.drop(1).fold(listOf(firstCommand)) { acc, cmd ->
-            acc + acc.last().thenCompose { run(cmd) }
-        }.let { allOfList ->
-            CompletableFuture.allOf(*allOfList.toTArray())
-                .thenApply { allOfList.map { it.join() } }
+            CommandResult(command, output, error, exitCode)
         }
+    }
+
+
+    suspend fun run(command: String): CommandResult {
+        val commandsList = command.split(Patterns.WORD_SPLIT)
+        return run(commandsList)
     }
 }
 
 
-data class CommandResult(val commands: List<String>,
-                         val consoleOutput: List<String>,
-                         val exitCode: Int,
-                         val command: String = commands.joinToString(" "))
+data class CommandResult(
+    val commands: List<String>,
+    val output: List<String>,
+    val errorOutput: List<String>,
+    val exitCode: Int,
+)

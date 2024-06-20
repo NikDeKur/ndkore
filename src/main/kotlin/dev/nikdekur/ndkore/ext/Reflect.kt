@@ -10,7 +10,8 @@ import java.lang.reflect.Method
 
 inline val ReflectResult.result: Any?
     get() {
-        check(this is ReflectResult.Success) { "Result is not success" }
+        if (this !is ReflectResult.Success)
+            return null
         return result
     }
 

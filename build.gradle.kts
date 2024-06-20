@@ -24,7 +24,7 @@ repositories {
     }
 }
 
-val javaVersion = JavaVersion.VERSION_11
+val javaVersion = JavaVersion.VERSION_1_8
 java {
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
@@ -36,13 +36,11 @@ java {
 }
 
 dependencies {
-    compileOnly("org.yaml:snakeyaml:2.0")
-    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC2")
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC")
     compileOnly("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
     compileOnly("com.google.guava:guava:32.1.3-jre")
-    compileOnly("com.google.code.gson:gson:2.10.1")
+    compileOnly("com.google.code.gson:gson:2.11.0")
     compileOnly("org.slf4j:slf4j-api:2.0.13")
-    compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.0")
 
 
     testImplementation(kotlin("test"))

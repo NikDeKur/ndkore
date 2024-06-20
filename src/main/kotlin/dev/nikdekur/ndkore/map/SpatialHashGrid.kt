@@ -3,11 +3,13 @@
 package dev.nikdekur.ndkore.map
 
 import dev.nikdekur.ndkore.spatial.Point
+import java.util.concurrent.ConcurrentHashMap
+import java.util.Collections
 
 abstract class SpatialHashGrid<T>(val cellSize: Int) {
 
-    val grid = HashMap<Point, HashSet<T>>()
-    private val newSetGen = { _: Point -> HashSet<T>()}
+    val grid = ConcurrentHashMap<Point, MutableSet<T>>()
+    private val newSetGen = { _: Point -> Collections.newSetFromMap(ConcurrentHashMap<T, Boolean>()) }
     private val reusablePoint = Point(0, 0, 0)
 
 

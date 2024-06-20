@@ -111,21 +111,12 @@ object Reflect {
         return callMethodTyped(clazz, obj, name, classes, *args)
     }
 
-
-    val getMethodOrNullMethod: Method by lazy {
-        Class::class.java.getDeclaredMethod(
-            "getMethod0",
-            String::class.java,
-            arrayOf<Class<*>>().javaClass,
-            Boolean::class.java,
-        ).also {
-            it.isAccessible = true
-        }
-    }
-
     inline fun getMethodOrNull(clazz: Class<*>, name: String, classes: Array<out Class<*>>): Method? {
-        val result = getMethodOrNullMethod.invoke(clazz, name, classes, true)
-        return result as? Method
+        return try {
+            clazz.getMethod(name, *classes)
+        } catch (_: NoSuchMethodException) {
+            null
+        }
     }
 
     fun getUnsafe(): Unsafe {

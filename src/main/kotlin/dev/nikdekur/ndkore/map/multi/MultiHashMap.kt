@@ -1,3 +1,11 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2024 Nik De Kur
+ */
+
 package dev.nikdekur.ndkore.map.multi
 
 open class MultiHashMap<K1, K2, V : Any> : MultiMap<K1, K2, V>, HashMap<K1, MutableMap<K2, V>>() {
@@ -19,7 +27,7 @@ open class MultiHashMap<K1, K2, V : Any> : MultiMap<K1, K2, V>, HashMap<K1, Muta
     }
 
     override fun contains(k1: K1, k2: K2): Boolean {
-        return get(k1)?.containsKey(k2) ?: false
+        return get(k1)?.containsKey(k2) == true
     }
 
 

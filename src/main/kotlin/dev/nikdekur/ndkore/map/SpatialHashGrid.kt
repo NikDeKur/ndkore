@@ -1,10 +1,18 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2024 Nik De Kur
+ */
+
 @file:Suppress("NOTHING_TO_INLINE")
 
 package dev.nikdekur.ndkore.map
 
 import dev.nikdekur.ndkore.spatial.Point
-import java.util.concurrent.ConcurrentHashMap
 import java.util.Collections
+import java.util.concurrent.ConcurrentHashMap
 
 abstract class SpatialHashGrid<T>(val cellSize: Int) {
 

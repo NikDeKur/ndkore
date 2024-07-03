@@ -39,11 +39,7 @@ bin/
 
 ### Gradle ###
 .gradle/
-gradle/
 .kotlin/
 build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
-gradlew.bat
-gradlew
+**/build/*
+!**/build/generated/

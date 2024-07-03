@@ -2,12 +2,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
     alias(libs.plugins.kotlinJvm)
+    alias(libs.plugins.licenser)
     id("java")
     id("maven-publish")
 }
 
 group = "dev.nikdekur"
 version = "1.1.0"
+val author = "Nik De Kur"
 
 repositories {
     mavenCentral()
@@ -53,6 +55,17 @@ tasks.named("compileKotlin", KotlinCompilationTask::class.java) {
     }
 }
 
+
+license {
+    header(project.file("HEADER.txt"))
+    properties {
+        set("year", "2024")
+        set("name", author)
+    }
+    ignoreFailures = true
+}
+
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
@@ -64,7 +77,7 @@ publishing {
                 developers {
                     developer {
                         id.set("nikdekur")
-                        name.set("Nik De Kur")
+                        name.set(author)
                     }
                 }
             }

@@ -1,8 +1,16 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (c) 2024 Nik De Kur
+ */
+
 package dev.nikdekur.ndkore.scheduler.impl
 
-import kotlinx.coroutines.runBlocking
 import dev.nikdekur.ndkore.scheduler.AbstractScheduler
 import dev.nikdekur.ndkore.scheduler.SchedulerTask
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.concurrent.ScheduledExecutorService

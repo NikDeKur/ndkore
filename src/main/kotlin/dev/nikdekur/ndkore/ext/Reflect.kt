@@ -6,14 +6,8 @@ import dev.nikdekur.ndkore.reflect.Reflect
 import dev.nikdekur.ndkore.reflect.ReflectResult
 import java.lang.reflect.AccessibleObject
 import java.lang.reflect.Constructor
+import java.lang.reflect.Field
 import java.lang.reflect.Method
-
-inline val ReflectResult.result: Any?
-    get() {
-        if (this !is ReflectResult.Success)
-            return null
-        return result
-    }
 
 inline fun findClass(name: String): Class<*>? {
     return try {
@@ -23,28 +17,34 @@ inline fun findClass(name: String): Class<*>? {
     }
 }
 
+inline fun Class<*>.searchField(name: String): Field? {
+    return Reflect.searchField(this, name)
+}
+
+inline fun Class<*>.searchFieldRecursive(name: String): Field? {
+    return Reflect.searchFieldRecursive(this, name)
+}
+
+inline fun Class<*>.searchMethod(name: String, classes: Array<out Class<*>>): Method? {
+    return Reflect.searchMethod(this, name, classes)
+}
+
+inline fun Class<*>.searchMethodRecursive(name: String, classes: Array<out Class<*>>): Method? {
+    return Reflect.searchMethodRecursive(this, name, classes)
+}
+
+
 inline val Any.r_ClassFields: Map<String, Any?>
     get() = Reflect.getClassFields(javaClass, this)
 
 inline val Any.r_ClassMethods: HashMap<String, Method>
     get() = Reflect.getClassMethods(javaClass)
 
-inline fun Any.r_GetField(name: String) = Reflect.getField(javaClass, this, name)
+inline fun Any.r_GetField(name: String) = Reflect.getFieldValue(javaClass, this, name)
 
-inline fun Any.r_SetField(name: String, value: Any?) = Reflect.setField(javaClass, this, name, value)
+inline fun Any.r_SetField(name: String, value: Any?) = Reflect.setFieldValue(javaClass, this, name, value)
 
 
-inline fun Class<*>.getMethodOrNull(name: String, classes: Array<out Class<*>>): Method? {
-    var objClass: Class<*>? = this
-    while (objClass != null) {
-        val method = Reflect.getMethodOrNull(objClass, name, classes)
-        if (method != null)
-            return method
-
-        objClass = objClass.superclass
-    }
-    return null
-}
 
 inline fun Any.r_CallMethodTyped(name: String, classes: Array<out Class<*>>, vararg args: Any?) : ReflectResult {
     return Reflect.callMethodTyped(javaClass, this, name, classes, *args)

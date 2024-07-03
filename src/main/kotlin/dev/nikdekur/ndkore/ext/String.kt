@@ -53,7 +53,7 @@ inline fun String.toBooleanSmart(): Boolean {
     }
 }
 
-inline fun String.toBooleanOrNullSmart(): Boolean? {
+inline fun String.toBooleanSmartOrNull(): Boolean? {
     return when (this) {
         "true", "1", "yes", "on" -> true
         "false", "0", "no", "off" -> false

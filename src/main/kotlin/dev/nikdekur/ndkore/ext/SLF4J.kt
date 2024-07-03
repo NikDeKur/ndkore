@@ -9,13 +9,23 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 inline fun Logger.log(level: Level, msg: String) = atLevel(level).log(msg)
-inline fun Logger.log(level: Level, msg: () -> String) = log(level, msg())
 
+inline fun Logger.log(level: Level, msg: () -> String) = log(level, msg())
 inline fun Logger.trace(msg: () -> String) = trace(msg())
 inline fun Logger.debug(msg: () -> String) = debug(msg())
 inline fun Logger.info(msg: () -> String) = info(msg())
 inline fun Logger.warn(msg: () -> String) = warn(msg())
 inline fun Logger.error(msg: () -> String) = error(msg())
+
+
+inline fun Logger.log(level: Level, throwable: Throwable, msg: () -> String) =
+    atLevel(level).setCause(throwable).log(msg())
+
+inline fun Logger.trace(throwable: Throwable, msg: () -> String) = trace(msg(), throwable)
+inline fun Logger.debug(throwable: Throwable, msg: () -> String) = debug(msg(), throwable)
+inline fun Logger.info(throwable: Throwable, msg: () -> String) = info(msg(), throwable)
+inline fun Logger.warn(throwable: Throwable, msg: () -> String) = warn(msg(), throwable)
+inline fun Logger.error(throwable: Throwable, msg: () -> String) = error(msg(), throwable)
 
 inline fun <T> Logger.recordTiming(level: Level = Level.INFO, name: String, block: () -> T): T {
     contract {

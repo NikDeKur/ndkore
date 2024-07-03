@@ -2,11 +2,11 @@
 
 package dev.nikdekur.ndkore.ext
 
-import org.checkerframework.checker.units.qual.K
 import dev.nikdekur.ndkore.interfaces.Snowflake
 import java.util.*
 import java.util.AbstractMap.SimpleEntry
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
 import java.util.function.Function
 
 
@@ -77,6 +77,11 @@ inline fun <T, K, V> Collection<T>.toConcurrentMap(key: Function<T, K>, value: F
 }
 inline fun <T, K, V> Collection<T>.toUnmodifiableMap(key: Function<T, K>, value: Function<T, V>): Map<K, V> {
     return stream().toUnmodifiableMap(key, value)
+}
+
+
+inline fun <K, V> Map<K, V>.toConcurrentMap(): ConcurrentMap<K, V> {
+    return ConcurrentHashMap(this)
 }
 
 
@@ -273,4 +278,16 @@ fun <V> Map<String, V>.getNested(key: String, separator: String): V? {
         map = map[keys[i]] as? Map<String, V> ?: return null
     }
     return map[keys.last()]
+}
+
+/**
+ * Call [block] for each entry in the map and clear the map
+ *
+ * @param block block to call for each entry
+ */
+inline fun <K, V> MutableMap<K, V>.clear(block: Map.Entry<K, V>.() -> Unit) {
+    forEach {
+        block(it)
+    }
+    clear()
 }

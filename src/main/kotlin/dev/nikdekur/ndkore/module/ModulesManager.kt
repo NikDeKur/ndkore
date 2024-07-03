@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 
 class ModulesManager<A> {
 
-    val logger: Logger = LoggerFactory.getLogger("Classlint-ModulesManager")
+    val logger: Logger = LoggerFactory.getLogger("ModulesManager")
 
     val modules = LinkedHashMap<String, Module<A>>()
     val modulesState = HashMap<String, ModuleState>()

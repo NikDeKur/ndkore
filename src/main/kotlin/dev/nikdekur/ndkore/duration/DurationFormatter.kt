@@ -1,6 +1,5 @@
 package dev.nikdekur.ndkore.duration
 
-import dev.nikdekur.ndkore.reflect.ReflectResult
 import dev.nikdekur.ndkore.ext.*
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
@@ -204,11 +203,10 @@ class DurationFormatter {
                 val formatterClass = getNestedClass<DurationFormatter>(language.uppercase())
                 return (formatterClass
                     .getInstanceField()
-                    .r_CallMethod("format", duration)
-                    as ReflectResult.Success)
-                    .result as String
+                    .r_CallMethod("format", duration))
+                    .value as String
 
-            } catch (e: ClassNotFoundException) {
+            } catch (_: ClassNotFoundException) {
                 val formatter = extraFormatters[language]
                 if (formatter != null) {
                     return formatter.format(duration)

@@ -1,12 +1,13 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+
 plugins {
-    kotlin("jvm") version "2.0.0"
+    alias(libs.plugins.kotlinJvm)
+    id("java")
     id("maven-publish")
 }
 
-val kotlin_version: String by project
-
 group = "dev.nikdekur"
-version = "1.0.0"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
@@ -35,15 +36,21 @@ java {
     }
 }
 
-dependencies {
-    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC")
-    compileOnly("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
-    compileOnly("com.google.guava:guava:32.1.3-jre")
-    compileOnly("com.google.code.gson:gson:2.11.0")
-    compileOnly("org.slf4j:slf4j-api:2.0.13")
 
+dependencies {
+    compileOnly(libs.kotlinx.coroutines)
+    compileOnly(libs.kotlin.reflect)
+    compileOnly(libs.google.guava)
+    compileOnly(libs.google.gson)
+    compileOnly(libs.slf4j.api)
 
     testImplementation(kotlin("test"))
+}
+
+tasks.named("compileKotlin", KotlinCompilationTask::class.java) {
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xno-param-assertions", "-Xno-call-assertions")
+    }
 }
 
 publishing {

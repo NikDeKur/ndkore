@@ -10,72 +10,52 @@ class PlaceholderParser(symbolLeft: String, symbolRight: String) {
 
     constructor(symbol: String) : this(symbol, symbol)
 
-    fun parseExpressionHard(pathRaw: String, placeholders: Map<String, Iterable<Any>>): String? {
-        var latestObject: Any? = null
-        val pathRaw2 = pathRaw.split(".")
-        if (pathRaw2.size == 1) return placeholders[pathRaw2[0]]?.first()?.toString()
-        val mainKey = pathRaw2[0]
-        val path = pathRaw2.subList(1, pathRaw2.size)
-        val placeholdersForKey = placeholders[mainKey] ?: return null
-        for (pathPart in path) {
-            if (latestObject == null) {
-                for (placeholder in placeholdersForKey) {
-                    latestObject = findValue(placeholder, pathPart)
-                    if (latestObject != null) break
-                }
-            } else {
-                latestObject = findValue(latestObject, pathPart)
-            }
-            if (latestObject == null) return null
-        }
-        return latestObject?.toString()
-    }
-
     fun parseExpression(pathRaw: String, placeholders: Map<String, Any>): String? {
-        var latestObject: Any? = null
-        val pathRaw2 = pathRaw.split(".")
-        if (pathRaw2.size == 1) return placeholders[pathRaw2[0]]?.toString()
-        val mainKey = pathRaw2[0]
-        val path = pathRaw2.subList(1, pathRaw2.size)
-        val value = placeholders[mainKey] ?: return null
-        for (pathPart in path) {
-            latestObject = if (latestObject == null) {
-                findValue(value, pathPart)
+        val parts = pathRaw.split(".")
+        var currentObject: Any? = placeholders[parts[0]] ?: return null
+
+        if (parts.size == 1) {
+            return if (currentObject is Iterable<*>) {
+                currentObject.iterator().next()?.toString()
             } else {
-                findValue(latestObject, pathPart)
+                currentObject.toString()
             }
-            if (latestObject == null) return null
         }
-        return latestObject?.toString()
+
+        for (partI in 1 until parts.size) {
+            val part = parts[partI]
+            currentObject = if (currentObject is Iterable<*>) {
+                var found: Any? = null
+                for (item in currentObject) {
+                    found = findValue(item!!, part)
+                    if (found != null) break
+                }
+                found
+            } else {
+                findValue(currentObject!!, part)
+            }
+            if (currentObject == null) return null
+        }
+
+        return currentObject.toString()
     }
 
-    fun parse(string: String, placeholders: Map<String, Iterable<Any>>): String {
+    fun parse(string: String, placeholders: Map<String, Any>): String {
         val sb = StringBuilder()
         val matcher = pattern.matcher(string)
         var lastEnd = 0
         while (matcher.find()) {
             sb.append(string, lastEnd, matcher.start())
             val matchString = matcher.group(1)
-            sb.append(parseExpressionHard(matchString, placeholders) ?: matcher.group())
+            sb.append(parseExpression(matchString, placeholders) ?: matcher.group())
             lastEnd = matcher.end()
         }
         sb.append(string.substring(lastEnd))
         return sb.toString()
     }
 
-    fun parse(string: String, vararg placeholders: Pair<String, Any>): String {
-        val map = placeholders.toMap()
-        val sb = StringBuilder()
-        val matcher = pattern.matcher(string)
-        var lastEnd = 0
-        while (matcher.find()) {
-            sb.append(string, lastEnd, matcher.start())
-            val matchString = matcher.group(1)
-            sb.append(parseExpression(matchString, map) ?: matcher.group())
-            lastEnd = matcher.end()
-        }
-        sb.append(string.substring(lastEnd))
-        return sb.toString()
+    inline fun parse(string: String, vararg placeholders: Pair<String, Any>): String {
+        return parse(string, placeholders.toMap())
     }
 
     companion object {
@@ -90,24 +70,9 @@ class PlaceholderParser(symbolLeft: String, symbolRight: String) {
                 val value = obj.placeholderMap[valueName]
                 if (value != null) return value
             }
-            return obj.r_GetField(valueName).result
-                ?: obj.r_CallMethod(valueName.asCamelCaseGetter()).result
-                ?: obj.r_CallMethod(valueName).result
+            return obj.r_GetField(valueName).value
+                ?: obj.r_CallMethod(valueName.asCamelCaseGetter()).value
+                ?: obj.r_CallMethod(valueName).value
         }
-
-//        class Placeholders : HashMap<String, Iterable<Placeholders>>(), Map<String, Iterable<Placeholders>> {
-//        }
-//
-//        inline fun placeholders(generator: () -> Map<String, Iterable<StrPlaceholder>>): Map<String, Iterable<StrPlaceholder>> {
-//            return generator()
-//        }
-//
-//        inline fun newGroup(name: String, vararg elements: Pair<String, Any>): Pair<String, Iterable<StrPlaceholder>> {
-//            return setOf(elements)
-//        }
-//
-//        inline fun newElement(name: String, value: Any): Pair<String, Any> {
-//            return name to value
-//        }
     }
 }

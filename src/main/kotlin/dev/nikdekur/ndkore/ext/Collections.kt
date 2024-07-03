@@ -4,10 +4,10 @@ package dev.nikdekur.ndkore.ext
 
 import dev.nikdekur.ndkore.interfaces.Prioritizable
 import java.util.*
+import java.util.Collections
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.function.Predicate
-import java.util.concurrent.ConcurrentHashMap
-import java.util.Collections
 
 
 fun <T> newArrayList() = ArrayList<T>()
@@ -293,4 +293,39 @@ fun <T> Collection<T>.randomUnique(random: Random, amount: Int): Collection<T> {
 }
 
 
+/**
+ * A method to create a concurrent hash set.
+ *
+ * Method uses the [Collections.newSetFromMap] method to create a concurrent hash set from a [ConcurrentHashMap].
+ *
+ * @return A concurrent hash set
+ */
+@Suppress("FunctionName")
 inline fun <T> ConcurrentHashSet(): MutableSet<T> = Collections.newSetFromMap(ConcurrentHashMap())
+
+
+/**
+ * An optimised variant of [listOfNotNull].
+ *
+ * The method will create a new list and add all elements that are not null.
+ *
+ * @param elements The elements to add to the list
+ * @return A list of non-null elements
+ * @see listOfNotNull
+ */
+inline fun <T> notNullListOf(vararg elements: T?): List<T> {
+    val list = LinkedList<T>()
+    elements.forEach { if (it != null) list.add(it) }
+    return list
+}
+
+/**
+ * Adds all elements that are not null to the list.
+ *
+ * Does not create a new list, but adds elements to the existing list.
+ *
+ * @param elements The elements to add to the list
+ */
+inline fun <T> MutableList<T>.addAllNotNull(vararg elements: T?) {
+    elements.forEach { if (it != null) add(it) }
+}

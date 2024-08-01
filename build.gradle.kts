@@ -3,13 +3,17 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 plugins {
     alias(libs.plugins.kotlinJvm)
     alias(libs.plugins.licenser)
+    alias(libs.plugins.kotlinSerialization)
     id("java")
     id("maven-publish")
 }
 
 group = "dev.nikdekur"
-version = "1.1.0"
-val author = "Nik De Kur"
+version = "1.2.0"
+
+val authorId: String by project
+val authorName: String by project
+
 
 repositories {
     mavenCentral()
@@ -39,12 +43,15 @@ java {
 }
 
 
+
 dependencies {
     compileOnly(libs.kotlinx.coroutines)
     compileOnly(libs.kotlin.reflect)
     compileOnly(libs.google.guava)
-    compileOnly(libs.google.gson)
+    compileOnly(libs.kotlinx.serialization)
+
     compileOnly(libs.slf4j.api)
+    compileOnly(libs.kaml)
 
     testImplementation(kotlin("test"))
 }
@@ -57,10 +64,10 @@ tasks.named("compileKotlin", KotlinCompilationTask::class.java) {
 
 
 license {
-    header(project.file("HEADER.txt"))
+    header(project.file("HEADER"))
     properties {
-        set("year", "2024")
-        set("name", author)
+        set("year", "2024-present")
+        set("name", authorName)
     }
     ignoreFailures = true
 }
@@ -76,8 +83,8 @@ publishing {
             pom {
                 developers {
                     developer {
-                        id.set("nikdekur")
-                        name.set(author)
+                        id.set(authorId)
+                        name.set(authorName)
                     }
                 }
             }

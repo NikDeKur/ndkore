@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  *
- * Copyright (c) 2024 Nik De Kur
+ * Copyright (c) 2024-present "Nik De Kur"
  */
 
 @file:Suppress("NOTHING_TO_INLINE", "OVERRIDE_BY_INLINE")
@@ -14,47 +14,65 @@ import java.io.File
 import java.util.function.Predicate
 
 /**
- * Class finder for finding classes in a package.
+ * A utility class for finding and working with classes within a specified package.
  *
- * Has a functionality to filter classes, create instances of classes and handle exceptions.
- * Most of those methods are open for overriding.
+ * This class provides functionality to discover classes within a given package, filter them based on custom criteria,
+ * create instances of these classes, and handle exceptions that might occur during the class discovery process.
+ * It is useful in scenarios such as plugin systems or dynamic class loading where classes need to be discovered
+ * and instantiated at runtime.
  *
- * @param classLoader The class loader to use for class loading.
- * @param packageName The package name to search for classes in.
+ * **Overview of `ClassFinder`:**
+ * - **Class Discovery:** Finds all classes within the specified package.
+ * - **Filtering:** Allows filtering classes based on custom criteria.
+ * - **Instance Creation:** Provides functionality to create instances of found classes.
+ * - **Error Handling:** Customizable error handling during class discovery.
+ *
+ * **Properties:**
+ * - `classLoader`: The class loader used for loading classes.
+ * - `packageName`: The name of the package to search for classes in.
+ *
+ * @param classLoader The class loader used for loading classes.
+ * @param packageName The name of the package to search for classes in.
  */
 open class ClassFinder(val classLoader: ClassLoader, val packageName: String) {
 
     /**
-     * Filter classes by class object.
+     * Determines whether a class should be included in the results based on custom filtering logic.
      *
-     * Called after finding a class and deciding whether to add it to the result list.
+     * This method is called after a class is found in the package.
+     * Subclasses can override this method
+     * to apply specific filtering criteria.
      *
      * @param clazz The class object to filter.
-     * @return True if the class should be added to the result list, false otherwise.
+     * @return `true` if the class should be included in the results, `false` otherwise.
      */
     open fun filter(clazz: Class<*>): Boolean {
         return true
     }
 
     /**
-     * Called when an exception occurs during class search.
+     * Handles exceptions that occur during the class discovery process.
+     *
+     * This method is called when an error occurs while trying to find classes.
+     * By default, it returns
+     * an empty list, but subclasses can override it to provide custom error handling.
      *
      * @param e The exception that occurred.
-     * @return A list that will be returned by the findClasses method.
+     * @return A list of classes that should be returned in the case of an error. By default, returns an empty list.
      */
     open fun onGlobalError(e: Throwable): List<Class<*>> {
         return emptyList()
     }
 
     /**
-     * Find a class by name.
+     * Finds a class by its fully qualified name.
      *
-     * Called when a class is found in the package. If the class is not found, it will return null.
+     * This method attempts to load a class with the specified name.
+     * If the class cannot be found,
+     * it returns `null`.
      *
-     * If null is returned, class will not be added to the result list.
-     *
-     * @param name The name of the class to find.
-     * @return The class object if found, null otherwise.
+     * @param name The fully qualified name of the class to find.
+     * @return The class object if found, or `null` if the class cannot be found.
      */
     open fun findClass(name: String): Class<*>? {
         return try {
@@ -65,14 +83,14 @@ open class ClassFinder(val classLoader: ClassLoader, val packageName: String) {
     }
 
     /**
-     * Create a new instance of a class.
+     * Creates a new instance of a class.
      *
-     * Called after finding a class and deciding to create an instance of it.
-     *
-     * If null is returned, the class will not be added to the result list.
+     * This method attempts to create a new instance of the specified class.
+     * If instantiation fails,
+     * it returns `null`.
      *
      * @param clazz The class object to create an instance of.
-     * @return The instance of the class if created, null otherwise.
+     * @return The new instance of the class if created successfully, or `null` otherwise.
      */
     open fun newInstance(clazz: Class<*>): Any? {
         return try {
@@ -83,22 +101,24 @@ open class ClassFinder(val classLoader: ClassLoader, val packageName: String) {
     }
 
     /**
-     * Find classes in the package.
+     * Finds all classes in the specified package.
      *
-     * @return A list of classes found in the package.
+     * This method scans the package directory for `.class` files, loads the class objects, applies
+     * the filter, and returns a list of classes that pass the filter criteria.
+     *
+     * @return A list of classes found in the package, after applying the filter.
      */
     fun findClasses(): List<Class<*>> {
-        val packageName = packageName
+        val path = packageName.replace('.', '/')
         return try {
-            val path = packageName.replace('.', '/')
             val resources = classLoader.getResources(path)
-            val classes = ArrayList<Class<*>>()
+            val classes = mutableListOf<Class<*>>()
             while (resources.hasMoreElements()) {
                 val resource = resources.nextElement()
                 if (resource.protocol != "file") continue
                 val directory = File(resource.file)
                 val files = directory.listFiles() ?: continue
-                for (file: File in files) {
+                for (file in files) {
                     if (!file.isFile || !file.name.endsWith(".class")) continue
                     val className = packageName + '.' + file.name.substring(0, file.name.length - 6)
                     val clazz = findClass(className) ?: continue
@@ -113,9 +133,13 @@ open class ClassFinder(val classLoader: ClassLoader, val packageName: String) {
     }
 
     /**
-     * Find instances of classes in the package.
+     * Finds and creates instances of classes in the specified package.
      *
-     * @return A list of classes' instances found in the package.
+     * This method first finds all classes in the package and then attempts to create instances of
+     * these classes.
+     * Classes that cannot be instantiated are excluded from the result.
+     *
+     * @return An instance's list of the classes found in the package that could be instantiated.
      */
     fun findInstances(): List<Any> {
         return findClasses().mapNotNull(this::newInstance)
@@ -124,40 +148,49 @@ open class ClassFinder(val classLoader: ClassLoader, val packageName: String) {
     companion object {
 
         /**
-         * Create a new instance of the class finder.
+         * Creates a new instance of `ClassFinder` with a custom filter.
+         *
+         * This factory method allows creating a `ClassFinder` with a specific filter function applied to
+         * determine which classes should be included.
          *
          * @param packageName The package name to search for classes in.
          * @param classLoader The class loader to use for class loading.
-         * @param filter The filter to use for filtering classes.
-         * @return The created class finder.
+         * @param filter The filter function to apply to each class to determine if it should be included.
+         * @return A new `ClassFinder` instance with the specified parameters.
          */
         inline fun new(packageName: String, classLoader: ClassLoader, filter: Predicate<Class<*>>): ClassFinder {
             return object : ClassFinder(classLoader, packageName) {
-                override inline fun filter(clazz: Class<*>): Boolean {
+                override fun filter(clazz: Class<*>): Boolean {
                     return filter.test(clazz)
                 }
             }
         }
 
         /**
-         * Find classes in the package.
+         * Finds all classes in a package using a custom filter.
+         *
+         * This utility method creates a new `ClassFinder` instance and uses it to find classes in the
+         * specified package with the provided filter function.
          *
          * @param packageName The package name to search for classes in.
          * @param classLoader The class loader to use for class loading.
-         * @param filter The filter to use for filtering classes.
-         * @return A list of classes found in the package.
+         * @param filter The filter function to apply to each class to determine if it should be included.
+         * @return A list of classes found in the package that pass the filter.
          */
         inline fun findClasses(packageName: String, classLoader: ClassLoader, filter: Predicate<Class<*>>): List<Class<*>> {
             return new(packageName, classLoader, filter).findClasses()
         }
 
         /**
-         * Find instances of classes in the package.
+         * Finds and creates instances of classes in a package using a custom filter.
+         *
+         * This utility method creates a new `ClassFinder` instance and uses it to find classes and
+         * create instances of these classes in the specified package with the provided filter function.
          *
          * @param packageName The package name to search for classes in.
          * @param classLoader The class loader to use for class loading.
-         * @param filter The filter to use for filtering classes.
-         * @return A list of classes' instances found in the package.
+         * @param filter The filter function to apply to each class to determine if it should be included.
+         * @return An instance's list of the classes found in the package that could be instantiated.
          */
         inline fun findInstances(packageName: String, classLoader: ClassLoader, filter: Predicate<Class<*>>): List<Any> {
             return new(packageName, classLoader, filter).findInstances()

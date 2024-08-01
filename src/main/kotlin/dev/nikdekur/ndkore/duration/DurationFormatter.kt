@@ -3,14 +3,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  *
- * Copyright (c) 2024 Nik De Kur
+ * Copyright (c) 2024-present "Nik De Kur"
  */
 
 package dev.nikdekur.ndkore.duration
 
 import dev.nikdekur.ndkore.ext.*
-import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
 class DurationFormatter {
 
@@ -18,10 +19,10 @@ class DurationFormatter {
 
     object RU : Formatter {
         override fun format(duration: Duration): String {
-            val years = duration.toDays() / 365
-            val months = duration.toDays() % 365 / 30
-            val weeks = duration.toDays() % 365 % 30 / 7
-            val days = duration.toDays() % 365 % 30 % 7
+            val years = duration.toInt(DurationUnit.DAYS) / 365
+            val months = duration.toInt(DurationUnit.DAYS) % 365 / 30
+            val weeks = duration.toInt(DurationUnit.DAYS) % 365 % 30 / 7
+            val days = duration.toInt(DurationUnit.DAYS) % 365 % 30 % 7
             val hours = duration.toHoursPart()
             val minutes = duration.toMinutesPart()
             val seconds = duration.toSecondsPart()
@@ -68,10 +69,10 @@ class DurationFormatter {
 
     object EN : Formatter {
         override fun format(duration: Duration): String {
-            val years = duration.toDays() / 365
-            val months = duration.toDays() % 365 / 30
-            val weeks = duration.toDays() % 365 % 30 / 7
-            val days = duration.toDays() % 365 % 30 % 7
+            val years = duration.toInt(DurationUnit.DAYS) / 365
+            val months = duration.toInt(DurationUnit.DAYS) % 365 / 30
+            val weeks = duration.toInt(DurationUnit.DAYS) % 365 % 30 / 7
+            val days = duration.toInt(DurationUnit.DAYS) % 365 % 30 % 7
             val hours = duration.toHoursPart()
             val minutes = duration.toMinutesPart()
             val seconds = duration.toSecondsPart()
@@ -106,12 +107,12 @@ class DurationFormatter {
     }
 
 
-    object UK : Formatter {
+    object UA : Formatter {
         override fun format(duration: Duration): String {
-            val years = duration.toDays() / 365
-            val months = duration.toDays() % 365 / 30
-            val weeks = duration.toDays() % 365 % 30 / 7
-            val days = duration.toDays() % 365 % 30 % 7
+            val years = duration.toInt(DurationUnit.DAYS) / 365
+            val months = duration.toInt(DurationUnit.DAYS) % 365 / 30
+            val weeks = duration.toInt(DurationUnit.DAYS) % 365 % 30 / 7
+            val days = duration.toInt(DurationUnit.DAYS) % 365 % 30 % 7
             val hours = duration.toHoursPart()
             val minutes = duration.toMinutesPart()
             val seconds = duration.toSecondsPart()
@@ -149,10 +150,10 @@ class DurationFormatter {
 
     object DE : Formatter {
         override fun format(duration: Duration): String {
-            val years = duration.toDays() / 365
-            val months = duration.toDays() % 365 / 30
-            val weeks = duration.toDays() % 365 % 30 / 7
-            val days = duration.toDays() % 365 % 30 % 7
+            val years = duration.toInt(DurationUnit.DAYS) / 365
+            val months = duration.toInt(DurationUnit.DAYS) % 365 / 30
+            val weeks = duration.toInt(DurationUnit.DAYS) % 365 % 30 / 7
+            val days = duration.toInt(DurationUnit.DAYS) % 365 % 30 % 7
             val hours = duration.toHoursPart()
             val minutes = duration.toMinutesPart()
             val seconds = duration.toSecondsPart()
@@ -197,6 +198,7 @@ class DurationFormatter {
 
     companion object {
 
+
         // TODO: Add Map for languages and remove slow reflect-search
         private val extraFormatters: ConcurrentHashMap<String, Formatter> = ConcurrentHashMap()
 
@@ -225,20 +227,15 @@ class DurationFormatter {
                 throw e
             }
         }
-
-
-        @JvmStatic
-        fun main(args: Array<String>) {
-            println("formatting duration")
-            println(Duration.ofSeconds(481).toReadableString("RU"))
-        }
     }
 
 
 
     class UnsupportedLanguageException(language: String) : RuntimeException("Support doesn't exists for '$language'")
 
-    interface Formatter { fun format(duration: Duration): String }
+    fun interface Formatter {
+        fun format(duration: Duration): String
+    }
 
 
     data class Configuration(
@@ -252,5 +249,3 @@ class DurationFormatter {
         val allowYears: Boolean = true
     )
 }
-
-typealias UA = DurationFormatter.UK

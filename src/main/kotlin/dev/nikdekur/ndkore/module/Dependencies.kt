@@ -3,10 +3,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  *
- * Copyright (c) 2024 Nik De Kur
+ * Copyright (c) 2024-present "Nik De Kur"
  */
 
 package dev.nikdekur.ndkore.module
+
+import dev.nikdekur.ndkore.NdkoreDSL
 
 /**
  * Represents dependencies of a plugin module.
@@ -61,6 +63,7 @@ class DependenciesBuilder {
     fun build() = Dependencies(before, after, first, last)
 }
 
+@NdkoreDSL
 inline fun dependencies(block: DependenciesBuilder.() -> Unit): Dependencies {
     val builder = DependenciesBuilder()
     builder.block()

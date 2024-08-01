@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  *
- * Copyright (c) 2024 Nik De Kur
+ * Copyright (c) 2024-present "Nik De Kur"
  */
 
 package dev.nikdekur.ndkore.scheduler.impl
@@ -17,11 +17,33 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 
 /**
- * Implementation of the GlobalScheduler interface
+ * ExecutorScheduler is a concrete implementation of [AbstractScheduler] that uses a Java
+ * [ScheduledExecutorService] to schedule and run tasks. It allows tasks to be run immediately,
+ * after a delay, or at fixed intervals. This scheduler is suitable for applications that require
+ * precise timing and integration with existing Java concurrency frameworks.
  *
- * Should create a new thread to run the tasks.
+ * Example usage:
  *
- * Tasks should be split between different holders.
+ * ```
+ * val scheduler = ExecutorScheduler(Executors.newScheduledThreadPool(4))
+ *
+ * // Run a task immediately
+ * scheduler.runTask {
+ *     println("Task running immediately")
+ * }
+ *
+ * // Run a task after a 1000ms delay
+ * scheduler.runTaskLater(1000L) {
+ *     println("Task running after 1 second delay")
+ * }
+ *
+ * // Run a task every 2000ms with an initial delay of 1000ms
+ * scheduler.runTaskTimer(1000L, 2000L) {
+ *     println("Task running every 2 seconds after an initial 1 second delay")
+ * }
+ * ```
+ *
+ * @param executor The [ScheduledExecutorService] to be used for scheduling tasks.
  */
 open class ExecutorScheduler(val executor: ScheduledExecutorService) : AbstractScheduler() {
 
@@ -46,13 +68,6 @@ open class ExecutorScheduler(val executor: ScheduledExecutorService) : AbstractS
         return schedulerTask
     }
 
-    /**
-     * Starts a task with a specified interval.
-     *
-     * @param delay Delay before the first task launch (in milliseconds).
-     * @param interval Interval between further task launches (in milliseconds).
-     * @param task The task to be executed.
-     */
     override fun runTaskTimer(delay: Long, interval: Long, task: suspend () -> Unit): SchedulerTask {
         val taskId = nextId()
         val wrapped = Runnable {
@@ -74,12 +89,7 @@ open class ExecutorScheduler(val executor: ScheduledExecutorService) : AbstractS
         return schedulerTask
     }
 
-    /**
-     * Starts the execution of a task after a specified time has elapsed.
-     *
-     * @param delay Delay before the task execution.
-     * @param task The task to be executed.
-     */
+
     override fun runTaskLater(delay: Long, task: suspend () -> Unit): SchedulerTask {
 
         val taskId = nextId()
@@ -102,7 +112,7 @@ open class ExecutorScheduler(val executor: ScheduledExecutorService) : AbstractS
     }
 
     /**
-     * Shutdown the executor service to ensure all tasks are completed.
+     * Shutdown the executor service immediately, attempting to stop all actively executing tasks.
      */
     fun shutdownNow() {
         tasks.clear()
@@ -110,13 +120,21 @@ open class ExecutorScheduler(val executor: ScheduledExecutorService) : AbstractS
     }
 
     /**
-     * Shutdown the executor service and wait for all tasks to complete.
+     * Initiates an orderly shutdown in which previously submitted tasks are executed,
+     * but no new tasks will be accepted.
      */
     fun shutdown() {
         tasks.clear()
         executor.shutdown()
     }
 
+    /**
+     * Initiates an orderly shutdown in which previously submitted tasks are executed,
+     * and waits for the specified time for the termination of all running tasks.
+     *
+     * @param time The maximum time to wait.
+     * @param unit The time unit of the time argument.
+     */
     fun shutdown(time: Long, unit: TimeUnit) {
         tasks.clear()
         executor.awaitTermination(time, unit)
@@ -124,7 +142,6 @@ open class ExecutorScheduler(val executor: ScheduledExecutorService) : AbstractS
 
     protected fun newTask(id: Int, future: Future<*>): SchedulerTask {
         val task = object : SchedulerTask {
-            override val scheduler: ExecutorScheduler = this@ExecutorScheduler
             override val id: Int = id
 
             override fun cancel() {
@@ -142,10 +159,23 @@ open class ExecutorScheduler(val executor: ScheduledExecutorService) : AbstractS
 
 
     companion object {
+        /**
+         * Creates an [ExecutorScheduler] with a thread pool of the specified size.
+         *
+         * @param size The number of threads in the pool.
+         * @return A new instance of [ExecutorScheduler].
+         */
+        @JvmStatic
         fun threadPool(size: Int): ExecutorScheduler {
             return ExecutorScheduler(Executors.newScheduledThreadPool(size))
         }
 
+        /**
+         * Creates an [ExecutorScheduler] with a single-threaded executor.
+         *
+         * @return A new instance of [ExecutorScheduler].
+         */
+        @JvmStatic
         fun singleThread(): ExecutorScheduler {
             return ExecutorScheduler(Executors.newSingleThreadScheduledExecutor())
         }

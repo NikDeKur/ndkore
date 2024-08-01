@@ -3,33 +3,24 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  *
- * Copyright (c) 2024 Nik De Kur
+ * Copyright (c) 2024-present "Nik De Kur"
  */
 
 @file:Suppress("NOTHING_TO_INLINE")
 
 package dev.nikdekur.ndkore.ext
 
-import dev.nikdekur.ndkore.interfaces.Prioritizable
+import dev.nikdekur.ndkore.`interface`.Prioritizable
 import java.util.*
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.CopyOnWriteArrayList
 import java.util.function.Predicate
-
-
-fun <T> newArrayList() = ArrayList<T>()
-fun <T> newCopyOnWriteArrayList() = CopyOnWriteArrayList<T>()
-fun <T> newHashSet() = HashSet<T>()
-fun <T> newLinkedHashSet() = LinkedHashSet<T>()
-
-
-
 
 
 @Suppress("UNCHECKED_CAST")
 /**
- * Provides a way to cast a nullable array to a non-nullable array.
+ * Cast a nullable array to a non-nullable array.
+ *
  * Unsafe to use if the array contains nulls.
  *
  * @return the array casted to non-nullable
@@ -39,11 +30,12 @@ inline fun <T> Array<T?>.notNull(): Array<T> {
 }
 
 /**
- * Creating a new array from the collection.
+ * Create a new array from the collection.
  *
  * Set the type of array as 'out T'
  *
  * Function is created to allow an array store covariant type
+ *
  * @return the array created from the collection
  */
 inline fun <reified T> Collection<T>.toTArray(): Array<out T> {
@@ -55,6 +47,15 @@ inline fun <reified T> Collection<T>.toTArray(): Array<out T> {
     return array as Array<out T>
 }
 
+/**
+ * Create a new array from the collection of collections.
+ *
+ * Set the type of array as 'out T'
+ *
+ * Function is created to allow an array store covariant type
+ *
+ * @return the array created from the collection of collections
+ */
 inline fun <reified T> Collection<Collection<T>>.toTArray(): Array<Array<out T>> {
     val main = arrayOfNulls<Array<out T>>(size)
     this.forEachIndexed { index, item ->
@@ -65,6 +66,10 @@ inline fun <reified T> Collection<Collection<T>>.toTArray(): Array<Array<out T>>
 }
 
 /**
+ * Add an item to the collection if the item is not already in the collection.
+ *
+ * Not recommended to use with [MutableSet], using [MutableSet.add] would be more efficient.
+ *
  * @return true if the item was added
  */
 inline fun <T> MutableCollection<T>.addIfNotContains(item: T): Boolean {
@@ -76,30 +81,77 @@ inline fun <T> MutableCollection<T>.addIfNotContains(item: T): Boolean {
 
 
 @Suppress("UNCHECKED_CAST")
-inline fun <T, R> Collection<T>.cast(clazz: Class<R>): Collection<R> = this as Collection<R>
+/**
+ * Cast a collection to a collection of different types.
+ *
+ * Unsafe to use if the collection contains elements of a different type.
+ *
+ * @return the collection casted to a different type
+ */
+inline fun <T, R> Collection<T>.cast(): Collection<R> = this as Collection<R>
 
 
-
+/**
+ * A method to try to optimize a list.
+ *
+ * If the list is empty, the method will return an [emptyList]
+ *
+ * If the list has only one element, the method will return a [Collections.SingletonList]
+ *
+ * If the list has more than one element, the method will return the list itself without any changes.
+ *
+ * @return An optimized list
+ */
 inline fun <T> List<T>.optimize(): List<T> = when (size) {
     0 -> emptyList()
     1 -> listOf(this[0])
     else -> this
 }
 
+/**
+ * Removes all elements from this mutable collection that do not match the given predicate.
+ *
+ * @param predicate a predicate which returns `true` for elements to be removed.
+ * @return `true` if any elements were removed from this collection, `false` otherwise.
+ */
 inline fun <T> MutableCollection<T>.removeIfNot(predicate: Predicate<T>): Boolean {
     return removeIf(predicate.negate())
 }
 
+/**
+ * Removes all elements from this mutable collection that are instances of the specified class.
+ *
+ * @param fromClass the class of the elements to be removed.
+ * @return `true` if any elements were removed from this collection, `false` otherwise.
+ */
 inline fun <T> MutableCollection<T>.removeIfAssignable(fromClass: Class<out T>): Boolean {
     return removeIf { fromClass.isInstance(it) }
 }
+
+/**
+ * Removes all elements from this mutable collection that are not instances of the specified class.
+ *
+ * @param fromClass the class of the elements to be retained.
+ * @return `true` if any elements were removed from this collection, `false` otherwise.
+ */
 inline fun <T> MutableCollection<T>.removeIfNotAssignable(fromClass: Class<out T>): Boolean {
     return removeIf { !fromClass.isInstance(it) }
 }
 
-
+/**
+ * Returns a singleton set containing only this element.
+ *
+ * @return a set containing only this element.
+ */
 inline fun <T> T.toSingletonSet() = setOf(this)
+
+/**
+ * Returns a singleton list containing only this element.
+ *
+ * @return a list containing only this element.
+ */
 inline fun <T> T.toSingletonList() = listOf(this)
+
 
 
 /**
@@ -255,6 +307,14 @@ fun <T> List<T>.mutableSafeForEach(onError: (T, Exception) -> Unit, action: (T) 
 }
 
 
+/**
+ * Copies all elements from the given iterable that start with the specified token (case-insensitive)
+ * into this mutable collection.
+ *
+ * @param token the token to match at the beginning of each element.
+ * @param from the iterable containing elements to be matched and copied.
+ * @return this mutable collection with the matched elements added.
+ */
 inline fun <T : MutableCollection<String>> T.copyPartialMatches(token: String, from: Iterable<String>): T {
     from
         .filter { it.startsWith(token, ignoreCase = true) }
@@ -262,43 +322,45 @@ inline fun <T : MutableCollection<String>> T.copyPartialMatches(token: String, f
     return this
 }
 
+/**
+ * Removes all elements from this mutable collection that do not start with the specified token (case-insensitive).
+ *
+ * @param token the token to match at the beginning of each element.
+ */
 inline fun <T : MutableCollection<String>> T.filterPartialMatches(token: String) {
     removeIf {
         !it.startsWith(token, ignoreCase = true)
     }
 }
 
-
-
+/**
+ * Adds all the specified elements to this mutable collection.
+ *
+ * @param elements the elements to add to this collection.
+ * @return `true` if the collection was modified as a result of the operation, `false` otherwise.
+ */
 inline fun <T> MutableCollection<T>.addAll(vararg elements: T) = addAll(elements)
 
-
+/**
+ * Returns a list containing a specified number of random elements from this list.
+ *
+ * @param random the random number generator to use for selecting random elements.
+ * @param amount the number of random elements to select.
+ * @return a list containing the specified number of random elements.
+ * @throws IllegalArgumentException if the amount is less than 0.
+ */
 fun <T> List<T>.random(random: Random, amount: Int): List<T> {
-    check(amount >= 0) { "amount cannot be less than 0" }
+    require(amount >= 0) { "amount cannot be less than 0" }
     if (amount == 0) return emptyList()
 
     val list = ArrayList<T>(amount)
-    for (i in 1..amount) {
-        val index = random.randInt(0, lastIndex)
+    repeat(amount) {
+        val index = random.nextInt(lastIndex + 1)
         list.add(this[index])
     }
     return list
 }
 
-fun <T> Collection<T>.randomUnique(random: Random, amount: Int): Collection<T> {
-    check(amount >= 0) { "amount cannot be less than 0" }
-    if (amount == 0) return emptyList()
-    if (amount == size) return ArrayList(this)
-
-    val list = HashSet<T>(amount)
-    while (true) {
-        val index = random.randInt(0, size + 1)
-        list.addIfNotContains(this.elementAt(index))
-        if (list.size == amount) break
-    }
-
-    return list
-}
 
 
 /**

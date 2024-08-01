@@ -3,14 +3,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  *
- * Copyright (c) 2024 Nik De Kur
+ * Copyright (c) 2024-present "Nik De Kur"
  */
 
 @file:Suppress("NOTHING_TO_INLINE", "KDocUnresolvedReference", "unused")
 
 package dev.nikdekur.ndkore.ext
 
-import dev.nikdekur.ndkore.interfaces.Snowflake
+import dev.nikdekur.ndkore.`interface`.Snowflake
 import java.util.*
 import java.util.AbstractMap.SimpleEntry
 import java.util.concurrent.ConcurrentHashMap
@@ -18,19 +18,29 @@ import java.util.concurrent.ConcurrentMap
 import java.util.function.Function
 
 
-fun <K, V> newHashMap() = HashMap<K, V>()
-fun <K, V> newConcurrentHashMap() = ConcurrentHashMap<K, V>()
-fun <K, V> newLinkedHashMap() = LinkedHashMap<K, V>()
-fun <K, V> newTreeMap() = TreeMap<K, V>()
-
+/**
+ * Retrieves the value associated with the given key as an Optional.
+ *
+ * This method provides a way to retrieve values from the map with the added convenience of Optional
+ * to handle cases where the key might not be present. This is particularly useful in contexts
+ * where you want to avoid null checks and leverage the Optional API for more expressive code.
+ *
+ * @param key the key whose associated value is to be returned.
+ * @return an Optional containing the value associated with the key, or an empty Optional if the key is not present.
+ */
 inline fun <K, V> Map<K, V>.getOptional(key: K): Optional<V & Any> {
     return Optional.ofNullable(get(key))
 }
 
-inline fun <K, V> Pair<K, V>.toMap() = mapOf(this)
-
-// Supress sonarlint warning because of sonarlint bug.
-// Collection could not be immutable, because immutable collections return immutable iterators.
+/**
+ * Removes entries from this mutable map if they satisfy the given predicate.
+ *
+ * The predicate takes a key-value pair and returns true if the entry should be removed. This method
+ * iterates over the entries of the map and applies the predicate to each entry, removing those that match.
+ * This allows for flexible and efficient bulk removal based on custom criteria.
+ *
+ * @param predicate a function that evaluates each key-value pair and returns true for entries to be removed.
+ */
 @Suppress("kotlin:S6524")
 inline fun <K, V> MutableMap<K, V>.removeIf(predicate: (K, V) -> Boolean) {
     val iterator = entries.iterator()
@@ -42,28 +52,68 @@ inline fun <K, V> MutableMap<K, V>.removeIf(predicate: (K, V) -> Boolean) {
     }
 }
 
-
+/**
+ * Retrieves the value associated with the given key and applies a mapping function to it.
+ *
+ * If the key is present in the map, the associated value is passed to the ifNotNullMapper function
+ * and the result is returned. If the key is not present, null is returned. This method provides a convenient
+ * way to transform values while retrieving them from the map.
+ *
+ * @param key the key whose associated value is to be retrieved and mapped.
+ * @param ifNotNullMapper a function to apply to the value if the key is present.
+ * @return the result of applying the mapping function to the value, or null if the key is not present.
+ */
 inline fun <K, V, NV> Map<K, V>.getAndMap(key: K, ifNotNullMapper: (V) -> NV): NV? {
     val v = this[key] ?: return null
     return ifNotNullMapper.invoke(v)
 }
 
-
-
-
-inline fun <K, Any> Map<K, Any>.getString(key: K, default: String?): String? {
+/**
+ * Retrieves the value associated with the given key as a String, or returns the default value if the key is not present.
+ *
+ * This method attempts to cast the value associated with the given key to a String. If the key is not present
+ * or the value cannot be cast to a String, the specified default value is returned. This is useful for maps
+ * where values are expected to be strings but might be missing or of a different type.
+ *
+ * @param key the key whose associated value is to be returned as a String.
+ * @param default the default value to return if the key is not present or the value cannot be cast to a String.
+ * @return the value associated with the key as a String, or the default value.
+ */
+inline fun <K> Map<K, *>.getString(key: K, default: String?): String? {
     return getAndMap(key) { it as String } ?: default
 }
 
-inline fun <K, Any> Map<K, Any>.getStringOrThrow(key: K): String {
+/**
+ * Retrieves the value associated with the given key as a String, or throws an exception if the key is not present.
+ *
+ * This method attempts to cast the value associated with the given key to a String. If the key is not present
+ * or the value cannot be cast to a String, a NoSuchElementException is thrown. This is useful for cases where
+ * a missing or invalid value should result in an immediate error.
+ *
+ * @param key the key whose associated value is to be returned as a String.
+ * @return the value associated with the key as a String.
+ * @throws NoSuchElementException if the key is not present or the value cannot be cast to a String.
+ */
+inline fun <K> Map<K, *>.getStringOrThrow(key: K): String {
     return getString(key, null) ?: throw NoSuchElementException(key.toString())
 }
 
-
+/**
+ * Transforms this map into a new mutable map using the specified key and value mappers.
+ *
+ * The keyMapper function is applied to each entry to produce the new keys, and the valueMapper function is applied
+ * to produce the new values. Entries for which the key or value mapper returns null are skipped. This allows for
+ * flexible transformation of maps, including filtering and changing the types of keys and values.
+ *
+ * @param keyMapper a function that maps entries to new keys.
+ * @param valueMapper a function that maps entries to new values.
+ * @param mapGen a function to generate the resulting mutable map.
+ * @return a new mutable map with the transformed keys and values.
+ */
 inline fun <K, V, NK, NV> Map<K, V>.map(
     keyMapper: Function<Map.Entry<K, V>, NK?>,
     valueMapper: Function<Map.Entry<NK, V>, out NV?>,
-    mapGen: () -> MutableMap<NK, NV> = ::newHashMap
+    mapGen: () -> MutableMap<NK, NV> = ::HashMap,
 ): MutableMap<NK, NV> {
     val newMap = mapGen()
     for ((key, value) in this) {
@@ -72,25 +122,79 @@ inline fun <K, V, NK, NV> Map<K, V>.map(
         val valEntry = SimpleEntry(newKey, value)
         val newValue = valueMapper.apply(valEntry) ?: continue
         newMap[newKey] = newValue
-
     }
     return newMap
 }
 
-inline fun <T, K, V> Collection<T>.toMap(key: Function<T, K>, value: Function<T, V>): MutableMap<K, V> {
-    return stream().toMap(key, value)
-}
-inline fun <T, K, V> Collection<T>.toConcurrentMap(key: Function<T, K>, value: Function<T, V>): MutableMap<K, V> {
-    return stream().toConcurrentMap(key, value)
-}
-inline fun <T, K, V> Collection<T>.toUnmodifiableMap(key: Function<T, K>, value: Function<T, V>): Map<K, V> {
-    return stream().toUnmodifiableMap(key, value)
+/**
+ * Converts this iterable to a mutable map using the specified key and value mappers.
+ *
+ * The keyMapper function is applied to each element to produce the keys, and the valueMapper function is applied
+ * to produce the values. This method provides a convenient way to construct maps from collections of elements,
+ * allowing for flexible transformation and aggregation of data.
+ *
+ * @param key a function that maps elements to keys.
+ * @param value a function that maps elements to values.
+ * @return a mutable map containing the mapped keys and values.
+ */
+inline fun <T, K, V> Iterable<T>.toMap(key: Function<T, K>, value: Function<T, V>): MutableMap<K, V> {
+    val map = HashMap<K, V>()
+    for (element in this) {
+        map[key.apply(element)] = value.apply(element)
+    }
+    return map
 }
 
+/**
+ * Converts this iterable to a concurrent map using the specified key and value mappers.
+ *
+ * The keyMapper function is applied to each element to produce the keys, and the valueMapper function is applied
+ * to produce the values. This method provides a convenient way to construct thread-safe maps from collections of elements,
+ * allowing for flexible transformation and aggregation of data.
+ *
+ * @param key a function that maps elements to keys.
+ * @param value a function that maps elements to values.
+ * @return a concurrent map containing the mapped keys and values.
+ */
+inline fun <T, K, V> Iterable<T>.toConcurrentMap(key: Function<T, K>, value: Function<T, V>): MutableMap<K, V> {
+    val map = ConcurrentHashMap<K, V>()
+    for (element in this) {
+        map[key.apply(element)] = value.apply(element)
+    }
+    return map
+}
 
+/**
+ * Converts this iterable to an unmodifiable map using the specified key and value mappers.
+ *
+ * The keyMapper function is applied to each element to produce the keys, and the valueMapper function is applied
+ * to produce the values. This method provides a convenient way to construct immutable maps from collections of elements,
+ * ensuring that the resulting map cannot be modified.
+ *
+ * @param key a function that maps elements to keys.
+ * @param value a function that maps elements to values.
+ * @return an unmodifiable map containing the mapped keys and values.
+ */
+inline fun <T, K, V> Iterable<T>.toUnmodifiableMap(key: Function<T, K>, value: Function<T, V>): Map<K, V> {
+    val map = HashMap<K, V>()
+    for (element in this) {
+        map[key.apply(element)] = value.apply(element)
+    }
+    return Collections.unmodifiableMap(map)
+}
+
+/**
+ * Converts this map to a concurrent map.
+ *
+ * This method provides a convenient way to create a thread-safe copy of this map, which can be used
+ * in concurrent environments to ensure safe access and modification of the map's entries.
+ *
+ * @return a concurrent map containing the same entries as this map.
+ */
 inline fun <K, V> Map<K, V>.toConcurrentMap(): ConcurrentMap<K, V> {
     return ConcurrentHashMap(this)
 }
+
 
 
 
@@ -201,49 +305,151 @@ inline fun <IdT, V : Snowflake<IdT>> MutableMap<IdT, V>.removeById(obj: V): V? {
 }
 
 
-// Contains
+/**
+ * Checks if this map contains the specified object by its ID.
+ *
+ * This method looks up the key in the map using the ID of the provided object.
+ * It is useful when you have objects implementing the Snowflake interface, which provides an ID,
+ * and you want to check for their presence in a map by their IDs.
+ *
+ * @param obj the object whose ID is used to check for presence in the map.
+ * @return true if the map contains the key corresponding to the object's ID, false otherwise.
+ */
 inline fun <IdT, V : Snowflake<IdT>> Map<IdT, V>.containsById(obj: V): Boolean {
     return containsKey(obj.id)
 }
 
-
+/**
+ * Adds an object to this mutable map using its class as the key.
+ *
+ * The object's runtime class is used as the key to store it in the map.
+ * This method is useful for storing instances in a map by their types, allowing retrieval based on the object's class.
+ *
+ * @param obj the object to be added to the map.
+ * @return the previous value associated with the object's class, or null if there was no mapping.
+ */
 inline fun <T : Any> MutableMap<Class<out T>, T>.addByClazz(obj: T): T? {
     return put(obj.javaClass, obj)
 }
 
+/**
+ * Adds all objects from the given iterable to this mutable map using their classes as the keys.
+ *
+ * Each object's runtime class is used as the key to store it in the map.
+ * This method is useful for storing multiple instances in a map by their types in a single operation.
+ *
+ * @param objs the iterable containing objects to be added to the map.
+ */
 inline fun <T : Any> MutableMap<Class<out T>, T>.addAllByClazz(objs: Iterable<T>) {
     objs.forEach {
         addByClazz(it)
     }
 }
 
+/**
+ * Removes an object from this mutable map using its class as the key.
+ *
+ * The object's runtime class is used to look up and remove it from the map.
+ * This method is useful for removing instances from a map by their types.
+ *
+ * @param obj the object to be removed from the map.
+ * @return the previous value associated with the object's class, or null if there was no mapping.
+ */
 inline fun <T : Any> MutableMap<Class<out T>, T>.removeByClazz(obj: T): T? {
     return remove(obj.javaClass)
 }
 
+/**
+ * Checks if this map contains the specified object by its class.
+ *
+ * The object's runtime class is used to check for its presence in the map.
+ * This method is useful for checking if instances are present in a map by their types.
+ *
+ * @param obj the object whose class is used to check for presence in the map.
+ * @return true if the map contains a key corresponding to the object's class, false otherwise.
+ */
 inline fun <T : Any> Map<Class<out T>, T>.containsByClazz(obj: T): Boolean {
     return containsKey(obj.javaClass)
 }
 
+/**
+ * Finds the first map entry that matches the given predicate.
+ *
+ * This method iterates over the entries of the map and returns the first one that satisfies the predicate.
+ * It is useful for finding specific entries based on custom criteria.
+ *
+ * @param predicate a function that evaluates each entry and returns true for the desired entry.
+ * @return the first map entry that matches the predicate.
+ * @throws NoSuchElementException if no entry matches the predicate.
+ */
+inline fun <K, V> Map<K, V>.firstEntry(predicate: Map.Entry<K, V>.() -> Boolean) = entries.first(predicate)
 
+/**
+ * Finds the first map entry that matches the given predicate or returns null if none match.
+ *
+ * This method iterates over the entries of the map and returns the first one that satisfies the predicate,
+ * or null if no entry matches. It is useful for safely finding specific entries without throwing exceptions.
+ *
+ * @param predicate a function that evaluates each entry and returns true for the desired entry.
+ * @return the first map entry that matches the predicate, or null if no entry matches.
+ */
+inline fun <K, V> Map<K, V>.firstEntryOrNull(predicate: Map.Entry<K, V>.() -> Boolean) = entries.firstOrNull(predicate)
 
-inline fun <K, V> Map<K, V>.firstEntry() = entries.first()
-inline fun <K, V> Map<K, V>.firstEntryOrNull() = entries.firstOrNull()
+/**
+ * Finds the first key that matches the given predicate.
+ *
+ * This method iterates over the keys of the map and returns the first one that satisfies the predicate.
+ * It is useful for finding specific keys based on custom criteria.
+ *
+ * @param predicate a function that evaluates each key and returns true for the desired key.
+ * @return the first key that matches the predicate.
+ * @throws NoSuchElementException if no key matches the predicate.
+ */
+inline fun <K, V> Map<K, V>.firstKey(predicate: (K) -> Boolean) = keys.first(predicate)
 
-inline fun <K, V> Map<K, V>.firstKey() = keys.first()
-inline fun <K, V> Map<K, V>.firstKeyOrNull() = keys.firstOrNull()
+/**
+ * Finds the first key that matches the given predicate or returns null if none match.
+ *
+ * This method iterates over the keys of the map and returns the first one that satisfies the predicate,
+ * or null if no key matches. It is useful for safely finding specific keys without throwing exceptions.
+ *
+ * @param predicate a function that evaluates each key and returns true for the desired key.
+ * @return the first key that matches the predicate, or null if no key matches.
+ */
+inline fun <K, V> Map<K, V>.firstKeyOrNull(predicate: (K) -> Boolean) = keys.firstOrNull(predicate)
 
-inline fun <K, V> Map<K, V>.firstValue() = values.first()
-inline fun <K, V> Map<K, V>.firstValueOrNull() = values.firstOrNull()
+/**
+ * Finds the first value that matches the given predicate.
+ *
+ * This method iterates over the values of the map and returns the first one that satisfies the predicate.
+ * It is useful for finding specific values based on custom criteria.
+ *
+ * @param predicate a function that evaluates each value and returns true for the desired value.
+ * @return the first value that matches the predicate.
+ * @throws NoSuchElementException if no value matches the predicate.
+ */
+inline fun <K, V> Map<K, V>.firstValue(predicate: (V) -> Boolean) = values.first(predicate)
+
+/**
+ * Finds the first value that matches the given predicate or returns null if none match.
+ *
+ * This method iterates over the values of the map and returns the first one that satisfies the predicate,
+ * or null if no value matches. It is useful for safely finding specific values without throwing exceptions.
+ *
+ * @param predicate a function that evaluates each value and returns true for the desired value.
+ * @return the first value that matches the predicate, or null if no value matches.
+ */
+inline fun <K, V> Map<K, V>.firstValueOrNull(predicate: (V) -> Boolean) = values.firstOrNull(predicate)
+
 
 /**
  * Similar to [Map.all] but accept kotlin style lambda
  *
  * Could be very useful, when you need to pass existing function to [Map.all] but it requires function, that takes [Map.Entry], not [K] and [V]
  */
-inline fun <K, V> Map<K, V>.all(action: (K, V) -> Boolean): Boolean {
-    for ((k, v) in this) {
-        if (!action(k, v)) return false
+inline fun <K, V> Map<K, V>.all(action: Map.Entry<K, V>.() -> Boolean): Boolean {
+    for (entry in this) {
+        if (!action(entry)) return false
     }
     return true
 }
@@ -253,9 +459,9 @@ inline fun <K, V> Map<K, V>.all(action: (K, V) -> Boolean): Boolean {
  *
  * Could be very useful, when you need to pass existing function to [Map.any] but it requires function, that takes [Map.Entry], not [K] and [V]
  */
-inline fun <K, V> Map<K, V>.any(action: (K, V) -> Boolean): Boolean {
-    for ((k, v) in this) {
-        if (action(k, v)) return true
+inline fun <K, V> Map<K, V>.any(action: Map.Entry<K, V>.() -> Boolean): Boolean {
+    for (entry in this) {
+        if (action(entry)) return true
     }
     return false
 }
@@ -270,8 +476,7 @@ inline fun <K, V> Map<K, V>.any(action: (K, V) -> Boolean): Boolean {
  *
  * Example:
  * - map: { "a": { "b": { "c": 1 } } }
- * - key: "a.b.c"
- * - separator: "."
+ * - key: listOf("a", "b", "c")
  * - result: 1
  *
  * @param key key to get
@@ -279,13 +484,13 @@ inline fun <K, V> Map<K, V>.any(action: (K, V) -> Boolean): Boolean {
  * @return value or null if not found
  */
 @Suppress("UNCHECKED_CAST")
-fun <V> Map<String, V>.getNested(key: String, separator: String): V? {
-    val keys = key.split(separator)
-    var map = this
-    for (i in 0 until keys.size - 1) {
-        map = map[keys[i]] as? Map<String, V> ?: return null
+fun Map<String, Any>.getNested(keys: Iterable<String>): Any? {
+    var current: Any? = this
+    for (key in keys) {
+        if (current !is Map<*, *>) return null
+        current = (current as Map<String, Any>)[key]
     }
-    return map[keys.last()]
+    return current
 }
 
 /**

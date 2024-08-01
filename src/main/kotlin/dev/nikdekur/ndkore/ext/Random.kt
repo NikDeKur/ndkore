@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  *
- * Copyright (c) 2024 Nik De Kur
+ * Copyright (c) 2024-present "Nik De Kur"
  */
 
 @file:Suppress("NOTHING_TO_INLINE")
@@ -63,18 +63,6 @@ inline fun Random.randFloat(min: Float, max: Float): Float {
     return nextFloat() * (max - min) + min
 }
 
-/**
- * Returns a random big integer between [min] and [max].
- *
- * @param min the minimum value
- * @param max the maximum value
- * @return the random integer
- */
-inline fun Random.randBigInt(min: Long, max: Long): Long {
-    require(min <= max) { "max must be greater than min" }
-    return (nextDouble() * (max - min) + min).toLong()
-}
-
 
 /**
  * Returns true with a chance of [chance].
@@ -83,7 +71,7 @@ inline fun Random.randBigInt(min: Long, max: Long): Long {
  * @return true with a chance of [chance]
  */
 inline fun Random.chance(chance: Double): Boolean {
-    check(chance in 0.0..100.0) { "chance must be between 0.0 and 100.0" }
+    require(chance in 0.0..100.0) { "chance must be between 0.0 and 100.0" }
     return randomBigPercent() < chance
 }
 

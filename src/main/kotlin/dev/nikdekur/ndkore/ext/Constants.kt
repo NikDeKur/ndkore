@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  *
- * Copyright (c) 2024 Nik De Kur
+ * Copyright (c) 2024-present "Nik De Kur"
  */
 
 package dev.nikdekur.ndkore.ext
@@ -26,8 +26,8 @@ object Patterns {
     val HEX_2: Pattern = Pattern.compile("#" + HEX_1.pattern())
     val ALL_RGB = listOf(RGB_1, RGB_2, RGB_3)
     val ALL_HEX = listOf(HEX_1, HEX_2)
-    val REMOVE_NOT_DIGITS = Regex("[^\\d.]")
-    val REMOVE_DIGITS = Regex("[\\d.]")
+    val NOT_DIGITS = Regex("[^\\d.]")
+    val DIGITS = Regex("[\\d.]")
 
     val UUID = Regex("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$")
     val WORD_SPLIT: Regex = Regex("\\s+")

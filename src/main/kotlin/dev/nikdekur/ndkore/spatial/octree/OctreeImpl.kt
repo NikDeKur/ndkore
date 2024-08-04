@@ -302,9 +302,6 @@ open class OctreeImpl<T>(
 
             if (current.data.isNotEmpty()) {
                 for (nodeData in current.data) {
-                    println(nodeData)
-                    println(this.min)
-                    println(this.max)
                     if (nodeData.intersects(min, max)) {
                         result.add(nodeData.data)
                     }

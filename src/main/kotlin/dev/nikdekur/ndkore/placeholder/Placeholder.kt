@@ -48,7 +48,7 @@ package dev.nikdekur.ndkore.placeholder
  * println(placeholder.getPlaceholder("greeting")) // Output: Hello
  * ```
  */
-fun interface Placeholder {
+interface Placeholder {
 
     /**
      * Retrieves the value associated with the specified key from the source.
@@ -56,7 +56,9 @@ fun interface Placeholder {
      * @param key The key whose associated value is to be retrieved.
      * @return The value associated with the key, or null if the key does not exist in the source.
      */
-    fun getPlaceholder(key: String): Any?
+    fun getPlaceholder(key: String): Any? {
+        return null
+    }
 
     companion object {
         /**

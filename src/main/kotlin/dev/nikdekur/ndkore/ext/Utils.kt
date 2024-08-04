@@ -31,25 +31,6 @@ inline fun input(text: String): String {
 
 
 
-
-/**
- * Converts the number to a comparable result.
- *
- * If the number is greater than 0, returns 1.
- * If the number is less than 0, returns -1.
- * Otherwise, returns 0.
- *
- * @return The comparable result.
- */
-inline fun Number.toComparableResult(): Int {
-    return when {
-        this > 0 -> 1
-        this < 0 -> -1
-        else -> 0
-    }
-}
-
-
 typealias CompAny = Comparable<Any>
 
 /**

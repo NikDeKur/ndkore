@@ -4,12 +4,11 @@ plugins {
     alias(libs.plugins.kotlinJvm)
     alias(libs.plugins.licenser)
     alias(libs.plugins.kotlinSerialization)
-    id("java")
     id("maven-publish")
 }
 
 group = "dev.nikdekur"
-version = "1.2.0"
+version = "1.2.1"
 
 val authorId: String by project
 val authorName: String by project

@@ -17,7 +17,7 @@ package dev.nikdekur.ndkore.spatial
  * @property y The y-coordinate of the point.
  * @property z The z-coordinate of the point.
  */
-data class Point(var x: Int, var y: Int, var z: Int) : Cloneable {
+data class Point(var x: Int, var y: Int, var z: Int) : Cloneable, Comparable<Point> {
 
     /**
      * Creates and returns a copy of this point.
@@ -84,6 +84,14 @@ data class Point(var x: Int, var y: Int, var z: Int) : Cloneable {
      */
     inline fun distanceSquared(point: Point): Double {
         return distanceSquared(x, y, z, point.x, point.y, point.z)
+    }
+
+    override fun compareTo(other: Point): Int {
+        return when {
+            x != other.x -> x - other.x
+            y != other.y -> y - other.y
+            else -> z - other.z
+        }
     }
 
     companion object {

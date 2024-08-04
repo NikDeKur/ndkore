@@ -95,6 +95,11 @@ data class Point(var x: Int, var y: Int, var z: Int) : Cloneable, Comparable<Poi
     }
 
     companion object {
+
+        @JvmField
+        val ZERO = Point(0, 0, 0)
+
+
         /**
          * Calculates the middle point between two given points.
          *

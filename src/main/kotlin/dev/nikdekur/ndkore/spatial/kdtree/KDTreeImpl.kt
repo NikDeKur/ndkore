@@ -113,9 +113,8 @@ open class KDTreeImpl<T> : MutableKDTree<T> {
         // Find the node to remove
         while (node != null) {
             val cd = depth % 3
-            if (node.point == point) {
-                break
-            }
+
+            if (node.point == point) break
 
             stack.addLast(node to depth)
             parent = node
@@ -124,10 +123,8 @@ open class KDTreeImpl<T> : MutableKDTree<T> {
             depth++
         }
 
-        if (node == null) {
-            // Node not found
-            return
-        }
+        // Node not found
+        if (node == null) return
 
         // Handle the case where the node to remove is a leaf node
         fun removeLeaf() {
@@ -155,7 +152,7 @@ open class KDTreeImpl<T> : MutableKDTree<T> {
             val min = findMin(node.right!!, (depth + 1) % 3, depth + 1)
             node.point = min!!.point
             node.value = min.value
-            node.right = remove(node.right, min.point, depth + 1).first
+            node.right = remove(node.right, min.point)
         }
 
         // Determine which removal case applies
@@ -169,70 +166,59 @@ open class KDTreeImpl<T> : MutableKDTree<T> {
     }
 
 
-    private fun remove(node: Node<T>?, point: Point, depth: Int): Pair<Node<T>?, Boolean> {
-        if (node == null) return null to false
-
-        val cd = depth % 3
-        return when {
-            node.point == point -> removeNode(node, depth)
-            comparePoint(point, node.point, cd) < 0 -> {
-                val (newLeft, removed) = remove(node.left, point, depth + 1)
-                node.left = newLeft
-                node to removed
-            }
-
-            else -> {
-                val (newRight, removed) = remove(node.right, point, depth + 1)
-                node.right = newRight
-                node to removed
-            }
-        }
-    }
-
-    private fun removeNode(node: Node<T>, depth: Int): Pair<Node<T>?, Boolean> {
-        return when {
-            node.right != null -> {
-                val min = findMin(node.right, depth % 3, depth + 1)
-                node.point = min!!.point
-                node.value = min.value
-                node.right = remove(node.right, min.point, depth + 1).first
-                node to true
-            }
-
-            node.left != null -> {
-                val min = findMin(node.left, depth % 3, depth + 1)
-                node.point = min!!.point
-                node.value = min.value
-                node.right = remove(node.left, min.point, depth + 1).first
-                node.left = null
-                node to true
-            }
-
-            else -> null to true
-        }
-    }
-
-    private fun findMin(node: Node<T>?, dim: Int, depth: Int): Node<T>? {
+    private fun remove(node: Node<T>?, point: Point): Node<T>? {
         if (node == null) return null
 
-        val cd = depth % 3
-        return if (cd == dim) {
-            node.left?.let { findMin(it, dim, depth + 1) } ?: node
-        } else {
-            minNode(node, findMin(node.left, dim, depth + 1), findMin(node.right, dim, depth + 1), dim)
+        val stack = ArrayDeque<Triple<Node<T>?, Point, Int>>()
+        stack.add(Triple(node, point, 0))
+        var parent: Node<T>? = null
+        var isLeftChild = false
+
+        while (stack.isNotEmpty()) {
+            val (currentNode, targetPoint, depth) = stack.removeAt(stack.size - 1)
+            if (currentNode == null) continue
+            val cd = depth % 3
+
+            if (currentNode.point == targetPoint) {
+                return if (currentNode.left != null || currentNode.right != null) {
+                    val replacement = findMin(currentNode.right ?: currentNode.left, cd, depth + 1)!!
+                    currentNode.point = replacement.point
+                    currentNode.value = replacement.value
+                    stack.add(Triple(currentNode.right ?: currentNode.left, replacement.point, depth + 1))
+                    currentNode.right = currentNode.left?.also { currentNode.left = null }
+                    parent?.let { if (isLeftChild) it.left = currentNode else it.right = currentNode }
+                    currentNode
+                } else {
+                    parent?.let { if (isLeftChild) it.left = null else it.right = null }
+                    null
+                }
+            } else {
+                parent = currentNode
+                if (comparePoint(targetPoint, currentNode.point, cd) < 0) {
+                    stack.add(Triple(currentNode.left, targetPoint, depth + 1))
+                    isLeftChild = true
+                } else {
+                    stack.add(Triple(currentNode.right, targetPoint, depth + 1))
+                    isLeftChild = false
+                }
+            }
         }
+        return node
     }
 
-    private inline fun minNode(x: Node<T>?, y: Node<T>?, z: Node<T>?, dim: Int): Node<T>? {
-        return listOfNotNull(x, y, z).minByOrNull { compare(it.point, Point(0, 0, 0), dim) }
-    }
 
-    private inline fun compare(a: Point, b: Point, dim: Int): Int {
-        return when (dim) {
-            0 -> a.x.compareTo(b.x)
-            1 -> a.y.compareTo(b.y)
-            else -> a.z.compareTo(b.z)
+    private inline fun findMin(node: Node<T>?, dim: Int, depth: Int): Node<T>? {
+        var depth = depth
+        var min = node
+        var current = node
+        while (current != null) {
+            if (comparePoint(current.point, min!!.point, dim) < 0) {
+                min = current
+            }
+            current = if (dim == depth % 3) current.left else current.right
+            depth++
         }
+        return min
     }
 
     private inline fun comparePoint(a: Point, b: Point, cd: Int): Int {

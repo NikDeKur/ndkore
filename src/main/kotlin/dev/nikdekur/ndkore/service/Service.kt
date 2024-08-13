@@ -8,16 +8,13 @@
 
 @file:Suppress("NOTHING_TO_INLINE")
 
-package dev.nikdekur.ndkore.module
+package dev.nikdekur.ndkore.service
 
-import dev.nikdekur.ndkore.`interface`.Snowflake
+interface Service<A> {
 
-interface Module<A> : Snowflake<String> {
-
-    val app: A
-
-    override val id: String
-        get() = idOf(javaClass)
+    val manager: ServicesManager<A>
+    val app
+        get() = manager.app
 
     fun onLoad() {
         // Plugin Module does not require to implement onLoad
@@ -28,16 +25,5 @@ interface Module<A> : Snowflake<String> {
 
     val dependencies: Dependencies
         get() = Dependencies.none()
-
-    companion object {
-        @JvmStatic
-        inline fun idOf(clazz: Class<out Module<*>>): String {
-            return clazz.simpleName
-        }
-
-        @JvmStatic
-        inline val Class<out Module<*>>.id
-            get() = idOf(this)
-    }
 }
 

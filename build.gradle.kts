@@ -1,3 +1,4 @@
+
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
@@ -8,7 +9,7 @@ plugins {
 }
 
 group = "dev.nikdekur"
-version = "1.2.1"
+version = "1.2.2"
 
 val authorId: String by project
 val authorName: String by project
@@ -51,8 +52,12 @@ dependencies {
 
     compileOnly(libs.slf4j.api)
     compileOnly(libs.kaml)
+    compileOnly(libs.koin)
 
     testImplementation(kotlin("test"))
+    testImplementation(libs.slf4j.api)
+    testImplementation(libs.slf4j.simple)
+    testImplementation(libs.koin)
 }
 
 tasks.named("compileKotlin", KotlinCompilationTask::class.java) {
@@ -68,9 +73,19 @@ license {
         set("year", "2024-present")
         set("name", authorName)
     }
+
     ignoreFailures = true
 }
 
+
+val repoUsernameProp = "NDK_REPO_USERNAME"
+val repoPasswordProp = "NDK_REPO_PASSWORD"
+val repoUsername = System.getenv(repoUsernameProp)
+val repoPassword = System.getenv(repoPasswordProp)
+
+if (repoUsername.isNullOrBlank() || repoPassword.isNullOrBlank()) {
+    throw GradleException("Environment variables $repoUsernameProp and $repoPasswordProp must be set.")
+}
 
 publishing {
     publications {
@@ -88,8 +103,25 @@ publishing {
                 }
             }
 
-            from(components["java"])
+            afterEvaluate {
+                val shadowJar = tasks.findByName("shadowJar")
+                if (shadowJar == null) from(components["java"])
+                else artifact(shadowJar)
+            }
         }
+    }
+
+    repositories {
+        maven {
+            name = "ndk-repo"
+            url = uri("https://repo.nikdekur.tech/releases")
+            credentials {
+                username = repoUsername
+                password = repoPassword
+            }
+        }
+
+        mavenLocal()
     }
 }
 

@@ -134,6 +134,7 @@ data class SphereBuilding(
 }
 
 
+@Suppress("UNCHECKED_CAST")
 class OctreeTest {
 
 

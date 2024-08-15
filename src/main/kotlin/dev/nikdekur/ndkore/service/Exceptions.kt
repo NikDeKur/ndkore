@@ -10,6 +10,9 @@ package dev.nikdekur.ndkore.service
 
 import kotlin.reflect.KClass
 
+/**
+ * Indicates service not found.
+ */
 class ServiceNotFoundException(serviceClass: KClass<*>) :
     RuntimeException("Service for '${serviceClass.qualifiedName}' not found!")
 

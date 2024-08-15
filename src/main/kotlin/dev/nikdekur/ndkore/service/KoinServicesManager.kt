@@ -21,6 +21,70 @@ import org.slf4j.LoggerFactory
 import java.util.LinkedList
 import kotlin.reflect.KClass
 
+/**
+ * [ServicesManager] implementation using a Koin Dependency Injection framework.
+ *
+ * Uses Koin to store services instances.
+ *
+ * ### Example Usage:
+ * ```
+ * // Define a simple service interface
+ * interface MyService {
+ *     fun doSomething()
+ * }
+ *
+ * // Implementation of the service
+ * class MyServiceImpl(override val servicesManager: ServicesManager<MyApp>) : Service<MyApp>, MyService {
+ *     override fun doSomething() {
+ *         println("Doing something!")
+ *     }
+ *
+ *     override fun onLoad() {
+ *         println("Service loaded!")
+ *     }
+ *
+ *     override fun onUnload() {
+ *         println("Service unloaded!")
+ *     }
+ * }
+ *
+ * // Define an application context
+ * class MyApp(val name: String)
+ *
+ * fun main() {
+ *     // Start Koin for dependency injection
+ *     startKoin {
+ *         // No modules to load initially
+ *     }
+ *
+ *     // Initialize the ServicesManager with the application context
+ *     val myApp = MyApp("My Application")
+ *     val serviceManager: ServicesManager<MyApp> = KoinServicesManager(GlobalContext, myApp)
+ *
+ *     // Register the service with the service manager
+ *     val myService = MyServiceImpl()
+ *     serviceManager.registerService(myService, MyService::class)
+ *
+ *     // Load all registered services
+ *     serviceManager.loadAll()
+ *
+ *     // Retrieve and use the service
+ *     val service: MyService = serviceManager.getService(MyService::class)
+ *     service.doSomething()
+ *
+ *     // Inject the service lazily
+ *     val injectedService by serviceManager.inject<MyService>()
+ *     injectedService.doSomething()
+ *
+ *     // Unload all registered services
+ *     serviceManager.unloadAll()
+ * }
+ * ```
+ *
+ * @param A The type of the application.
+ * @property context The Koin context.
+ * @property app The application.
+ */
 class KoinServicesManager<A>(
     val context: KoinContext,
     override val app: A
@@ -29,7 +93,6 @@ class KoinServicesManager<A>(
     val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     override val services = LinkedList<Service<A>>()
-    val states = HashMap<String, ServiceState>()
 
     override fun registerService(service: Service<A>, vararg bindTo: KClass<*>) {
 

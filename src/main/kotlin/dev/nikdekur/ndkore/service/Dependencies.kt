@@ -17,8 +17,8 @@ import kotlin.reflect.KClass
  *
  * @param before List of modules that should be loaded before this module
  * @param after List of modules that should be loaded after this module
- * @param first True if this module should be loaded first
- * @param last True if this module should be loaded last
+ * @param first True if this module should be loaded as first as possible by other dependencies
+ * @param last True if this module should be loaded as last as possible by other dependencies
  * @see Service
  */
 data class Dependencies(
@@ -29,8 +29,21 @@ data class Dependencies(
 ) {
 
     companion object {
+        /**
+         * Creates a new instance of [Dependencies] with the given modules that should be loaded before this module.
+         *
+         * @param modules List of modules that should be loaded before this module
+         * @return New instance of [Dependencies]
+         */
         @JvmStatic
         fun after(vararg modules: KClass<*>) = Dependencies(emptyList(), modules.toList(), first = false, last = false)
+
+        /**
+         * Creates a new instance of [Dependencies] with the given modules that should be loaded after this module.
+         *
+         * @param modules List of modules that should be loaded after this module
+         * @return New instance of [Dependencies]
+         */
         @JvmStatic
         fun before(vararg modules: KClass<*>) = Dependencies(modules.toList(), emptyList(), first = false, last = false)
 
@@ -44,10 +57,27 @@ data class Dependencies(
             Dependencies(emptyList(), emptyList(), first = false, last = true)
         }
 
+        /**
+         * Returns an empty instance of [Dependencies].
+         *
+         * @return Empty instance of [Dependencies]
+         */
         @JvmStatic
         fun none() = EMPTY
+
+        /**
+         * Returns an instance of [Dependencies] that should be loaded as first as possible by other dependencies.
+         *
+         * @return Instance of [Dependencies] that should be loaded as first as possible by other dependencies
+         */
         @JvmStatic
         fun first() = FIRST
+
+        /**
+         * Returns an instance of [Dependencies] that should be loaded as last as possible by other dependencies.
+         *
+         * @return Instance of [Dependencies] that should be loaded as last as possible by other dependencies
+         */
         @JvmStatic
         fun last() = LAST
     }

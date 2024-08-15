@@ -36,7 +36,7 @@ interface ServicesManager<A> {
      * This property provides access to an iterable collection of all services that have been registered
      * with the service manager.
      */
-    val services: Iterable<Service<A>>
+    val services: Collection<Service<A>>
 
     /**
      * Registers a service with the manager.

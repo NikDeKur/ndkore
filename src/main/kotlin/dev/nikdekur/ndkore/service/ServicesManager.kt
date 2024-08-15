@@ -14,6 +14,8 @@ interface ServicesManager<A> {
 
     val app: A
 
+    val services: Iterable<Service<A>>
+
     fun registerService(service: Service<A>, vararg bindTo: KClass<*>)
 
     fun <T : Any> getServiceOrNull(serviceClass: KClass<T>): T?

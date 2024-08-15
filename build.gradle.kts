@@ -35,7 +35,6 @@ val javaVersion = JavaVersion.VERSION_1_8
 java {
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
-    // withJavadocJar()
     withSourcesJar()
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(javaVersion.majorVersion))

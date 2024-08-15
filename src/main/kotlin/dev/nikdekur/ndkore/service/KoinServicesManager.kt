@@ -28,7 +28,7 @@ class KoinServicesManager<A>(
 
     val logger: Logger = LoggerFactory.getLogger(javaClass)
 
-    val services = LinkedList<Service<A>>()
+    override val services = LinkedList<Service<A>>()
     val states = HashMap<String, ServiceState>()
 
     override fun registerService(service: Service<A>, vararg bindTo: KClass<*>) {

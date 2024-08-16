@@ -12,6 +12,8 @@
 package dev.nikdekur.ndkore.ext
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.selects.SelectBuilder
+import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import java.util.concurrent.CompletableFuture
@@ -98,6 +100,23 @@ inline fun <T, R> CoroutineScope.parallel(
                 block(it)
             }
         }
-    } as List<Deferred<R>>
-
+    }
 }
+
+/**
+ * Delays coroutine for at least the given time without blocking a thread and resumes it after a specified time.
+ * If the given [timeMillis] is non-positive, this function returns immediately.
+ *
+ * This suspending function is cancellable: if the [Job] of the current coroutine is cancelled while this
+ * suspending function is waiting, this function immediately resumes with [CancellationException].
+ * There is a **prompt cancellation guarantee**: even if this function is ready to return the result, but was cancelled
+ * while suspended, [CancellationException] will be thrown. See [suspendCancellableCoroutine] for low-level details.
+ *
+ * If you want to delay forever (until cancellation), consider using [awaitCancellation] instead.
+ *
+ * Note that delay can be used in [select] invocation with [onTimeout][SelectBuilder.onTimeout] clause.
+ *
+ * Implementation note: how exactly time is tracked is an implementation detail of [CoroutineDispatcher] in the context.
+ * @param timeMillis time in milliseconds.
+ */
+suspend inline fun delay(timeMillis: Int) = delay(timeMillis.toLong())

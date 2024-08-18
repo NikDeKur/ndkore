@@ -8,4 +8,4 @@
 
 package dev.nikdekur.ndkore.service
 
-typealias MyModule = Service<App>
+typealias MyService = Service<App>

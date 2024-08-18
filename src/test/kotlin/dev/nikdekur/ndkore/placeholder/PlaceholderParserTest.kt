@@ -21,6 +21,13 @@ class PlaceholderParserTest {
     }
 
     @Test
+    fun singleCasePlaceholderResolvedCorrectly() {
+        val parser = PatternPlaceholderParser.CURLY_BRACKET
+        val result = parser.parse("name is {userName}", mapOf("userName" to "John Doe"))
+        assertEquals("name is John Doe", result)
+    }
+
+    @Test
     fun multiplePlaceholdersResolvedCorrectly() {
         val parser = PatternPlaceholderParser.PROCENT
         val result =
@@ -121,4 +128,6 @@ class PlaceholderParserTest {
 
         assertEquals("value https://example.com/icon.png John - 20", result)
     }
+
+    // TODO: Big letter problem
 }

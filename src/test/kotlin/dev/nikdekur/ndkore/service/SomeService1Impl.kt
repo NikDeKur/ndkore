@@ -10,7 +10,7 @@ package dev.nikdekur.ndkore.service
 
 class SomeService1Impl(
     override val manager: ServicesManager<App>
-) : MyModule, SomeService1 {
+) : MyService, SomeService1 {
 
     override fun onLoad() {
         loaded = true

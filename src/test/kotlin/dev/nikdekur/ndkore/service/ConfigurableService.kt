@@ -8,7 +8,7 @@
 
 package dev.nikdekur.ndkore.service
 
-interface DependencyService {
+interface ConfigurableService {
 
     val dependencies: Dependencies
 }

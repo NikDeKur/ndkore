@@ -20,20 +20,7 @@ package dev.nikdekur.ndkore.service
  * @param A The type of the application.
  * @see ServicesManager
  */
-interface Service<A> {
-
-    /**
-     * The manager that manages this service.
-     */
-    val manager: ServicesManager<A>
-
-    /**
-     * The application instance.
-     *
-     * This property provides access to the application-specific data or context that services may depend on.
-     */
-    val app
-        get() = manager.app
+interface Service<A> : ServicesComponent<A> {
 
     /**
      * Load's service.

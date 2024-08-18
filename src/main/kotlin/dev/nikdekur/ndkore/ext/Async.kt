@@ -119,4 +119,4 @@ inline fun <T, R> CoroutineScope.parallel(
  * Implementation note: how exactly time is tracked is an implementation detail of [CoroutineDispatcher] in the context.
  * @param timeMillis time in milliseconds.
  */
-suspend inline fun delay(timeMillis: Int) = delay(timeMillis.toLong())
+suspend inline fun delay(timeMillis: Number) = kotlinx.coroutines.delay(timeMillis.toLong())

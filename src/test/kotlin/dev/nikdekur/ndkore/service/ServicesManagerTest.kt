@@ -16,6 +16,7 @@ import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.environmentProperties
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 interface App {
     val flag: Boolean
@@ -164,6 +165,20 @@ class ServicesManagerTest {
         assertEquals(service2, injected2.value)
     }
 
+    @Test
+    fun serviceReBindTest() {
+        val service1 = object : MyService {
+            override val manager = this@ServicesManagerTest.manager
+        }
+        val service2 = object : MyService {
+            override val manager = this@ServicesManagerTest.manager
+        }
+        manager.registerService(service1, MyService::class)
+        assertTrue(manager.getService(MyService::class) === service1)
+        manager.registerService(service2, MyService::class)
+        assertTrue(manager.getService(MyService::class) === service2)
+    }
+
 
     @Test
     fun servicesLoadTest() {
@@ -193,18 +208,18 @@ class ServicesManagerTest {
     fun defaultOrderTest() {
         var loadedFirst = false
         var loadedSecond = false
-        val service1 = DependencyServiceImpl(manager, onTestLoad = {
+        val service1 = ConfigurableServiceImpl(manager, onTestLoad = {
             loadedFirst = true
             assertEquals(false, loadedSecond)
         })
 
-        val service2 = DependencyServiceImpl(manager, onTestLoad = {
+        val service2 = ConfigurableServiceImpl(manager, onTestLoad = {
             loadedSecond = true
             assertEquals(true, loadedFirst)
         })
 
-        manager.registerService(service1, DependencyServiceImpl::class)
-        manager.registerService(service2, DependencyService::class)
+        manager.registerService(service1, ConfigurableServiceImpl::class)
+        manager.registerService(service2, ConfigurableService::class)
         manager.loadAll()
     }
 
@@ -213,18 +228,18 @@ class ServicesManagerTest {
     fun reverseOrderTest() {
         var loadedFirst = false
         var loadedSecond = false
-        val service1 = DependencyServiceImpl(manager, onTestLoad = {
+        val service1 = ConfigurableServiceImpl(manager, onTestLoad = {
             loadedFirst = true
             assertEquals(true, loadedSecond)
         })
 
-        val service2 = DependencyServiceImpl(manager, onTestLoad = {
+        val service2 = ConfigurableServiceImpl(manager, onTestLoad = {
             loadedSecond = true
             assertEquals(false, loadedFirst)
         })
 
-        manager.registerService(service2, DependencyService::class)
-        manager.registerService(service1, DependencyServiceImpl::class)
+        manager.registerService(service2, ConfigurableService::class)
+        manager.registerService(service1, ConfigurableServiceImpl::class)
         manager.loadAll()
     }
 
@@ -233,18 +248,18 @@ class ServicesManagerTest {
     fun dependencyAfterLoadTest() {
         var loadedFirst = false
         var loadedSecond = false
-        val service1 = DependencyServiceImpl(manager, Dependencies.after(DependencyService::class), onTestLoad = {
+        val service1 = ConfigurableServiceImpl(manager, Dependencies.after(ConfigurableService::class), onTestLoad = {
             loadedFirst = true
             assertEquals(true, loadedSecond)
         })
 
-        val service2 = DependencyServiceImpl(manager, onTestLoad = {
+        val service2 = ConfigurableServiceImpl(manager, onTestLoad = {
             loadedSecond = true
             assertEquals(false, loadedFirst)
         })
 
-        manager.registerService(service1, DependencyServiceImpl::class)
-        manager.registerService(service2, DependencyService::class)
+        manager.registerService(service1, ConfigurableServiceImpl::class)
+        manager.registerService(service2, ConfigurableService::class)
         manager.loadAll()
     }
 
@@ -253,18 +268,18 @@ class ServicesManagerTest {
     fun dependencyBeforeLoadTest() {
         var loadedFirst = false
         var loadedSecond = false
-        val service1 = DependencyServiceImpl(manager, Dependencies.before(DependencyService::class), onTestLoad = {
+        val service1 = ConfigurableServiceImpl(manager, Dependencies.before(ConfigurableService::class), onTestLoad = {
             loadedFirst = true
             assertEquals(true, loadedSecond)
         })
 
-        val service2 = DependencyServiceImpl(manager, onTestLoad = {
+        val service2 = ConfigurableServiceImpl(manager, onTestLoad = {
             loadedSecond = true
             assertEquals(false, loadedFirst)
         })
 
-        manager.registerService(service1, DependencyServiceImpl::class)
-        manager.registerService(service2, DependencyService::class)
+        manager.registerService(service1, ConfigurableServiceImpl::class)
+        manager.registerService(service2, ConfigurableService::class)
         // right order: service2, service1
         manager.loadAll()
     }
@@ -274,18 +289,18 @@ class ServicesManagerTest {
     fun dependencyLastLoadTest() {
         var loadedFirst = false
         var loadedSecond = false
-        val service1 = DependencyServiceImpl(manager, Dependencies.last(), onTestLoad = {
+        val service1 = ConfigurableServiceImpl(manager, Dependencies.last(), onTestLoad = {
             loadedFirst = true
             assertEquals(true, loadedSecond)
         })
 
-        val service2 = DependencyServiceImpl(manager, onTestLoad = {
+        val service2 = ConfigurableServiceImpl(manager, onTestLoad = {
             loadedSecond = true
             assertEquals(false, loadedFirst)
         })
 
-        manager.registerService(service1, DependencyServiceImpl::class)
-        manager.registerService(service2, DependencyService::class)
+        manager.registerService(service1, ConfigurableServiceImpl::class)
+        manager.registerService(service2, ConfigurableService::class)
         // right order: service2, service1
         manager.loadAll()
     }
@@ -294,18 +309,18 @@ class ServicesManagerTest {
     fun dependencyFirstLoadTest() {
         var loadedFirst = false
         var loadedSecond = false
-        val service1 = DependencyServiceImpl(manager, onTestLoad = {
+        val service1 = ConfigurableServiceImpl(manager, onTestLoad = {
             loadedFirst = true
             assertEquals(true, loadedSecond)
         })
 
-        val service2 = DependencyServiceImpl(manager, Dependencies.first(), onTestLoad = {
+        val service2 = ConfigurableServiceImpl(manager, Dependencies.first(), onTestLoad = {
             loadedSecond = true
             assertEquals(false, loadedFirst)
         })
 
-        manager.registerService(service1, DependencyServiceImpl::class)
-        manager.registerService(service2, DependencyService::class)
+        manager.registerService(service1, ConfigurableServiceImpl::class)
+        manager.registerService(service2, ConfigurableService::class)
         // right order: service2, service1
         manager.loadAll()
     }
@@ -324,8 +339,8 @@ class ServicesManagerTest {
 
     @Test
     fun selfDependencyTest() {
-        val service = DependencyServiceImpl(manager, Dependencies.after(DependencyServiceImpl::class))
-        manager.registerService(service, DependencyServiceImpl::class)
+        val service = ConfigurableServiceImpl(manager, Dependencies.after(ConfigurableServiceImpl::class))
+        manager.registerService(service, ConfigurableServiceImpl::class)
         assertThrows<CircularDependencyException> {
             manager.loadAll()
         }
@@ -333,10 +348,10 @@ class ServicesManagerTest {
 
     @Test
     fun recursiveDependencyTest() {
-        val service1 = DependencyServiceImpl(manager, Dependencies.after(DependencyService::class))
-        val service2 = DependencyServiceImpl(manager, Dependencies.after(DependencyServiceImpl::class))
-        manager.registerService(service1, DependencyService::class)
-        manager.registerService(service2, DependencyServiceImpl::class)
+        val service1 = ConfigurableServiceImpl(manager, Dependencies.after(ConfigurableService::class))
+        val service2 = ConfigurableServiceImpl(manager, Dependencies.after(ConfigurableServiceImpl::class))
+        manager.registerService(service1, ConfigurableService::class)
+        manager.registerService(service2, ConfigurableServiceImpl::class)
         assertThrows<CircularDependencyException> {
             manager.loadAll()
         }

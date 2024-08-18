@@ -10,7 +10,7 @@ package dev.nikdekur.ndkore.service
 
 class SomeService2Impl(
     override val manager: ServicesManager<App>
-) : MyModule, SomeService2 {
+) : MyService, SomeService2 {
 
     override val dependencies = dependencies {
         after(SomeService1::class)

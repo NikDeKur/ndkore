@@ -8,7 +8,7 @@
 
 package dev.nikdekur.ndkore.service
 
-import dev.nikdekur.ndkore.NdkoreDSL
+import dev.nikdekur.ndkore.annotation.NdkoreDSL
 import java.util.LinkedList
 import kotlin.reflect.KClass
 

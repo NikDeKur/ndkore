@@ -128,6 +128,4 @@ class PlaceholderParserTest {
 
         assertEquals("value https://example.com/icon.png John - 20", result)
     }
-
-    // TODO: Big letter problem
 }

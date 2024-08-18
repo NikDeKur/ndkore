@@ -6,7 +6,7 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
-package dev.nikdekur.ndkore
+package dev.nikdekur.ndkore.annotation
 
 /**
  * Global annotation used to mark DSLs in the Ndkore library.

@@ -6,16 +6,6 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
-package dev.nikdekur.ndkore.duration
+package dev.nikdekur.ndkore.reflect.classfinder.dir1
 
-
-class DurationFormatterTest {
-
-//    @Test
-//    fun formatToRussian() {
-//        val duration = 500.seconds
-//
-//        val string = duration.toReadableString("RU")
-//        println(string)
-//    }
-}
+class Dir1Class

@@ -8,6 +8,23 @@
 
 package dev.nikdekur.ndkore.service
 
+/**
+ * # Services Component
+ *
+ * Represents a component that has access to a [ServicesManager].
+ *
+ * This interface is shortcut for accessing components from a [ServicesManager].
+ *
+ * ### Example Usage:
+ * ```kotlin
+ * class MyComponent(override val manager: ServicesManager) : ServicesComponent {
+ *    // We assume AnotherService is a service class and is registered in the manager.
+ *    val anotherService by inject<AnotherService>()
+ * }
+ * ```
+ *
+ * @see ServicesManager
+ */
 interface ServicesComponent {
 
     /**

@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "dev.nikdekur"
-version = "1.2.2"
+version = "1.2.3"
 
 val authorId: String by project
 val authorName: String by project
@@ -60,6 +60,7 @@ dependencies {
     testImplementation(libs.slf4j.api)
     testImplementation(libs.slf4j.simple)
     testImplementation(libs.koin)
+    testImplementation(libs.google.guava)
 }
 
 tasks.named("compileKotlin", KotlinCompilationTask::class.java) {

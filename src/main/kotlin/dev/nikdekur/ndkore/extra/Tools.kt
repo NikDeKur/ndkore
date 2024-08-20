@@ -10,9 +10,7 @@
 
 package dev.nikdekur.ndkore.extra
 
-import com.google.common.reflect.ClassPath
 import java.io.File
-import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
 import java.net.URLDecoder
@@ -28,9 +26,6 @@ import java.util.jar.JarFile
 
 @Suppress("unused")
 object Tools {
-
-
-
 
     @JvmOverloads
     fun packDateTimeBeautiful(time: OffsetDateTime = OffsetDateTime.now()): String {
@@ -88,39 +83,34 @@ object Tools {
     }
 
     fun findFileInJar(filePath: String): File? {
-        // Получаем путь к текущему JAR-файлу
+        // Get the path to the JAR-file
         val jarPath = Tools::class.java.protectionDomain.codeSource.location.path
-        try {
-            JarFile(jarPath).use { jarFile ->
-                // Перебираем все записи внутри JAR-файла
-                val entries: Enumeration<JarEntry> = jarFile.entries()
-                while (entries.hasMoreElements()) {
-                    val entry: JarEntry = entries.nextElement()
-                    // Проверяем, является ли текущая запись файлом и имеет ли нужный путь
-                    if (!entry.isDirectory && (entry.name == filePath)) {
-                        // Найден нужный файл внутри JAR-файла
+        JarFile(jarPath).use { jarFile ->
+            // Iterate over the entries and look for the file
+            val entries: Enumeration<JarEntry> = jarFile.entries()
+            while (entries.hasMoreElements()) {
+                val entry: JarEntry = entries.nextElement()
+                // Check if the entry is a file and has the correct name
+                if (!entry.isDirectory && (entry.name == filePath)) {
+                    // File found
 
-                        // Создаем временный файл для копирования содержимого
-                        val tempFile: File = File.createTempFile("tempfile", ".tmp")
-                        tempFile.deleteOnExit()
-                        jarFile.getInputStream(entry).use { inputStream ->
-                            Files.copy(
-                                inputStream,
-                                tempFile.toPath(),
-                                StandardCopyOption.REPLACE_EXISTING
-                            )
-                        }
-
-                        // Возвращаем объект File для временного файла
-                        return tempFile
+                    // Create a temporary file and copy the contents of the entry to it
+                    val tempFile: File = File.createTempFile("tempfile", ".tmp")
+                    tempFile.deleteOnExit()
+                    jarFile.getInputStream(entry).use { inputStream ->
+                        Files.copy(
+                            inputStream,
+                            tempFile.toPath(),
+                            StandardCopyOption.REPLACE_EXISTING
+                        )
                     }
-                }
 
-                // Файл не найден
-                return null
+                    // Return the temporary file
+                    return tempFile
+                }
             }
-        } catch (e: IOException) {
-            e.printStackTrace()
+
+            // File not found
             return null
         }
     }
@@ -151,18 +141,6 @@ object Tools {
         }
 
     class FileNotFoundException(fileName: String) : RuntimeException(fileName)
-
-
-    fun findClasses(classLoader: ClassLoader, packageName: String): List<Class<*>> {
-        return ClassPath.from(classLoader)
-            .allClasses
-            .filter{
-                it.packageName.startsWith(packageName)
-            }
-            .map {
-                it.load()
-            }
-    }
 }
 
 

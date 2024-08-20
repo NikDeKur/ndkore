@@ -8,4 +8,10 @@
 
 package dev.nikdekur.ndkore.service
 
-typealias MyService = Service<App>
+interface MyService : Service<App> {
+
+    val app: App
+
+    override val manager: ServicesManager
+        get() = app.manager
+}

@@ -8,6 +8,7 @@
 
 package dev.nikdekur.ndkore.service
 
+import org.checkerframework.checker.units.qual.A
 import kotlin.reflect.KClass
 
 /**
@@ -21,14 +22,8 @@ import kotlin.reflect.KClass
  *
  * @param A The type representing the application context or environment that services may need to access.
  */
-interface ServicesManager<A> {
+interface ServicesManager {
 
-    /**
-     * The application instance.
-     *
-     * This property provides access to the application-specific data or context that services may depend on.
-     */
-    val app: A
 
     /**
      * A collection of all registered services.
@@ -36,7 +31,7 @@ interface ServicesManager<A> {
      * This property provides access to an iterable collection of all services that have been registered
      * with the service manager.
      */
-    val services: Collection<Service<A>>
+    val services: Collection<Service<*>>
 
     /**
      * Registers a service with the manager.
@@ -47,7 +42,7 @@ interface ServicesManager<A> {
      * @param service The service to be registered.
      * @param bindTo One or more classes to which the service should be bound.
      */
-    fun registerService(service: Service<A>, vararg bindTo: KClass<*>)
+    fun <S : Service<*>> registerService(service: S, vararg bindTo: KClass<out S>)
 
     /**
      * Retrieves a service by its class, or returns null if it is not found.
@@ -56,11 +51,11 @@ interface ServicesManager<A> {
      * It will return the service instance if found,
      * or null if no service matching the class or its superclasses is registered.
      *
-     * @param T The type of the service to retrieve.
+     * @param S The type of the service to retrieve.
      * @param serviceClass The KClass of the service to retrieve.
      * @return The service instance, or null if not found.
      */
-    fun <T : Any> getServiceOrNull(serviceClass: KClass<T>): T?
+    fun <S : Service<*>> getServiceOrNull(serviceClass: KClass<out S>): S?
 
     /**
      * Retrieves a service by its class.
@@ -69,12 +64,12 @@ interface ServicesManager<A> {
      * It will return the service instance if found,
      * or throw a [ServiceNotFoundException] if no service matching the class or its superclasses is registered.
      *
-     * @param T The type of the service to retrieve.
+     * @param S The type of the service to retrieve.
      * @param serviceClass The KClass of the service to retrieve.
      * @return The service instance.
      * @throws ServiceNotFoundException If the service is not found.
      */
-    fun <T : Any> getService(serviceClass: KClass<T>): T
+    fun <S : Service<*>> getService(serviceClass: KClass<out S>): S
 
     /**
      * Loads all registered services.
@@ -114,7 +109,7 @@ interface ServicesManager<A> {
  * @param S The type of the service to retrieve.
  * @return The service instance, or null if not found.
  */
-inline fun <reified S : Any> ServicesManager<*>.getServiceOrNull() = getServiceOrNull(S::class)
+inline fun <reified S : Service<out Any>> ServicesManager.getServiceOrNull() = getServiceOrNull<S>(S::class)
 
 /**
  * Retrieves a service by its class.
@@ -126,7 +121,7 @@ inline fun <reified S : Any> ServicesManager<*>.getServiceOrNull() = getServiceO
  * @return The service instance.
  * @throws ServiceNotFoundException If the service is not found.
  */
-inline fun <reified S : Any> ServicesManager<*>.getService() = getService(S::class)
+inline fun <reified S : Service<*>> ServicesManager.getService() = getService(S::class)
 
 /**
  * Lazily injects a service by its class.
@@ -138,4 +133,4 @@ inline fun <reified S : Any> ServicesManager<*>.getService() = getService(S::cla
  * @return A lazy delegate that provides the service instance.
  * @throws ServiceNotFoundException If the service is not found.
  */
-inline fun <reified S : Any> ServicesManager<*>.inject() = lazy { getService<S>() }
+inline fun <reified S : Service<*>> ServicesManager.inject() = lazy { getService<S>() }

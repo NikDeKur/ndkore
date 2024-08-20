@@ -22,8 +22,8 @@ import kotlin.reflect.KClass
  * @see Service
  */
 data class Dependencies(
-    val before: List<KClass<*>>,
-    val after: List<KClass<*>>,
+    val before: List<KClass<out Service<*>>>,
+    val after: List<KClass<out Service<*>>>,
     val first: Boolean = false,
     val last: Boolean = false,
 ) {
@@ -36,7 +36,8 @@ data class Dependencies(
          * @return New instance of [Dependencies]
          */
         @JvmStatic
-        fun after(vararg modules: KClass<*>) = Dependencies(emptyList(), modules.toList(), first = false, last = false)
+        fun after(vararg modules: KClass<out Service<*>>) =
+            Dependencies(emptyList(), modules.toList(), first = false, last = false)
 
         /**
          * Creates a new instance of [Dependencies] with the given modules that should be loaded after this module.
@@ -45,7 +46,8 @@ data class Dependencies(
          * @return New instance of [Dependencies]
          */
         @JvmStatic
-        fun before(vararg modules: KClass<*>) = Dependencies(modules.toList(), emptyList(), first = false, last = false)
+        fun before(vararg modules: KClass<out Service<*>>) =
+            Dependencies(modules.toList(), emptyList(), first = false, last = false)
 
         private val EMPTY by lazy {
             Dependencies(emptyList(), emptyList(), first = false, last = false)
@@ -85,8 +87,8 @@ data class Dependencies(
 
 
 class DependenciesBuilder {
-    private val before = LinkedList<KClass<*>>()
-    private val after = LinkedList<KClass<*>>()
+    private val before = LinkedList<KClass<out Service<*>>>()
+    private val after = LinkedList<KClass<out Service<*>>>()
     private var first = false
     private var last = false
 
@@ -98,11 +100,11 @@ class DependenciesBuilder {
         last = true
     }
 
-    fun before(vararg services: KClass<*>) {
+    fun before(vararg services: KClass<out Service<*>>) {
         before.addAll(services)
     }
 
-    fun after(vararg services: KClass<*>) {
+    fun after(vararg services: KClass<out Service<*>>) {
         after.addAll(services)
     }
 

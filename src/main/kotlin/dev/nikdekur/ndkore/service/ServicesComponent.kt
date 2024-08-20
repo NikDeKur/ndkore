@@ -8,20 +8,12 @@
 
 package dev.nikdekur.ndkore.service
 
-interface ServicesComponent<A> {
+interface ServicesComponent {
 
     /**
      * The manager that manages this service.
      */
-    val manager: ServicesManager<A>
-
-    /**
-     * The application instance.
-     *
-     * This property provides access to the application-specific data or context that services may depend on.
-     */
-    val app
-        get() = manager.app
+    val manager: ServicesManager
 }
 
 /**
@@ -32,7 +24,7 @@ interface ServicesComponent<A> {
  * @param S The type of the service to retrieve.
  * @return The service instance, or null if not found.
  */
-inline fun <reified S : Any> ServicesComponent<*>.getOrNull() = manager.getServiceOrNull(S::class)
+inline fun <reified S : Service<*>> ServicesComponent.getOrNull() = manager.getServiceOrNull(S::class)
 
 /**
  * Retrieves a service by its class.
@@ -44,7 +36,7 @@ inline fun <reified S : Any> ServicesComponent<*>.getOrNull() = manager.getServi
  * @return The service instance.
  * @throws ServiceNotFoundException If the service is not found.
  */
-inline fun <reified S : Any> ServicesComponent<*>.get() = manager.getService(S::class)
+inline fun <reified S : Service<*>> ServicesComponent.get() = manager.getService(S::class)
 
 /**
  * Lazily injects a service by its class.
@@ -56,5 +48,5 @@ inline fun <reified S : Any> ServicesComponent<*>.get() = manager.getService(S::
  * @return A lazy delegate that provides the service instance.
  * @throws ServiceNotFoundException If the service is not found.
  */
-inline fun <reified S : Any> ServicesComponent<*>.inject() = lazy { get<S>() }
+inline fun <reified S : Service<*>> ServicesComponent.inject() = lazy { get<S>() }
 

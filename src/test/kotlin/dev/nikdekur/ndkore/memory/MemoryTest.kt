@@ -59,7 +59,7 @@ class MemoryTest {
     }
 
     @Test
-    fun `addition`() {
+    fun `addition test`() {
         val memory1 = MemoryAmount(MemoryUnit.KB, 1.toBigInteger())
         val memory2 = MemoryAmount(MemoryUnit.KB, 2.toBigInteger())
         val result = memory1 + memory2

@@ -20,7 +20,7 @@ package dev.nikdekur.ndkore.service
  * @param A The type of the application.
  * @see ServicesManager
  */
-interface Service<A> : ServicesComponent<A> {
+interface Service<A : Any> : ServicesComponent {
 
     /**
      * Load's service.

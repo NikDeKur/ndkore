@@ -8,21 +8,20 @@
 
 package dev.nikdekur.ndkore.service
 
-class SomeService2Impl(
-    override val app: App
-) : SomeService2 {
+class ConfigurableService1Impl(
+    override val app: App,
+    override val dependencies: Dependencies = Dependencies.none(),
+    val onTestLoad: ConfigurableService1Impl.() -> Unit = {},
+    val onTestUnload: ConfigurableService1Impl.() -> Unit = {}
+) : ConfigurableService {
 
-    override val dependencies = dependencies {
-        after(SomeService1::class)
-    }
+    val service by inject<SomeService1>()
 
     override fun onLoad() {
-        loaded = true
+        onTestLoad()
     }
 
     override fun onUnload() {
-        loaded = false
+        onTestUnload()
     }
-
-    override var loaded: Boolean = false
 }

@@ -8,17 +8,15 @@
 
 package dev.nikdekur.ndkore.service
 
-class SomeService1Impl(
-    override val app: App
-) : SomeService1 {
+import org.junit.jupiter.api.BeforeEach
 
-    override fun onLoad() {
-        loaded = true
+class RuntimeServicesManagerTest : ServicesManagerTest {
+
+    override lateinit var app: App
+
+    @BeforeEach
+    fun setUp() {
+        val manager = RuntimeServicesManager()
+        app = TestApp(manager, true)
     }
-
-    override fun onUnload() {
-        loaded = false
-    }
-
-    override var loaded: Boolean = false
 }

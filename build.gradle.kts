@@ -1,4 +1,4 @@
-
+import org.gradle.kotlin.dsl.test
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
@@ -54,6 +54,9 @@ dependencies {
     compileOnly(libs.koin)
 
     testImplementation(kotlin("test"))
+    testImplementation(libs.junit.jupiter.api)
+    testImplementation(libs.junit.jupiter.engine)
+    testImplementation(libs.junit.jupiter.params)
     testImplementation(libs.slf4j.api)
     testImplementation(libs.slf4j.simple)
     testImplementation(libs.koin)

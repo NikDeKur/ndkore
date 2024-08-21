@@ -6,19 +6,23 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
-package dev.nikdekur.ndkore.map.count
+@file:Suppress("NOTHING_TO_INLINE")
 
-typealias CountMap<K> = MutableMap<K, Int>
+package dev.nikdekur.ndkore.map
 
-fun <K> CountMap<K>.increment(key: K) {
+
+typealias CountMap<K> = Map<K, Int>
+typealias MutableCountMap<K> = MutableMap<K, Int>
+
+inline fun <K> MutableCountMap<K>.increment(key: K) {
     val count = get(key, 0)
     this[key] = count + 1
 }
 
-fun <K> CountMap<K>.reset(key: K) {
+fun <K> MutableCountMap<K>.reset(key: K) {
     remove(key)
 }
 
-fun <K> CountMap<K>.get(key: K, default: Int = 0): Int {
+inline fun <K> CountMap<K>.get(key: K, default: Int = 0): Int {
     return getOrDefault(key, default)
 }

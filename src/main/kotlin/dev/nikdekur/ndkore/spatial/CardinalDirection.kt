@@ -8,9 +8,9 @@
 
 package dev.nikdekur.ndkore.spatial
 
-import kotlin.math.absoluteValue
-
 /**
+ * # Cardinal Direction
+ *
  * An enum representing the four primary cardinal directions, each associated with a specific azimuth value.
  *
  * This enum provides functionality to retrieve a direction based on various parameters:
@@ -18,7 +18,7 @@ import kotlin.math.absoluteValue
  * - Index
  * - Azimuth value
  *
- * Example usage:
+ * ### Example usage:
  * ```
  * val direction = CardinalDirection.getByString("north") // Returns CardinalDirection.NORTH
  * val directionByIndex = CardinalDirection.getByIndex(1) // Returns CardinalDirection.EAST
@@ -78,8 +78,6 @@ enum class CardinalDirection(val azimuth: Int) {
         /**
          * Retrieves a [CardinalDirection] that is closest to the provided azimuth value.
          *
-         * The azimuth value is normalized to the range [0, 360) before comparison.
-         *
          * @param azimuth The azimuth value in degrees.
          * @return The [CardinalDirection] closest to the provided azimuth.
          *
@@ -89,10 +87,13 @@ enum class CardinalDirection(val azimuth: Int) {
          * ```
          */
         fun getByAzimuth(azimuth: Int): CardinalDirection {
-            val adjustedAzimuth = (azimuth + 360) % 360 // Normalize to [0, 360) range
-            return entries.minByOrNull {
-                (it.azimuth - adjustedAzimuth).absoluteValue
-            } ?: NORTH
+            return when {
+                azimuth < 45 -> NORTH
+                azimuth < 135 -> EAST
+                azimuth < 225 -> SOUTH
+                azimuth < 315 -> WEST
+                else -> NORTH
+            }
         }
     }
 }

@@ -8,9 +8,8 @@
 
 @file:Suppress("NOTHING_TO_INLINE")
 
-package dev.nikdekur.ndkore.map
+package dev.nikdekur.ndkore.spatial
 
-import dev.nikdekur.ndkore.spatial.Point
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 

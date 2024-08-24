@@ -399,3 +399,22 @@ inline fun <T> notNullListOf(vararg elements: T?): List<T> {
 inline fun <T> MutableList<T>.addAllNotNull(vararg elements: T?) {
     elements.forEach { if (it != null) add(it) }
 }
+
+
+/**
+ * Find the first element in iterable that is an instance of the specified class.
+ *
+ * @param T the type of the class
+ * @return the first element that is an instance of the specified class
+ * @throws NoSuchElementException if no such element is found
+ */
+inline fun <reified T> Iterable<*>.firstInstance() = first { it is T } as T
+
+/**
+ * Find the first element in iterable that is an instance of the specified class or null if no such element is found.
+ *
+ * @param T the type of the class
+ * @return the first element that is an instance of the specified class or null if no such element is found
+ * @throws NoSuchElementException if no such element is found
+ */
+inline fun <reified T> Iterable<*>.firstInstanceOrNull() = firstOrNull { it is T } as? T

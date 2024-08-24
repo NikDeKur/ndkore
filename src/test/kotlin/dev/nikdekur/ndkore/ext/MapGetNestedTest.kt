@@ -11,7 +11,7 @@ package dev.nikdekur.ndkore.ext
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class MapTest {
+class MapGetNestedTest {
 
     @Test
     fun getNestedSingleTest() {

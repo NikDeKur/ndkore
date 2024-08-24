@@ -18,31 +18,68 @@ abstract class AbstractServicesManager : ServicesManager {
 
     val logger = LoggerFactory.getLogger(javaClass)
 
-    override fun loadAll() {
+    override var state = ServicesManager.State.DISABLED
+
+    val servicesCollection = LinkedHashSet<Service<*>>()
+
+    override val services
+        get() = sortModules()
+
+    override fun <S : Service<*>> registerService(service: S, vararg bindTo: KClass<out S>) {
+        // If services manager is enabled and bind override existing services,
+        // then disable existing services and enable the new one
+        if (state == ServicesManager.State.ENABLED) {
+            getServiceOrNull(service::class)?.doDisable()
+            bindTo.forEach { getServiceOrNull(it)?.doDisable() }
+
+            service.doEnable()
+        }
+
+        servicesCollection.add(service)
+    }
+
+
+    override fun enable() {
+        check(state == ServicesManager.State.DISABLED) {
+            "Services Manager is not disabled!"
+        }
+
+        state = ServicesManager.State.ENABLING
+
         val sorted = sortModules()
         logger.info("Load order: ${sorted.joinToString { it.javaClass.simpleName }}")
         sorted.forEach {
             try {
-                it.onLoad()
+                it.onEnable()
             } catch (e: Exception) {
                 logger.error("Error while loading module '$it'!", e)
             }
         }
+
+        state = ServicesManager.State.ENABLED
     }
 
-    override fun unloadAll() {
+    override fun disable() {
+        check(state == ServicesManager.State.ENABLED) {
+            "Services Manager is not enabled!"
+        }
+
+        state = ServicesManager.State.DISABLING
+
         // Unload in reverse order, because of dependencies
         sortModules().reversed().forEach {
             try {
-                it.onUnload()
+                it.onDisable()
             } catch (e: Exception) {
                 logger.error("Error while unloading module '$it'!", e)
             }
         }
+
+        state = ServicesManager.State.DISABLED
     }
 
 
-    private fun sortModules(): Collection<Service<*>> {
+    fun sortModules(): Collection<Service<*>> {
         val firstModules = LinkedList<Service<*>>()
         val lastModules = LinkedList<Service<*>>()
         val middleModules = LinkedList<Service<*>>()
@@ -50,7 +87,7 @@ abstract class AbstractServicesManager : ServicesManager {
         val addedModules = HashSet<KClass<out Service<*>>>()
 
         // Group modules into first, last, and middle categories
-        services.forEach { service ->
+        servicesCollection.forEach { service ->
             when {
                 service.dependencies.first -> firstModules.add(service)
                 service.dependencies.last -> lastModules.add(service)

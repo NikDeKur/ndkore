@@ -17,11 +17,11 @@ class ConfigurableService2Impl(
 
     val service by inject<SomeService1>()
 
-    override fun onLoad() {
+    override fun onEnable() {
         onTestLoad()
     }
 
-    override fun onUnload() {
+    override fun onDisable() {
         onTestUnload()
     }
 }

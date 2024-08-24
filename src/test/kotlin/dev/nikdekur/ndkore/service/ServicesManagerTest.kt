@@ -11,6 +11,7 @@ package dev.nikdekur.ndkore.service
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.koin.core.context.GlobalContext
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -184,9 +185,9 @@ interface ServicesManagerTest {
         val service = SomeService1Impl(app)
         manager.registerService(service, SomeService1::class)
         assertEquals(false, service.loaded)
-        manager.loadAll()
+        manager.enable()
         assertEquals(true, service.loaded)
-        manager.unloadAll()
+        manager.disable()
         assertEquals(false, service.loaded)
     }
 
@@ -196,10 +197,48 @@ interface ServicesManagerTest {
         val service = SomeService1Impl(app)
         manager.registerService(service, SomeService1::class)
         assertEquals(false, service.loaded)
-        manager.loadAll()
+        manager.enable()
         assertEquals(true, service.loaded)
-        manager.reloadAll()
+        manager.reload()
         assertEquals(true, service.loaded)
+    }
+
+    @Test
+    fun `disable previous service and enable new after rebind`() {
+        val service1 = SomeService1Impl(app)
+        manager.registerService(service1, SomeService1::class)
+        manager.enable()
+
+        assertEquals(true, service1.loaded)
+
+        val service2 = SomeService2Impl(app)
+        manager.registerService(service2, SomeService1::class)
+
+        assertEquals(false, service1.loaded)
+        assertEquals(true, service2.loaded)
+    }
+
+
+    @Test
+    fun `disable previous service and enable new after rebind with multiple services`() {
+        val service1 = SomeService1Impl(app)
+        val service2 = SomeService2Impl(app)
+        manager.registerService(service1, SomeService1::class)
+        manager.registerService(service2, SomeService2::class)
+        manager.enable()
+
+        assertEquals(true, service1.loaded)
+        assertEquals(true, service2.loaded)
+
+        val service3 = SomeService1Impl(app)
+        val service4 = SomeService2Impl(app)
+        manager.registerService(service3, SomeService1::class)
+        manager.registerService(service4, SomeService2::class)
+
+        assertEquals(false, service1.loaded)
+        assertEquals(false, service2.loaded)
+        assertEquals(true, service3.loaded)
+        assertEquals(true, service4.loaded)
     }
 
 
@@ -220,7 +259,7 @@ interface ServicesManagerTest {
         manager.registerService(service1, ConfigurableService1Impl::class)
         manager.registerService(service2, ConfigurableService::class)
         println(manager.services)
-        manager.loadAll()
+        manager.enable()
     }
 
 
@@ -240,7 +279,7 @@ interface ServicesManagerTest {
 
         manager.registerService(service2, ConfigurableService::class)
         manager.registerService(service1, ConfigurableService1Impl::class)
-        manager.loadAll()
+        manager.enable()
     }
 
 
@@ -260,7 +299,7 @@ interface ServicesManagerTest {
 
         manager.registerService(service1, ConfigurableService1Impl::class)
         manager.registerService(service2, ConfigurableService::class)
-        manager.loadAll()
+        manager.enable()
     }
 
 
@@ -281,7 +320,7 @@ interface ServicesManagerTest {
         manager.registerService(service1, ConfigurableService1Impl::class)
         manager.registerService(service2, ConfigurableService::class)
         // right order: service2, service1
-        manager.loadAll()
+        manager.enable()
     }
 
 
@@ -302,7 +341,7 @@ interface ServicesManagerTest {
         manager.registerService(service1, ConfigurableService1Impl::class)
         manager.registerService(service2, ConfigurableService::class)
         // right order: service2, service1
-        manager.loadAll()
+        manager.enable()
     }
 
     @Test
@@ -322,7 +361,20 @@ interface ServicesManagerTest {
         manager.registerService(service1, ConfigurableService1Impl::class)
         manager.registerService(service2, ConfigurableService::class)
         // right order: service2, service1
-        manager.loadAll()
+        manager.enable()
+    }
+
+
+    @Test
+    fun `services list return list in order of dependencies`() {
+        val service1 = SomeService1Impl(app, Dependencies.after(SomeService2::class))
+        val service2 = SomeService2Impl(app)
+
+
+        manager.registerService(service1, SomeService1::class)
+        manager.registerService(service2, SomeService2::class)
+        manager.enable()
+        assertContentEquals(listOf(service2, service1), manager.services)
     }
 
 
@@ -342,7 +394,7 @@ interface ServicesManagerTest {
         val service = ConfigurableService1Impl(app, Dependencies.after(ConfigurableService1Impl::class))
         manager.registerService(service, ConfigurableService1Impl::class)
         assertThrows<CircularDependencyException> {
-            manager.loadAll()
+            manager.enable()
         }
     }
 
@@ -353,7 +405,7 @@ interface ServicesManagerTest {
         manager.registerService(service1, ConfigurableService::class)
         manager.registerService(service2, ConfigurableService1Impl::class)
         assertThrows<CircularDependencyException> {
-            manager.loadAll()
+            manager.enable()
         }
     }
 }

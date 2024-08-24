@@ -9,14 +9,15 @@
 package dev.nikdekur.ndkore.service
 
 class SomeService1Impl(
-    override val app: App
+    override val app: App,
+    override val dependencies: Dependencies = Dependencies.none()
 ) : SomeService1 {
 
-    override fun onLoad() {
+    override fun onEnable() {
         loaded = true
     }
 
-    override fun onUnload() {
+    override fun onDisable() {
         loaded = false
     }
 

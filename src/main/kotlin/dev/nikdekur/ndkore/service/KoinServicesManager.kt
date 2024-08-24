@@ -16,13 +16,14 @@ import org.koin.core.context.KoinContext
 import org.koin.core.error.NoDefinitionFoundException
 import org.koin.core.module.Module
 import org.koin.dsl.bind
-import java.util.LinkedList
 import kotlin.reflect.KClass
 
 /**
+ * # Koin Services Manager
+ *
  * [ServicesManager] implementation using a Koin Dependency Injection framework.
  *
- * Uses Koin to store services instances.
+ * Use Koin to store and manage services instances.
  *
  * ### Example Usage:
  * ```
@@ -87,16 +88,13 @@ class KoinServicesManager(
     val context: KoinContext
 ) : AbstractServicesManager() {
 
-    override val services = LinkedList<Service<*>>()
-
     override fun <S : Service<*>> registerService(service: S, vararg bindTo: KClass<out S>) {
+        super.registerService(service, *bindTo)
         // Koin doesn't allow passing class instead of a reified type, so here we see
         // rewrote access to koin internals to make it work and cast magic
         context.loadModule {
             reg<Any>(service, *bindTo)
         }
-
-        services.add(service as Service<*>)
     }
 
 

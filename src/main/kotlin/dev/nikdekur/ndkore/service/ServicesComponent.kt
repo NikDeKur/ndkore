@@ -8,6 +8,8 @@
 
 package dev.nikdekur.ndkore.service
 
+import kotlin.properties.ReadOnlyProperty
+
 /**
  * # Services Component
  *
@@ -56,14 +58,13 @@ inline fun <reified S : Service<*>> ServicesComponent.getOrNull() = manager.getS
 inline fun <reified S : Service<*>> ServicesComponent.get() = manager.getService(S::class)
 
 /**
- * Lazily injects a service by its class.
+ * Return a property delegate that provides a service instance.
  *
- * This extension function allows for lazy initialization of a service, which will be injected when first accessed.
- * It uses reified generics to infer the service class.
+ * Service instance every time will be retrieved from the manager.
  *
  * @param S The type of the service to inject.
- * @return A lazy delegate that provides the service instance.
+ * @return A property delegate that provides the service instance.
  * @throws ServiceNotFoundException If the service is not found.
  */
-inline fun <reified S : Service<*>> ServicesComponent.inject() = lazy { get<S>() }
+inline fun <reified S : Service<*>> ServicesComponent.inject() = ReadOnlyProperty<Any?, S> { _, _ -> get() }
 

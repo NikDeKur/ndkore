@@ -12,6 +12,8 @@ import org.checkerframework.checker.units.qual.A
 import kotlin.reflect.KClass
 
 /**
+ * # Services Manager
+ *
  * Interface for managing the lifecycle and registration of services within an application.
  *
  * Services are components that provide functionality to an application.
@@ -24,12 +26,20 @@ import kotlin.reflect.KClass
  */
 interface ServicesManager {
 
+    /**
+     * The current state of the service manager.
+     *
+     * @see State
+     */
+    val state: State
 
     /**
      * A collection of all registered services.
      *
      * This property provides access to an iterable collection of all services that have been registered
      * with the service manager.
+     *
+     * Guaranteed to return services in the order of their dependencies.
      */
     val services: Collection<Service<*>>
 
@@ -39,6 +49,10 @@ interface ServicesManager {
      * This method registers a service and binds it to one or more classes, allowing for dependency injection.
      * Injecting a service will always return the same instance.
      *
+     * If manager is enabled, the service will be enabled immediately.
+     * If some service is already registered with the same class, it will be replaced
+     * and the old service will be disabled (if manager is enabled).
+     *
      * @param service The service to be registered.
      * @param bindTo One or more classes to which the service should be bound.
      */
@@ -47,9 +61,10 @@ interface ServicesManager {
     /**
      * Retrieves a service by its class, or returns null if it is not found.
      *
-     * This method attempts to locate a service by its class.
+     * This method attempts to locate a service by its class
+     * or class it is binded to.
      * It will return the service instance if found,
-     * or null if no service matching the class or its superclasses is registered.
+     * or null if no service is found.
      *
      * @param S The type of the service to retrieve.
      * @param serviceClass The KClass of the service to retrieve.
@@ -60,9 +75,8 @@ interface ServicesManager {
     /**
      * Retrieves a service by its class.
      *
-     * This method attempts to locate a service by its class.
-     * It will return the service instance if found,
-     * or throw a [ServiceNotFoundException] if no service matching the class or its superclasses is registered.
+     * This method attempts to locate a service by its class
+     * or class it is binded to.
      *
      * @param S The type of the service to retrieve.
      * @param serviceClass The KClass of the service to retrieve.
@@ -72,32 +86,41 @@ interface ServicesManager {
     fun <S : Service<*>> getService(serviceClass: KClass<out S>): S
 
     /**
-     * Loads all registered services.
+     * Enable service manager.
      *
-     * This method should be called after all services have been registered.
-     * It will invoke the [Service.onLoad]
-     * method on all registered services to initialize them.
+     * This method will enable all registered services ([Service.doEnable])
+     * and will enable every service in the correct order to satisfy all dependencies.
      */
-    fun loadAll()
+    fun enable()
 
     /**
-     * Unloads all registered services.
+     * Disable service manager.
      *
-     * This method will invoke the [Service.onUnload] method on all registered services, allowing them to perform
-     * any necessary cleanup before being unloaded.
+     * This method will disable all registered services ([Service.doDisable])
+     * and will disable every service in the correct order to satisfy all dependencies.
      */
-    fun unloadAll()
+    fun disable()
+
 
     /**
-     * Reloads all registered services.
+     * Reload service manager.
      *
-     * This method is equivalent to calling [unloadAll] followed by [loadAll].
-     * It allows for reinitializing
-     * services without restarting the entire application.
+     * This method call is equivalent to calling [disable] and [enable] in sequence.
+     *
+     * @see enable
+     * @see disable
      */
-    fun reloadAll() {
-        unloadAll()
-        loadAll()
+    fun reload() {
+        disable()
+        enable()
+    }
+
+
+    enum class State {
+        ENABLING,
+        ENABLED,
+        DISABLING,
+        DISABLED
     }
 }
 

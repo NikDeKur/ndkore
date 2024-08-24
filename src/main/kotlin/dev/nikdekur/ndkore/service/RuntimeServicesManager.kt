@@ -14,10 +14,9 @@ class RuntimeServicesManager : AbstractServicesManager() {
 
     val servicesMap = LinkedHashMap<String, Service<*>>()
 
-    override val services
-        get() = servicesMap.values
-
     override fun <S : Service<*>> registerService(service: S, vararg bindTo: KClass<out S>) {
+        super.registerService(service, *bindTo)
+
         bindTo.forEach { clazz ->
             val name = clazz.java.name
             servicesMap[name] = service

@@ -12,10 +12,14 @@ package dev.nikdekur.ndkore.ext
 
 import dev.nikdekur.ndkore.reflect.Reflect
 import dev.nikdekur.ndkore.reflect.ReflectResult
+import java.io.File
 import java.lang.reflect.AccessibleObject
 import java.lang.reflect.Constructor
 import java.lang.reflect.Field
 import java.lang.reflect.Method
+import java.security.ProtectionDomain
+import java.util.jar.JarEntry
+import java.util.jar.JarFile
 
 
 /**
@@ -297,4 +301,29 @@ inline fun <reified T : Enum<T>> enumValueOf(name: String, ignoreCase: Boolean =
     } else {
         kotlin.enumValueOf(name)
     }
+}
+
+/**
+ * Retrieves the JAR file
+ *
+ * @param protectionDomain The `ProtectionDomain` of the class to resolve the JAR file.
+ * Could be obtained by [Class.getProtectionDomain]
+ * @return The `File` object representing the JAR file.
+ */
+inline fun resolveJar(protectionDomain: ProtectionDomain): File {
+    return File(protectionDomain.codeSource.location.toURI())
+}
+
+/**
+ * Searches for entries in the JAR file that match the specified directory.
+ *
+ * @param directory The directory to search for in the JAR file.
+ * @return The `File` object representing the JAR file.
+ */
+inline fun JarFile.getEntries(directory: String): List<JarEntry> {
+    val path = "$directory/"
+    return entries()
+        .asSequence()
+        .filter { it.name.startsWith(path) && it.name != path }
+        .toList()
 }

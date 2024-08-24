@@ -11,11 +11,8 @@
 package dev.nikdekur.ndkore.extra
 
 import java.io.File
-import java.net.URI
-import java.net.URISyntaxException
 import java.net.URLDecoder
 import java.nio.file.Files
-import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.time.Duration
 import java.time.OffsetDateTime
@@ -115,30 +112,8 @@ object Tools {
         }
     }
 
-    val jarPath: String
-        get() = Paths.get(jarFile.toURI()).toAbsolutePath().toString()
 
 
-    val jarFile: File
-        get() {
-            val klass: Class<*> = Tools::class.java
-            val className = klass.simpleName + ".class"
-            val classPath = klass.getResource(className)!!.toString()
-            return if (classPath.startsWith("jar:file:")) {
-                try {
-                    val jarFilePath = classPath.substring("jar:file:".length, classPath.indexOf("!"))
-                    File(URI(jarFilePath))
-                } catch (e: URISyntaxException) {
-                    throw RuntimeException(e)
-                }
-            } else if (classPath.startsWith("file:")) {
-                val endIndex = classPath.indexOf(className)
-                val filePath = classPath.substring("file:".length, endIndex)
-                File(filePath)
-            } else {
-                throw UnsupportedOperationException("Unsupported URL format: $classPath")
-            }
-        }
 
     class FileNotFoundException(fileName: String) : RuntimeException(fileName)
 }

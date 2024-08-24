@@ -80,9 +80,7 @@ import kotlin.reflect.KClass
  * }
  * ```
  *
- * @param A The type of the application.
  * @property context The Koin context.
- * @property app The application.
  */
 class KoinServicesManager(
     val context: KoinContext

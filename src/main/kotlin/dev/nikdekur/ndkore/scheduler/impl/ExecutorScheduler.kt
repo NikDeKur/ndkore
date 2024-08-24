@@ -15,6 +15,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
 
 /**
  * ExecutorScheduler is a concrete implementation of [AbstractScheduler] that uses a Java
@@ -68,7 +69,7 @@ open class ExecutorScheduler(val executor: ScheduledExecutorService) : AbstractS
         return schedulerTask
     }
 
-    override fun runTaskTimer(delay: Long, interval: Long, task: suspend () -> Unit): SchedulerTask {
+    override fun runTaskTimer(delay: Duration, interval: Duration, task: suspend () -> Unit): SchedulerTask {
         val taskId = nextId()
         val wrapped = Runnable {
             try {
@@ -82,7 +83,12 @@ open class ExecutorScheduler(val executor: ScheduledExecutorService) : AbstractS
             }
         }
 
-        val future = executor.scheduleAtFixedRate(wrapped, delay, interval, TimeUnit.MILLISECONDS)
+        val future = executor.scheduleAtFixedRate(
+            wrapped,
+            delay.inWholeNanoseconds,
+            interval.inWholeNanoseconds,
+            TimeUnit.NANOSECONDS
+        )
 
         val schedulerTask = newTask(taskId, future)
 
@@ -90,7 +96,7 @@ open class ExecutorScheduler(val executor: ScheduledExecutorService) : AbstractS
     }
 
 
-    override fun runTaskLater(delay: Long, task: suspend () -> Unit): SchedulerTask {
+    override fun runTaskLater(delay: Duration, task: suspend () -> Unit): SchedulerTask {
 
         val taskId = nextId()
         val wrapped = Runnable {
@@ -105,7 +111,7 @@ open class ExecutorScheduler(val executor: ScheduledExecutorService) : AbstractS
             }
         }
 
-        val future = executor.schedule(wrapped, delay, TimeUnit.MILLISECONDS)
+        val future = executor.schedule(wrapped, delay.inWholeNanoseconds, TimeUnit.NANOSECONDS)
 
         val sTask = newTask(taskId, future)
         return sTask

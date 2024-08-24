@@ -12,6 +12,8 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
+ * # AbstractScheduler
+ *
  * AbstractScheduler is an abstract base class that provides common functionality for different
  * scheduler implementations.
  * It manages the registration and cancellation of tasks using a

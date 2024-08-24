@@ -18,8 +18,11 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration
 
 /**
+ * # CoroutineScheduler
+ *
  * CoroutineScheduler is a concrete implementation of [AbstractScheduler] that uses Kotlin coroutines
  * to schedule and run tasks.
  * It allows tasks to be run immediately, after a delay, or at fixed intervals.
@@ -28,7 +31,7 @@ import kotlin.coroutines.CoroutineContext
  * The tasks are managed within a [CoroutineScope], which ensures proper lifecycle management and
  * structured concurrency.
  *
- * Example usage:
+ * ### Example usage:
  *
  * ```
  * val scheduler = CoroutineScheduler(CoroutineScope(Dispatchers.Default))
@@ -64,7 +67,7 @@ open class CoroutineScheduler(val scope: CoroutineScope) : AbstractScheduler(), 
 
 
     @OptIn(ObsoleteCoroutinesApi::class)
-    override fun runTaskTimer(delay: Long, interval: Long, task: suspend () -> Unit): SchedulerTask {
+    override fun runTaskTimer(delay: Duration, interval: Duration, task: suspend () -> Unit): SchedulerTask {
         val taskId = nextId()
         val flow = flow {
             delay(delay)
@@ -85,7 +88,7 @@ open class CoroutineScheduler(val scope: CoroutineScope) : AbstractScheduler(), 
         return newTask(taskId, flow)
     }
 
-    override fun runTaskLater(delay: Long, task: suspend () -> Unit): SchedulerTask {
+    override fun runTaskLater(delay: Duration, task: suspend () -> Unit): SchedulerTask {
         val taskId = nextId()
 
         val job = scope.launch {

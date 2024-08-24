@@ -6,11 +6,14 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
+@file:Suppress("NOTHING_TO_INLINE")
+
 package dev.nikdekur.ndkore.scheduler
 
 import dev.nikdekur.ndkore.scheduler.impl.CoroutineScheduler
 import dev.nikdekur.ndkore.scheduler.impl.ExecutorScheduler
 import java.util.concurrent.ScheduledExecutorService
+import kotlin.time.Duration
 
 /**
  * The scheduler interface is used to run tasks in different thread pools.
@@ -36,21 +39,12 @@ interface Scheduler {
     /**
      * Starts a task with a specified interval.
      *
-     * @param delay Delay before the first task launch (in milliseconds).
-     * @param interval Interval between further task launches (in milliseconds).
+     * @param delay Delay before the first task launch.
+     * @param interval Interval between further task launches.
      * @param task The task to be executed.
      * @return The task object.
      */
-    fun runTaskTimer(delay: Long, interval: Long, task: suspend () -> Unit): SchedulerTask
-
-    /**
-     * Starts a task with a specified interval.
-     *
-     * @param interval Interval between further task launches (in milliseconds).
-     * @param task The task to be executed.
-     * @return The task object.
-     */
-    fun runTaskTimer(interval: Long, task: suspend () -> Unit) = runTaskTimer(interval, interval, task)
+    fun runTaskTimer(delay: Duration, interval: Duration, task: suspend () -> Unit): SchedulerTask
 
     /**
      * Starts the execution of a task after a specified time has elapsed.
@@ -59,7 +53,7 @@ interface Scheduler {
      * @param task The task to be executed.
      * @return The task object.
      */
-    fun runTaskLater(delay: Long, task: suspend () -> Unit): SchedulerTask
+    fun runTaskLater(delay: Duration, task: suspend () -> Unit): SchedulerTask
 
 
     /**
@@ -67,3 +61,15 @@ interface Scheduler {
      */
     fun cancelAllTasks()
 }
+
+/**
+ * Starts a task with a specified interval.
+ *
+ * @param interval Interval between further task launches.
+ * @param task The task to be executed.
+ * @return The task object.
+ */
+inline fun Scheduler.runTaskTimer(
+    interval: Duration,
+    noinline task: suspend () -> Unit
+) = runTaskTimer(interval, interval, task)

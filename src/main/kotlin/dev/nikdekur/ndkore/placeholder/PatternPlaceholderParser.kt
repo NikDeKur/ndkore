@@ -67,7 +67,7 @@ import java.util.regex.Pattern
  * println(result) // Output: Bob is 30 years old
  * ```
  */
-class PatternPlaceholderParser(val pattern: Pattern) : PlaceholderParser {
+open class PatternPlaceholderParser(val pattern: Pattern) : PlaceholderParser {
 
     constructor(symbolLeft: String, symbolRight: String) : this(Pattern.compile("$symbolLeft(.*?)$symbolRight"))
     constructor(symbol: String) : this(symbol, symbol)
@@ -115,22 +115,20 @@ class PatternPlaceholderParser(val pattern: Pattern) : PlaceholderParser {
         return sb.toString()
     }
 
+    open fun findValue(obj: Any, valueName: String): Any? {
+        if (obj is Placeholder) {
+            val value = obj.getPlaceholder(valueName)
+            if (value != null) return value
+        }
+        return obj.r_GetField(valueName).value
+            ?: obj.r_CallMethod(valueName.asCamelCaseGetter()).value
+            ?: obj.r_CallMethod(valueName).value
+    }
 
 
     companion object {
         val HASH = PatternPlaceholderParser("#")
         val PROCENT = PatternPlaceholderParser("%")
         val CURLY_BRACKET = PatternPlaceholderParser("\\{", "\\}")
-
-
-        inline fun findValue(obj: Any, valueName: String): Any? {
-            if (obj is Placeholder) {
-                val value = obj.getPlaceholder(valueName)
-                if (value != null) return value
-            }
-            return obj.r_GetField(valueName).value
-                ?: obj.r_CallMethod(valueName.asCamelCaseGetter()).value
-                ?: obj.r_CallMethod(valueName).value
-        }
     }
 }

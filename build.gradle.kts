@@ -61,6 +61,7 @@ dependencies {
     testImplementation(libs.slf4j.simple)
     testImplementation(libs.koin)
     testImplementation(libs.google.guava)
+    testImplementation(libs.kotlinx.serialization)
 }
 
 tasks.named("compileKotlin", KotlinCompilationTask::class.java) {

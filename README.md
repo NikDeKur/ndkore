@@ -40,6 +40,8 @@ Ex: inline functions, reified types, etc.
 
 Replace `{version}` with the latest version number on repository.
 
+[`01.09.2024`] Latest version: `1.2.5`
+
 ### Gradle (Kotlin)
 
 ```kotlin

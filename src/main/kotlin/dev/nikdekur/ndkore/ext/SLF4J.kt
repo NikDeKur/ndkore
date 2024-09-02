@@ -14,7 +14,6 @@ package dev.nikdekur.ndkore.ext
 import org.slf4j.Logger
 import org.slf4j.event.Level
 import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
 
 inline fun Logger.log(level: Level, msg: String) = atLevel(level).log(msg)
 
@@ -35,32 +34,9 @@ inline fun Logger.info(throwable: Throwable, msg: () -> String) = info(msg(), th
 inline fun Logger.warn(throwable: Throwable, msg: () -> String) = warn(msg(), throwable)
 inline fun Logger.error(throwable: Throwable, msg: () -> String) = error(msg(), throwable)
 
-inline fun <T> Logger.recordTiming(level: Level = Level.INFO, name: String, block: () -> T): T {
-    contract {
-        callsInPlace(block, kotlin.contracts.InvocationKind.EXACTLY_ONCE)
-    }
-
-    val start = System.nanoTime()
-    val result = block()
-    val end = System.nanoTime()
-
-    // Round to 2dp
-    val ms = ((end - start) / 1_000_000.0).format(2)
-    atLevel(level)
-        .log("$name took ${ms}ms")
-
-    return result
-}
+fun <T> Logger.recordTiming(level: Level = Level.INFO, name: String, block: () -> T): T =
+    recordTimingImpl({ log(level, it) }, name, block)
 
 
-inline fun <T> Logger.recordTimingNano(level: Level, name: String, block: () -> T): T {
-    val start = System.nanoTime()
-    val result = block()
-    val end = System.nanoTime()
-
-    val nanos = (end - start)
-    atLevel(level)
-        .log("$name took ${nanos}nanos")
-
-    return result
-}
+fun <T> Logger.recordTimingNano(level: Level, name: String, block: () -> T): T =
+    recordTimingNanoImpl({ log(level, it) }, name, block)

@@ -8,8 +8,13 @@
 
 @file:Suppress("NOTHING_TO_INLINE")
 
-package dev.nikdekur.ndkore.service
+package dev.nikdekur.ndkore.service.manager
 
+import dev.nikdekur.ndkore.service.CircularDependencyException
+import dev.nikdekur.ndkore.service.ClassIsNotServiceException
+import dev.nikdekur.ndkore.service.Service
+import dev.nikdekur.ndkore.service.ServiceNotFoundException
+import dev.nikdekur.ndkore.service.ServicesManager
 import org.slf4j.LoggerFactory
 import java.util.LinkedList
 import kotlin.reflect.KClass
@@ -20,23 +25,31 @@ abstract class AbstractServicesManager : ServicesManager {
 
     override var state = ServicesManager.State.DISABLED
 
-    val servicesCollection = LinkedHashSet<Service<*>>()
+    val servicesCollection = LinkedHashSet<Service>()
 
     override val services
         get() = sortModules()
 
-    override fun <S : Service<*>> registerService(service: S, vararg bindTo: KClass<out S>) {
+    override fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
+        if (service !is Service)
+            throw ClassIsNotServiceException(service::class)
+
         // If services manager is enabled and bind override existing services,
         // then disable existing services and enable the new one
         if (state == ServicesManager.State.ENABLED) {
-            getServiceOrNull(service::class)?.doDisable()
-            bindTo.forEach { getServiceOrNull(it)?.doDisable() }
-
+            getServiceInternal(service::class)?.doDisable()
+            bindTo.forEach { getServiceInternal(it)?.doDisable() }
             service.doEnable()
         }
 
         servicesCollection.add(service)
     }
+
+    fun getServiceInternal(serviceClass: KClass<*>): Service? {
+        val service = getServiceOrNull(serviceClass) ?: return null
+        return service as? Service ?: throw ClassIsNotServiceException(serviceClass)
+    }
+
 
 
     override fun enable() {
@@ -50,7 +63,7 @@ abstract class AbstractServicesManager : ServicesManager {
         logger.info("Load order: ${sorted.joinToString { it.javaClass.simpleName }}")
         sorted.forEach {
             try {
-                it.onEnable()
+                it.doEnable()
             } catch (e: Exception) {
                 logger.error("Error while loading module '$it'!", e)
             }
@@ -69,7 +82,7 @@ abstract class AbstractServicesManager : ServicesManager {
         // Unload in reverse order, because of dependencies
         sortModules().reversed().forEach {
             try {
-                it.onDisable()
+                it.doDisable()
             } catch (e: Exception) {
                 logger.error("Error while unloading module '$it'!", e)
             }
@@ -79,12 +92,18 @@ abstract class AbstractServicesManager : ServicesManager {
     }
 
 
-    fun sortModules(): Collection<Service<*>> {
-        val firstModules = LinkedList<Service<*>>()
-        val lastModules = LinkedList<Service<*>>()
-        val middleModules = LinkedList<Service<*>>()
-        val sortedServices = LinkedHashSet<Service<*>>()
-        val addedModules = HashSet<KClass<out Service<*>>>()
+    fun reload(service: Service) {
+        service.onDisable()
+        service.onEnable()
+    }
+
+
+    fun sortModules(): Collection<Service> {
+        val firstModules = LinkedList<Service>()
+        val lastModules = LinkedList<Service>()
+        val middleModules = LinkedList<Service>()
+        val sortedServices = LinkedHashSet<Service>()
+        val addedModules = HashSet<KClass<out Service>>()
 
         // Group modules into first, last, and middle categories
         servicesCollection.forEach { service ->
@@ -96,10 +115,10 @@ abstract class AbstractServicesManager : ServicesManager {
         }
 
         // Set for tracking modules currently in the process of loading
-        val currentlyProcessing = HashSet<Service<*>>()
+        val currentlyProcessing = HashSet<Service>()
 
         // Helper function to add a module considering its dependencies
-        fun addModule(service: Service<*>) {
+        fun addModule(service: Service) {
             if (sortedServices.contains(service)) return
 
             if (currentlyProcessing.contains(service)) {
@@ -112,7 +131,7 @@ abstract class AbstractServicesManager : ServicesManager {
 
             // Load modules that the current one depends on
             service.dependencies.after.forEach { afterModule ->
-                val afterService = getServiceOrNull(afterModule) ?: throw ServiceNotFoundException(afterModule)
+                val afterService = getServiceInternal(afterModule) ?: throw ServiceNotFoundException(afterModule)
                 @Suppress("UNCHECKED_CAST")
                 addModule(afterService)
             }
@@ -123,7 +142,7 @@ abstract class AbstractServicesManager : ServicesManager {
 
             // Load modules that should be loaded before the current one
             service.dependencies.before.forEach { beforeModule ->
-                val beforeService = getServiceOrNull(beforeModule)
+                val beforeService = getServiceInternal(beforeModule)
                 if (beforeService != null && !sortedServices.contains(beforeService)) {
                     // Remove the current module so it can be re-added after its dependencies
                     sortedServices.remove(service)

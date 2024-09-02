@@ -9,6 +9,7 @@
 package dev.nikdekur.ndkore.service
 
 import dev.nikdekur.ndkore.koin.SimpleKoinContext
+import dev.nikdekur.ndkore.service.manager.KoinServicesManager
 import org.junit.jupiter.api.BeforeEach
 import org.koin.environmentProperties
 

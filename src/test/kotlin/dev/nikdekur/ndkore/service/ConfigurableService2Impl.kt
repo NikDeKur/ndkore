@@ -13,7 +13,7 @@ class ConfigurableService2Impl(
     override val dependencies: Dependencies = Dependencies.none(),
     val onTestLoad: ConfigurableService2Impl.() -> Unit = {},
     val onTestUnload: ConfigurableService2Impl.() -> Unit = {}
-) : ConfigurableService {
+) : MyService(), ConfigurableService {
 
     val service by inject<SomeService1>()
 

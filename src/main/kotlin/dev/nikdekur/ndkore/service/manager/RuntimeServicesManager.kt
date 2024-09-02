@@ -6,16 +6,20 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
-package dev.nikdekur.ndkore.service
+package dev.nikdekur.ndkore.service.manager
 
+import dev.nikdekur.ndkore.service.Service
+import dev.nikdekur.ndkore.service.ServiceNotFoundException
 import kotlin.reflect.KClass
 
 class RuntimeServicesManager : AbstractServicesManager() {
 
-    val servicesMap = LinkedHashMap<String, Service<*>>()
+    val servicesMap = LinkedHashMap<String, Service>()
 
-    override fun <S : Service<*>> registerService(service: S, vararg bindTo: KClass<out S>) {
+    override fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
         super.registerService(service, *bindTo)
+
+        service as Service
 
         bindTo.forEach { clazz ->
             val name = clazz.java.name
@@ -27,15 +31,14 @@ class RuntimeServicesManager : AbstractServicesManager() {
         servicesMap[name] = service
     }
 
-
-    override fun <S : Service<*>> getServiceOrNull(serviceClass: KClass<out S>): S? {
+    override fun <C : Any> getServiceOrNull(serviceClass: KClass<out C>): C? {
         val name = serviceClass.java.name
         val service = servicesMap[name] ?: return null
         @Suppress("UNCHECKED_CAST")
-        return service as S
+        return service as C
     }
 
-    override fun <S : Service<*>> getService(serviceClass: KClass<out S>): S {
+    override fun <C : Any> getService(serviceClass: KClass<out C>): C {
         return getServiceOrNull(serviceClass) ?: throw ServiceNotFoundException(serviceClass)
     }
 }

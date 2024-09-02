@@ -22,10 +22,12 @@ val logger = LoggerFactory.getLogger(Service::class.java)
  *
  * Service have to be able to do a reload infinitely.
  *
- * @param A The type of the application.
  * @see ServicesManager
  */
-interface Service<A : Any> : ServicesComponent {
+abstract class Service : ServicesComponent {
+
+    open val logger = LoggerFactory.getLogger(javaClass)
+    open var state: State = State.Disabled
 
     /**
      * Dependencies that this service has.
@@ -33,7 +35,7 @@ interface Service<A : Any> : ServicesComponent {
      * [ServicesManager] will enable all dependencies in the order
      * to satisfy all dependencies of all services.
      */
-    val dependencies: Dependencies
+    open val dependencies: Dependencies
         get() = Dependencies.none()
 
     /**
@@ -43,7 +45,7 @@ interface Service<A : Any> : ServicesComponent {
      *
      * @see doEnable
      */
-    fun onEnable() {
+    open fun onEnable() {
         // Do nothing by default
     }
 
@@ -54,7 +56,7 @@ interface Service<A : Any> : ServicesComponent {
      *
      * @see doDisable
      */
-    fun onDisable() {
+    open fun onDisable() {
         // Do nothing by default
     }
 
@@ -63,13 +65,14 @@ interface Service<A : Any> : ServicesComponent {
      *
      * Calls [onEnable] function and catches all exceptions.
      */
-    fun doEnable() {
+    open fun doEnable() {
+        state = State.Enabling
         try {
             onEnable()
+            state = State.Enabled
         } catch (e: Exception) {
-            logger.error(e) {
-                "Failed to enable service: ${this::class.simpleName}"
-            }
+            logger.error(e) { "Failed to enable service: ${this::class.simpleName}" }
+            state = State.ErrorEnabling(e)
         }
     }
 
@@ -78,14 +81,38 @@ interface Service<A : Any> : ServicesComponent {
      *
      * Calls [onDisable] function and catches all exceptions.
      */
-    fun doDisable() {
+    open fun doDisable() {
+        state = State.Disabling
         try {
             onDisable()
+            state = State.Disabled
         } catch (e: Exception) {
-            logger.error(e) {
-                "Failed to disable service: ${this::class.simpleName}"
-            }
+            logger.error(e) { "Failed to disable service: ${this::class.simpleName}" }
+            state = State.ErrorDisabling(e)
         }
+    }
+
+    /**
+     * Reloads the service.
+     *
+     * Calls [doDisable] and [doEnable] functions in sequence.
+     */
+    open fun doReload() {
+        doDisable()
+        doEnable()
+    }
+
+
+    sealed interface State {
+        object Enabling : State
+        data class ErrorEnabling(val e: Exception) : State
+        object Enabled : State
+
+        object Disabling : State
+        data class ErrorDisabling(val e: Exception) : State
+        object Disabled : State
+
+        fun isErrored() = this is ErrorEnabling || this is ErrorDisabling
     }
 
 }

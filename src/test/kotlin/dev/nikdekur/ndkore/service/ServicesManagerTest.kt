@@ -8,6 +8,8 @@
 
 package dev.nikdekur.ndkore.service
 
+import dev.nikdekur.ndkore.service.manager.KoinServicesManager
+import dev.nikdekur.ndkore.service.manager.RuntimeServicesManager
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.koin.core.context.GlobalContext
@@ -60,8 +62,8 @@ interface ServicesManagerTest {
     fun serviceAddAndInjectTest() {
         val service = SomeService1Impl(app)
         manager.registerService(service)
-        val injected = manager.inject<SomeService1Impl>()
-        assertEquals(service, injected.value)
+        val injected by manager.inject<SomeService1Impl>()
+        assertEquals(service, injected)
     }
 
 
@@ -91,10 +93,10 @@ interface ServicesManagerTest {
         val service2 = SomeService2Impl(app)
         manager.registerService(service1)
         manager.registerService(service2)
-        val injected1 = manager.inject<SomeService1Impl>()
-        val injected2 = manager.inject<SomeService2Impl>()
-        assertEquals(service1, injected1.value)
-        assertEquals(service2, injected2.value)
+        val injected1 by manager.inject<SomeService1Impl>()
+        val injected2 by manager.inject<SomeService2Impl>()
+        assertEquals(service1, injected1)
+        assertEquals(service2, injected2)
     }
 
 
@@ -118,10 +120,10 @@ interface ServicesManagerTest {
     fun serviceAddAndBindAndInjectTest() {
         val service = SomeService1Impl(app)
         manager.registerService(service, SomeService1::class)
-        val injected = manager.inject<SomeService1>()
-        val injected2 = manager.inject<SomeService1Impl>()
-        assertEquals(service, injected2.value)
-        assertEquals(service, injected.value)
+        val injected by manager.inject<SomeService1>()
+        val injected2 by manager.inject<SomeService1Impl>()
+        assertEquals(service, injected2)
+        assertEquals(service, injected)
     }
 
 
@@ -153,23 +155,23 @@ interface ServicesManagerTest {
         val service2 = SomeService2Impl(app)
         manager.registerService(service1, SomeService1::class)
         manager.registerService(service2, SomeService2::class)
-        val injected1 = manager.inject<SomeService1>()
-        val injected11 = manager.inject<SomeService1Impl>()
-        val injected2 = manager.inject<SomeService2>()
-        val injected22 = manager.inject<SomeService2Impl>()
-        assertEquals(service1, injected11.value)
-        assertEquals(service1, injected1.value)
-        assertEquals(service2, injected22.value)
-        assertEquals(service2, injected2.value)
+        val injected1 by manager.inject<SomeService1>()
+        val injected11 by manager.inject<SomeService1Impl>()
+        val injected2 by manager.inject<SomeService2>()
+        val injected22 by manager.inject<SomeService2Impl>()
+        assertEquals(service1, injected11)
+        assertEquals(service1, injected1)
+        assertEquals(service2, injected22)
+        assertEquals(service2, injected2)
     }
 
     @Test
     fun serviceReBindTest() {
-        val service1 = object : MyService {
+        val service1 = object : MyService() {
             override val app = this@ServicesManagerTest.app
             override val manager = this@ServicesManagerTest.manager
         }
-        val service2 = object : MyService {
+        val service2 = object : MyService() {
             override val app = this@ServicesManagerTest.app
             override val manager = this@ServicesManagerTest.manager
         }
@@ -258,7 +260,6 @@ interface ServicesManagerTest {
 
         manager.registerService(service1, ConfigurableService1Impl::class)
         manager.registerService(service2, ConfigurableService::class)
-        println(manager.services)
         manager.enable()
     }
 

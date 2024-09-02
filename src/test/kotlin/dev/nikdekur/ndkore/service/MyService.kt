@@ -8,9 +8,9 @@
 
 package dev.nikdekur.ndkore.service
 
-interface MyService : Service<App> {
+abstract class MyService : Service() {
 
-    val app: App
+    abstract val app: App
 
     override val manager: ServicesManager
         get() = app.manager

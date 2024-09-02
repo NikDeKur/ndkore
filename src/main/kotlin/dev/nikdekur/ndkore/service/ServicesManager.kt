@@ -8,7 +8,7 @@
 
 package dev.nikdekur.ndkore.service
 
-import org.checkerframework.checker.units.qual.A
+import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
 
 /**
@@ -41,7 +41,7 @@ interface ServicesManager {
      *
      * Guaranteed to return services in the order of their dependencies.
      */
-    val services: Collection<Service<*>>
+    val services: Collection<Service>
 
     /**
      * Registers a service with the manager.
@@ -56,7 +56,7 @@ interface ServicesManager {
      * @param service The service to be registered.
      * @param bindTo One or more classes to which the service should be bound.
      */
-    fun <S : Service<*>> registerService(service: S, vararg bindTo: KClass<out S>)
+    fun <C : Any, S> registerService(service: S, vararg bindTo: KClass<out C>) where S : C
 
     /**
      * Retrieves a service by its class, or returns null if it is not found.
@@ -70,7 +70,7 @@ interface ServicesManager {
      * @param serviceClass The KClass of the service to retrieve.
      * @return The service instance, or null if not found.
      */
-    fun <S : Service<*>> getServiceOrNull(serviceClass: KClass<out S>): S?
+    fun <C : Any> getServiceOrNull(serviceClass: KClass<out C>): C?
 
     /**
      * Retrieves a service by its class.
@@ -83,7 +83,7 @@ interface ServicesManager {
      * @return The service instance.
      * @throws ServiceNotFoundException If the service is not found.
      */
-    fun <S : Service<*>> getService(serviceClass: KClass<out S>): S
+    fun <C : Any> getService(serviceClass: KClass<out C>): C
 
     /**
      * Enable service manager.
@@ -129,10 +129,10 @@ interface ServicesManager {
  *
  * This extension function simplifies the retrieval of services by using reified generics to infer the service class.
  *
- * @param S The type of the service to retrieve.
+ * @param C The type of the service to retrieve.
  * @return The service instance, or null if not found.
  */
-inline fun <reified S : Service<out Any>> ServicesManager.getServiceOrNull() = getServiceOrNull<S>(S::class)
+inline fun <reified C : Any> ServicesManager.getServiceOrNull() = getServiceOrNull<C>(C::class)
 
 /**
  * Retrieves a service by its class.
@@ -140,11 +140,11 @@ inline fun <reified S : Service<out Any>> ServicesManager.getServiceOrNull() = g
  * This extension function simplifies the retrieval of services by using reified generics to infer the service class.
  * It will return the service instance if found, or throw a [ServiceNotFoundException] if not found.
  *
- * @param S The type of the service to retrieve.
+ * @param C The type of the service to retrieve.
  * @return The service instance.
  * @throws ServiceNotFoundException If the service is not found.
  */
-inline fun <reified S : Service<*>> ServicesManager.getService() = getService(S::class)
+inline fun <reified C : Any> ServicesManager.getService() = getService(C::class)
 
 /**
  * Lazily injects a service by its class.
@@ -152,8 +152,8 @@ inline fun <reified S : Service<*>> ServicesManager.getService() = getService(S:
  * This extension function allows for lazy initialization of a service, which will be injected when first accessed.
  * It uses reified generics to infer the service class.
  *
- * @param S The type of the service to inject.
+ * @param C The type of the service to inject.
  * @return A lazy delegate that provides the service instance.
  * @throws ServiceNotFoundException If the service is not found.
  */
-inline fun <reified S : Service<*>> ServicesManager.inject() = lazy { getService<S>() }
+inline fun <reified C : Any> ServicesManager.inject() = ReadOnlyProperty<Any?, C> { _, _ -> getService() }

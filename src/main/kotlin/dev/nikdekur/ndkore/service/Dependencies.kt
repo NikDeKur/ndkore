@@ -22,8 +22,8 @@ import kotlin.reflect.KClass
  * @see Service
  */
 data class Dependencies(
-    val before: List<KClass<out Service<*>>>,
-    val after: List<KClass<out Service<*>>>,
+    val before: List<KClass<out Any>>,
+    val after: List<KClass<out Any>>,
     val first: Boolean = false,
     val last: Boolean = false,
 ) {
@@ -36,7 +36,7 @@ data class Dependencies(
          * @return New instance of [Dependencies]
          */
         @JvmStatic
-        fun after(vararg modules: KClass<out Service<*>>) =
+        fun after(vararg modules: KClass<out Any>) =
             Dependencies(emptyList(), modules.toList(), first = false, last = false)
 
         /**
@@ -46,7 +46,7 @@ data class Dependencies(
          * @return New instance of [Dependencies]
          */
         @JvmStatic
-        fun before(vararg modules: KClass<out Service<*>>) =
+        fun before(vararg modules: KClass<out Any>) =
             Dependencies(modules.toList(), emptyList(), first = false, last = false)
 
         private val EMPTY by lazy {
@@ -87,8 +87,8 @@ data class Dependencies(
 
 
 class DependenciesBuilder {
-    private val before = LinkedList<KClass<out Service<*>>>()
-    private val after = LinkedList<KClass<out Service<*>>>()
+    private val before = LinkedList<KClass<out Any>>()
+    private val after = LinkedList<KClass<out Any>>()
     private var first = false
     private var last = false
 
@@ -100,11 +100,11 @@ class DependenciesBuilder {
         last = true
     }
 
-    fun before(vararg services: KClass<out Service<*>>) {
+    fun before(vararg services: KClass<out Any>) {
         before.addAll(services)
     }
 
-    fun after(vararg services: KClass<out Service<*>>) {
+    fun after(vararg services: KClass<out Any>) {
         after.addAll(services)
     }
 

@@ -8,6 +8,7 @@
 
 package dev.nikdekur.ndkore.service
 
+import dev.nikdekur.ndkore.service.manager.RuntimeServicesManager
 import org.junit.jupiter.api.BeforeEach
 
 class RuntimeServicesManagerTest : ServicesManagerTest {

@@ -10,13 +10,17 @@ package dev.nikdekur.ndkore.service
 
 import kotlin.reflect.KClass
 
+class ClassIsNotServiceException(clazz: KClass<*>) :
+    RuntimeException("Class '${clazz.qualifiedName}' is not a service!")
+
 /**
  * Indicates service not found.
  */
 class ServiceNotFoundException(serviceClass: KClass<*>) :
     RuntimeException("Service for '${serviceClass.qualifiedName}' not found!")
 
+
 /**
  * Indicates service circular dependency or self-dependency.
  */
-class CircularDependencyException(service: Service<*>) : RuntimeException("Circular dependency in '$service'!")
+class CircularDependencyException(service: Service) : RuntimeException("Circular dependency in '$service'!")

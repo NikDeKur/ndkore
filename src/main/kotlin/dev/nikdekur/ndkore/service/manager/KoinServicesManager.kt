@@ -8,10 +8,12 @@
 
 @file:Suppress("NOTHING_TO_INLINE")
 
-package dev.nikdekur.ndkore.service
+package dev.nikdekur.ndkore.service.manager
 
 import dev.nikdekur.ndkore.ext.loadModule
 import dev.nikdekur.ndkore.ext.single
+import dev.nikdekur.ndkore.service.Service
+import dev.nikdekur.ndkore.service.ServiceNotFoundException
 import org.koin.core.context.KoinContext
 import org.koin.core.error.NoDefinitionFoundException
 import org.koin.core.module.Module
@@ -86,18 +88,17 @@ class KoinServicesManager(
     val context: KoinContext
 ) : AbstractServicesManager() {
 
-    override fun <S : Service<*>> registerService(service: S, vararg bindTo: KClass<out S>) {
+
+    override fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
         super.registerService(service, *bindTo)
-        // Koin doesn't allow passing class instead of a reified type, so here we see
-        // rewrote access to koin internals to make it work and cast magic
         context.loadModule {
-            reg<Any>(service, *bindTo)
+            reg<Any>(service as Service, *bindTo)
         }
     }
 
 
     @Suppress("UNCHECKED_CAST")
-    inline fun <I : Any> Module.reg(service: Service<*>, vararg bindTo: KClass<*>) {
+    inline fun <I : Any> Module.reg(service: Service, vararg bindTo: KClass<*>) {
         val moduleClass = service::class as KClass<I>
         val service = service as I
         val definition = single(clazz = moduleClass) { service }
@@ -106,11 +107,11 @@ class KoinServicesManager(
         }
     }
 
-    override fun <S : Service<*>> getServiceOrNull(serviceClass: KClass<out S>): S? {
+    override fun <C : Any> getServiceOrNull(serviceClass: KClass<out C>): C? {
         return context.get().getOrNull(serviceClass)
     }
 
-    override fun <S : Service<*>> getService(serviceClass: KClass<out S>): S {
+    override fun <C : Any> getService(serviceClass: KClass<out C>): C {
         return try {
             context.get().get(serviceClass)
         } catch (e: NoDefinitionFoundException) {

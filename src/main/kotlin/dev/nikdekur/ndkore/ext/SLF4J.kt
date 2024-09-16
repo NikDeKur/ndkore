@@ -34,9 +34,9 @@ inline fun Logger.info(throwable: Throwable, msg: () -> String) = info(msg(), th
 inline fun Logger.warn(throwable: Throwable, msg: () -> String) = warn(msg(), throwable)
 inline fun Logger.error(throwable: Throwable, msg: () -> String) = error(msg(), throwable)
 
-fun <T> Logger.recordTiming(level: Level = Level.INFO, name: String, block: () -> T): T =
+inline fun <T> Logger.recordTiming(level: Level = Level.INFO, name: String, block: () -> T): T =
     recordTimingImpl({ log(level, it) }, name, block)
 
 
-fun <T> Logger.recordTimingNano(level: Level, name: String, block: () -> T): T =
+inline fun <T> Logger.recordTimingNano(level: Level, name: String, block: () -> T): T =
     recordTimingNanoImpl({ log(level, it) }, name, block)

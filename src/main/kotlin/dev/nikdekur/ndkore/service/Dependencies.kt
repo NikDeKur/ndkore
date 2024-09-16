@@ -6,10 +6,12 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
+@file:Suppress("NOTHING_TO_INLINE")
+
 package dev.nikdekur.ndkore.service
 
 import dev.nikdekur.ndkore.annotation.NdkoreDSL
-import java.util.LinkedList
+import java.util.*
 import kotlin.reflect.KClass
 
 /**
@@ -22,8 +24,8 @@ import kotlin.reflect.KClass
  * @see Service
  */
 data class Dependencies(
-    val before: List<KClass<out Any>>,
-    val after: List<KClass<out Any>>,
+    val before: List<Class<out Any>>,
+    val after: List<Class<out Any>>,
     val first: Boolean = false,
     val last: Boolean = false,
 ) {
@@ -36,7 +38,7 @@ data class Dependencies(
          * @return New instance of [Dependencies]
          */
         @JvmStatic
-        fun after(vararg modules: KClass<out Any>) =
+        fun after(vararg modules: Class<out Any>) =
             Dependencies(emptyList(), modules.toList(), first = false, last = false)
 
         /**
@@ -46,7 +48,7 @@ data class Dependencies(
          * @return New instance of [Dependencies]
          */
         @JvmStatic
-        fun before(vararg modules: KClass<out Any>) =
+        fun before(vararg modules: Class<out Any>) =
             Dependencies(modules.toList(), emptyList(), first = false, last = false)
 
         private val EMPTY by lazy {
@@ -87,8 +89,8 @@ data class Dependencies(
 
 
 class DependenciesBuilder {
-    private val before = LinkedList<KClass<out Any>>()
-    private val after = LinkedList<KClass<out Any>>()
+    private val before = LinkedList<Class<out Any>>()
+    private val after = LinkedList<Class<out Any>>()
     private var first = false
     private var last = false
 
@@ -100,16 +102,40 @@ class DependenciesBuilder {
         last = true
     }
 
-    fun before(vararg services: KClass<out Any>) {
+    fun before(vararg services: Class<out Any>) {
         before.addAll(services)
     }
 
-    fun after(vararg services: KClass<out Any>) {
+    fun after(vararg services: Class<out Any>) {
         after.addAll(services)
+    }
+
+    operator fun plus(service: Class<out Any>) {
+        after.add(service)
+    }
+
+    operator fun minus(service: Class<out Any>) {
+        before.add(service)
     }
 
 
     fun build() = Dependencies(before, after, first, last)
+}
+
+inline fun DependenciesBuilder.before(vararg services: KClass<out Any>) {
+    services.forEach { before(it.java) }
+}
+
+inline fun DependenciesBuilder.after(vararg services: KClass<out Any>) {
+    services.forEach { after(it.java) }
+}
+
+inline operator fun DependenciesBuilder.plus(service: KClass<out Any>) {
+    plus(service.java)
+}
+
+inline operator fun DependenciesBuilder.minus(service: KClass<out Any>) {
+    minus(service.java)
 }
 
 @NdkoreDSL

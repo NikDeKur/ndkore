@@ -6,30 +6,37 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
+@file:Suppress("NOTHING_TO_INLINE")
+
 package dev.nikdekur.ndkore.placeholder
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-class PlaceholderParserTest {
+inline fun PatternPlaceholderParserTest.getParser(symbol: String) = getParser(symbol, symbol)
+
+
+interface PatternPlaceholderParserTest {
+
+    fun getParser(symbolR: String, symbolL: String): PatternPlaceholderParser
 
     @Test
     fun singlePlaceholderResolvedCorrectly() {
-        val parser = PatternPlaceholderParser.HASH
+        val parser = getParser("#")
         val result = parser.parse("#name#", mapOf("name" to "John Doe"))
         assertEquals("John Doe", result)
     }
 
     @Test
     fun singleCasePlaceholderResolvedCorrectly() {
-        val parser = PatternPlaceholderParser.CURLY_BRACKET
+        val parser = getParser("\\{", "\\}")
         val result = parser.parse("name is {userName}", mapOf("userName" to "John Doe"))
         assertEquals("name is John Doe", result)
     }
 
     @Test
     fun multiplePlaceholdersResolvedCorrectly() {
-        val parser = PatternPlaceholderParser.PROCENT
+        val parser = getParser("%")
         val result =
             parser.parse("Hello, %name%! Your balance is %balance%.", mapOf("name" to "Jane Doe", "balance" to "100"))
         assertEquals("Hello, Jane Doe! Your balance is 100.", result)
@@ -37,7 +44,7 @@ class PlaceholderParserTest {
 
     @Test
     fun nestedPlaceholdersResolvedCorrectly() {
-        val parser = PatternPlaceholderParser.CURLY_BRACKET
+        val parser = getParser("\\{", "\\}")
         val result = parser.parse(
             "{user.name} is {user.age} years old", mapOf(
                 "user" to setOf(
@@ -51,33 +58,40 @@ class PlaceholderParserTest {
 
     @Test
     fun placeholderWithIterableResolvedToFirstElement() {
-        val parser = PatternPlaceholderParser.PROCENT
+        val parser = getParser("%")
         val result = parser.parse("%users%", mapOf("users" to listOf("Bob", "Charlie")))
         assertEquals("Bob", result)
     }
 
     @Test
     fun placeholderWithMapResolvedCorrectly() {
-        val parser = PatternPlaceholderParser.PROCENT
+        val parser = getParser("%")
         val result = parser.parse("%user.name%", mapOf("user" to Placeholder.of("name" to "Diana")))
         assertEquals("Diana", result)
     }
 
     @Test
     fun parseWithVarargsPlaceholdersResolvedCorrectly() {
-        val parser = PatternPlaceholderParser.HASH
+        val parser = getParser("#")
         val result = parser.parse("#name# and #age#", "name" to "Frank", "age" to "28")
         assertEquals("Frank and 28", result)
     }
 
+
+    interface User {
+        val name: String
+        val age: Int
+    }
+
+    fun getUser(name: String, age: Int): User
+
     @Test
     fun parseFromClass() {
 
-        data class Member(val name: String, val age: Int)
 
-        val member = Member("John", 20)
+        val member = getUser("John", 20)
 
-        val parser = PatternPlaceholderParser.CURLY_BRACKET
+        val parser = getParser("\\{", "\\}")
         val result = parser.parse(
             "{val} {member.name} - {member.age}", mapOf(
                 "val" to "value",
@@ -87,19 +101,22 @@ class PlaceholderParserTest {
         assertEquals("value John - 20", result)
     }
 
+    interface Member {
+        val user: User
+    }
+
+    fun getMember(user: User): Member
+
     @Test
     fun parseFromNestedClass() {
 
-        data class Member(val name: String, val age: Int)
-        data class User(val member: Member)
+        val user = getMember(getUser("John", 20))
 
-        val user = User(Member("John", 20))
-
-        val parser = PatternPlaceholderParser.CURLY_BRACKET
+        val parser = getParser("\\{", "\\}")
         val result = parser.parse(
-            "{val} {user.member.name} - {user.member.age}", mapOf(
+            "{val} {member.user.name} - {member.user.age}", mapOf(
                 "val" to "value",
-                "user" to user
+                "member" to user
             )
         )
         assertEquals("value John - 20", result)
@@ -108,21 +125,19 @@ class PlaceholderParserTest {
     @Test
     fun parseFromNestedClassAndExtraClassOption() {
 
-        data class Member(val name: String, val age: Int)
-        data class User(val member: Member)
 
-        val user = User(Member("John", 20))
+        val member = getMember(getUser("John", 20))
 
-        val userPlaceholders = listOf(
+        val memberPlaceholders = listOf(
             Placeholder.ofSingle("icon", "https://example.com/icon.png"),
-            user
+            member
         )
 
-        val parser = PatternPlaceholderParser.CURLY_BRACKET
+        val parser = getParser("\\{", "\\}")
         val result = parser.parse(
-            "{val} {user.icon} {user.member.name} - {user.member.age}", mapOf(
+            "{val} {member.icon} {member.user.name} - {member.user.age}", mapOf(
                 "val" to "value",
-                "user" to userPlaceholders,
+                "member" to memberPlaceholders,
             )
         )
 

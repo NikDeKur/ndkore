@@ -1,4 +1,3 @@
-import org.gradle.kotlin.dsl.test
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
@@ -9,7 +8,7 @@ plugins {
 }
 
 group = "dev.nikdekur"
-version = "1.2.6"
+version = "1.3.0"
 
 val authorId: String by project
 val authorName: String by project
@@ -47,21 +46,28 @@ dependencies {
     compileOnly(libs.kotlinx.coroutines)
     compileOnly(libs.kotlin.reflect)
     compileOnly(libs.google.guava)
-    compileOnly(libs.kotlinx.serialization)
+    compileOnly(libs.kotlinx.serialization.core)
+    compileOnly(libs.kotlinx.serialization.json)
+    compileOnly(libs.kotlinx.serialization.properties)
 
     compileOnly(libs.slf4j.api)
     compileOnly(libs.kaml)
     compileOnly(libs.koin)
 
+    // ndkore has test extensions, so mark as compileOnly, not testImplementation
+    compileOnly(libs.junit.jupiter.api)
+    compileOnly(libs.junit.jupiter.engine)
+    compileOnly(libs.junit.jupiter.params)
+
     testImplementation(kotlin("test"))
-    testImplementation(libs.junit.jupiter.api)
-    testImplementation(libs.junit.jupiter.engine)
-    testImplementation(libs.junit.jupiter.params)
     testImplementation(libs.slf4j.api)
+
+    // Logback is not supported on jdk-8
     testImplementation(libs.slf4j.simple)
     testImplementation(libs.koin)
     testImplementation(libs.google.guava)
-    testImplementation(libs.kotlinx.serialization)
+    testImplementation(libs.kotlinx.serialization.core)
+    testImplementation(libs.kotlinx.serialization.properties)
 }
 
 tasks.named("compileKotlin", KotlinCompilationTask::class.java) {

@@ -123,6 +123,12 @@ open class CoroutineScheduler(val scope: CoroutineScope) : AbstractScheduler(), 
     }
 
 
+    override fun shutdown() {
+        cancelAllTasks()
+        scope.cancel()
+    }
+
+
     companion object {
         /**
          * Creates a [CoroutineScheduler] with a [SupervisorJob] in the provided [CoroutineContext].

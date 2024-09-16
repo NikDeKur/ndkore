@@ -8,16 +8,14 @@
 
 package dev.nikdekur.ndkore.service
 
-import kotlin.reflect.KClass
-
-class ClassIsNotServiceException(clazz: KClass<*>) :
-    RuntimeException("Class '${clazz.qualifiedName}' is not a service!")
+class ClassIsNotServiceException(clazz: Class<*>) :
+    RuntimeException("Class '${clazz.name}' is not a service!")
 
 /**
  * Indicates service not found.
  */
-class ServiceNotFoundException(serviceClass: KClass<*>) :
-    RuntimeException("Service for '${serviceClass.qualifiedName}' not found!")
+class ServiceNotFoundException(serviceClass: Class<*>) :
+    RuntimeException("Service for '${serviceClass.name}' not found!")
 
 
 /**

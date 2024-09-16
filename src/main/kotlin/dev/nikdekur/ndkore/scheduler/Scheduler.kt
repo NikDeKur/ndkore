@@ -60,6 +60,13 @@ interface Scheduler {
      * Cancels all running tasks.
      */
     fun cancelAllTasks()
+
+    /**
+     * Shuts down the scheduler.
+     *
+     * Scheduler should not be used after this method is called.
+     */
+    fun shutdown()
 }
 
 /**

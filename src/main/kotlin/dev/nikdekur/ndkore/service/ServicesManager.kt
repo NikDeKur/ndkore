@@ -8,9 +8,6 @@
 
 package dev.nikdekur.ndkore.service
 
-import kotlin.properties.ReadOnlyProperty
-import kotlin.reflect.KClass
-
 /**
  * # Services Manager
  *
@@ -24,7 +21,10 @@ import kotlin.reflect.KClass
  *
  * @param A The type representing the application context or environment that services may need to access.
  */
-interface ServicesManager {
+interface ServicesManager : ServicesComponent {
+
+    override val manager: ServicesManager
+        get() = this
 
     /**
      * The current state of the service manager.
@@ -56,7 +56,7 @@ interface ServicesManager {
      * @param service The service to be registered.
      * @param bindTo One or more classes to which the service should be bound.
      */
-    fun <C : Any, S> registerService(service: S, vararg bindTo: KClass<out C>) where S : C
+    fun <C : Any, S> registerService(service: S, vararg bindTo: Class<out C>) where S : C
 
     /**
      * Retrieves a service by its class, or returns null if it is not found.
@@ -70,7 +70,7 @@ interface ServicesManager {
      * @param serviceClass The KClass of the service to retrieve.
      * @return The service instance, or null if not found.
      */
-    fun <C : Any> getServiceOrNull(serviceClass: KClass<out C>): C?
+    fun <C : Any> getServiceOrNull(serviceClass: Class<out C>): C?
 
     /**
      * Retrieves a service by its class.
@@ -83,7 +83,7 @@ interface ServicesManager {
      * @return The service instance.
      * @throws ServiceNotFoundException If the service is not found.
      */
-    fun <C : Any> getService(serviceClass: KClass<out C>): C
+    fun <C : Any> getService(serviceClass: Class<out C>): C
 
     /**
      * Enable service manager.
@@ -132,7 +132,7 @@ interface ServicesManager {
  * @param C The type of the service to retrieve.
  * @return The service instance, or null if not found.
  */
-inline fun <reified C : Any> ServicesManager.getServiceOrNull() = getServiceOrNull<C>(C::class)
+inline fun <reified C : Any> ServicesManager.getServiceOrNull() = getServiceOrNull(C::class.java)
 
 /**
  * Retrieves a service by its class.
@@ -144,16 +144,4 @@ inline fun <reified C : Any> ServicesManager.getServiceOrNull() = getServiceOrNu
  * @return The service instance.
  * @throws ServiceNotFoundException If the service is not found.
  */
-inline fun <reified C : Any> ServicesManager.getService() = getService(C::class)
-
-/**
- * Lazily injects a service by its class.
- *
- * This extension function allows for lazy initialization of a service, which will be injected when first accessed.
- * It uses reified generics to infer the service class.
- *
- * @param C The type of the service to inject.
- * @return A lazy delegate that provides the service instance.
- * @throws ServiceNotFoundException If the service is not found.
- */
-inline fun <reified C : Any> ServicesManager.inject() = ReadOnlyProperty<Any?, C> { _, _ -> getService() }
+inline fun <reified C : Any> ServicesManager.getService() = getService(C::class.java)

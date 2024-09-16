@@ -54,10 +54,10 @@ interface Placeholder {
      * Retrieves the value associated with the specified key from the source.
      *
      * @param key The key whose associated value is to be retrieved.
-     * @return The value associated with the key, or null if the key does not exist in the source.
+     * @return The value associated with the key, or [ValuesSource.NotFound] if the key does not exist in the source.
      */
     fun getPlaceholder(key: String): Any? {
-        return null
+        return ValuesSource.NotFound
     }
 
     companion object {

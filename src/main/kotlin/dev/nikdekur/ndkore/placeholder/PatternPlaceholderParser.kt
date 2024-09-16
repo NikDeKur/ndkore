@@ -10,7 +10,6 @@
 
 package dev.nikdekur.ndkore.placeholder
 
-import dev.nikdekur.ndkore.ext.*
 import java.util.regex.Pattern
 
 /**
@@ -67,10 +66,18 @@ import java.util.regex.Pattern
  * println(result) // Output: Bob is 30 years old
  * ```
  */
-open class PatternPlaceholderParser(val pattern: Pattern) : PlaceholderParser {
+open class PatternPlaceholderParser(
+    val pattern: Pattern,
+    val source: ValuesSource
+) : PlaceholderParser {
 
-    constructor(symbolLeft: String, symbolRight: String) : this(Pattern.compile("$symbolLeft(.*?)$symbolRight"))
-    constructor(symbol: String) : this(symbol, symbol)
+    constructor(
+        symbolLeft: String,
+        symbolRight: String,
+        source: ValuesSource
+    ) : this(Pattern.compile("$symbolLeft(.*?)$symbolRight"), source)
+
+    constructor(symbol: String, source: ValuesSource) : this(symbol, symbol, source)
 
     override fun parseExpression(pathRaw: String, placeholders: Map<String, Any?>): String? {
         val parts = pathRaw.split(".")
@@ -88,12 +95,12 @@ open class PatternPlaceholderParser(val pattern: Pattern) : PlaceholderParser {
             currentObject = if (currentObject is Iterable<*>) {
                 var found: Any? = null
                 for (item in currentObject) {
-                    found = findValue(item!!, part)
+                    found = source.findValue(item!!, part)
                     if (found != null) break
                 }
                 found
             } else {
-                findValue(currentObject!!, part)
+                source.findValue(currentObject!!, part)
             }
             if (currentObject == null) return null
         }
@@ -113,22 +120,5 @@ open class PatternPlaceholderParser(val pattern: Pattern) : PlaceholderParser {
         }
         sb.append(string.substring(lastEnd))
         return sb.toString()
-    }
-
-    open fun findValue(obj: Any, valueName: String): Any? {
-        if (obj is Placeholder) {
-            val value = obj.getPlaceholder(valueName)
-            if (value != null) return value
-        }
-        return obj.r_GetField(valueName).value
-            ?: obj.r_CallMethod(valueName.asCamelCaseGetter()).value
-            ?: obj.r_CallMethod(valueName).value
-    }
-
-
-    companion object {
-        val HASH = PatternPlaceholderParser("#")
-        val PROCENT = PatternPlaceholderParser("%")
-        val CURLY_BRACKET = PatternPlaceholderParser("\\{", "\\}")
     }
 }

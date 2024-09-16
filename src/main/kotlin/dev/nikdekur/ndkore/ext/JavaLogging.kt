@@ -15,7 +15,7 @@ import java.util.logging.Logger
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
-fun <T> recordTimingImpl(log: (String) -> Unit, name: String, block: () -> T): T {
+inline fun <T> recordTimingImpl(log: (String) -> Unit, name: String, block: () -> T): T {
     contract {
         callsInPlace(block, kotlin.contracts.InvocationKind.EXACTLY_ONCE)
     }
@@ -30,7 +30,7 @@ fun <T> recordTimingImpl(log: (String) -> Unit, name: String, block: () -> T): T
     return result
 }
 
-fun <T> recordTimingNanoImpl(log: (String) -> Unit, name: String, block: () -> T): T {
+inline fun <T> recordTimingNanoImpl(log: (String) -> Unit, name: String, block: () -> T): T {
     val start = System.nanoTime()
     val result = block()
     val end = System.nanoTime()
@@ -57,8 +57,8 @@ inline fun Logger.info(throwable: Throwable, msg: () -> String) = log(Level.INFO
 inline fun Logger.warning(throwable: Throwable, msg: () -> String) = log(Level.WARNING, msg(), throwable)
 inline fun Logger.severe(throwable: Throwable, msg: () -> String) = log(Level.SEVERE, msg(), throwable)
 
-fun <T> Logger.recordTiming(level: Level = Level.INFO, name: String, block: () -> T): T =
+inline fun <T> Logger.recordTiming(level: Level = Level.INFO, name: String, block: () -> T): T =
     recordTimingImpl({ log(level, it) }, name, block)
 
-fun <T> Logger.recordTimingNano(level: Level, name: String, block: () -> T): T =
+inline fun <T> Logger.recordTimingNano(level: Level, name: String, block: () -> T): T =
     recordTimingNanoImpl({ log(level, it) }, name, block)

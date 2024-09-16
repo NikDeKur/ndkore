@@ -129,7 +129,7 @@ open class ExecutorScheduler(val executor: ScheduledExecutorService) : AbstractS
      * Initiates an orderly shutdown in which previously submitted tasks are executed,
      * but no new tasks will be accepted.
      */
-    fun shutdown() {
+    override fun shutdown() {
         tasks.clear()
         executor.shutdown()
     }

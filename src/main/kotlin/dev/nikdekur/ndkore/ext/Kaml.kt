@@ -6,12 +6,33 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
+@file:Suppress("NOTHING_TO_INLINE")
+
 package dev.nikdekur.ndkore.ext
 
 import com.charleskorn.kaml.Yaml
-import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.serializer
 import org.intellij.lang.annotations.Language
 import java.io.File
+
+/**
+ * Loads a configuration of the specified type from a YAML formatted string.
+ *
+ * This function uses Kotlin serialization to decode the given YAML string into an instance of the specified type.
+ * The string should be a valid YAML document. This method is useful for loading configurations directly from
+ * string literals, for instance, when configurations are provided dynamically or in tests.
+ *
+ * @param T the type of the configuration object.
+ * @param text the YAML formatted string containing the configuration.
+ * @param clazz the class of the configuration object.
+ * @return the configuration object decoded from the YAML string.
+ */
+inline fun <T> Yaml.loadConfig(@Language("yaml") text: String, clazz: Class<T>): T {
+    @Suppress("UNCHECKED_CAST")
+    val serializer = serializersModule.serializer(clazz) as KSerializer<T>
+    return decodeFromString(serializer, text)
+}
 
 
 /**
@@ -25,7 +46,7 @@ import java.io.File
  * @param text the YAML formatted string containing the configuration.
  * @return the configuration object decoded from the YAML string.
  */
-inline fun <reified T> Yaml.loadConfig(@Language("yaml") text: String): T = decodeFromString(text)
+inline fun <reified T> Yaml.loadConfig(@Language("yaml") text: String): T = loadConfig(text, T::class.java)
 
 /**
  * Loads a configuration of the specified type from a YAML file.

@@ -63,6 +63,16 @@ inline fun <reified C : Any> ServicesComponent.get() = manager.getService<C>()
  * Service instance every time will be retrieved from the manager.
  *
  * @param C The type of the service to inject.
+ * @return A property delegate that provides the service instance, which might return null if no service found.
+ */
+inline fun <reified C : Any> ServicesComponent.injectOrNull() = ReadOnlyProperty<Any?, C?> { _, _ -> getOrNull() }
+
+/**
+ * Return a property delegate that provides a service instance.
+ *
+ * Service instance every time will be retrieved from the manager.
+ *
+ * @param C The type of the service to inject.
  * @return A property delegate that provides the service instance.
  * @throws ServiceNotFoundException If the service is not found.
  */

@@ -11,6 +11,7 @@
 package dev.nikdekur.ndkore.service
 
 import dev.nikdekur.ndkore.ext.error
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 val logger = LoggerFactory.getLogger(Service::class.java)
@@ -26,7 +27,7 @@ val logger = LoggerFactory.getLogger(Service::class.java)
  */
 abstract class Service : ServicesComponent {
 
-    open val logger = LoggerFactory.getLogger(javaClass)
+    open val logger: Logger = LoggerFactory.getLogger(javaClass)
     open var state: State = State.Disabled
 
     /**

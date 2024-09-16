@@ -10,36 +10,22 @@
 
 package dev.nikdekur.ndkore.ext
 
-import org.jetbrains.annotations.Contract
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
-import java.util.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlin.time.Duration
 
+object LenientDurationSerializer : KSerializer<Duration> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("LenientDuration", PrimitiveKind.STRING)
 
-@Contract("null -> null")
-inline fun Any.serialize(): String {
-    try {
-        val byteArrayOutputStream = ByteArrayOutputStream()
-        ObjectOutputStream(byteArrayOutputStream).use {
-            it.writeObject(this)
-        }
-        return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray())
-    } catch (e: Exception) {
-        e.printStackAndThrow()
+    override fun serialize(encoder: Encoder, value: Duration) {
+        encoder.encodeString(value.toString())
     }
-}
 
-inline fun Any?.serialise(): String {
-    if (this == null) return "null"
-    return this.serialize()
-}
-inline fun String.deSerialize(): Any {
-    try {
-        val data = Base64.getDecoder().decode(this)
-        ObjectInputStream(ByteArrayInputStream(data)).use { objectInputStream -> return objectInputStream.readObject() }
-    } catch (e: Exception) {
-        e.printStackAndThrow()
+    override fun deserialize(decoder: Decoder): Duration {
+        return Duration.parse(decoder.decodeString())
     }
 }

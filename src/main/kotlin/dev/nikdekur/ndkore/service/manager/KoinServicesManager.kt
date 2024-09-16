@@ -89,7 +89,7 @@ class KoinServicesManager(
 ) : AbstractServicesManager() {
 
 
-    override fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
+    override fun <C : Any, S : C> registerService(service: S, vararg bindTo: Class<out C>) {
         super.registerService(service, *bindTo)
         context.loadModule {
             reg<Any>(service as Service, *bindTo)
@@ -98,22 +98,22 @@ class KoinServicesManager(
 
 
     @Suppress("UNCHECKED_CAST")
-    inline fun <I : Any> Module.reg(service: Service, vararg bindTo: KClass<*>) {
+    inline fun <I : Any> Module.reg(service: Service, vararg bindTo: Class<*>) {
         val moduleClass = service::class as KClass<I>
         val service = service as I
         val definition = single(clazz = moduleClass) { service }
         bindTo.forEach {
-            definition bind it as KClass<I>
+            definition bind it.kotlin as KClass<I>
         }
     }
 
-    override fun <C : Any> getServiceOrNull(serviceClass: KClass<out C>): C? {
-        return context.get().getOrNull(serviceClass)
+    override fun <C : Any> getServiceOrNull(serviceClass: Class<out C>): C? {
+        return context.get().getOrNull(serviceClass.kotlin)
     }
 
-    override fun <C : Any> getService(serviceClass: KClass<out C>): C {
+    override fun <C : Any> getService(serviceClass: Class<out C>): C {
         return try {
-            context.get().get(serviceClass)
+            context.get().get(serviceClass.kotlin)
         } catch (e: NoDefinitionFoundException) {
             throw ServiceNotFoundException(serviceClass)
         }

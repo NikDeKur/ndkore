@@ -6,22 +6,17 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
-@file:Suppress("NOTHING_TO_INLINE")
-
 package dev.nikdekur.ndkore.service.manager
 
-import dev.nikdekur.ndkore.service.CircularDependencyException
-import dev.nikdekur.ndkore.service.ClassIsNotServiceException
-import dev.nikdekur.ndkore.service.Service
-import dev.nikdekur.ndkore.service.ServiceNotFoundException
-import dev.nikdekur.ndkore.service.ServicesManager
+import dev.nikdekur.ndkore.service.*
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.LinkedList
+import java.util.*
 import kotlin.reflect.KClass
 
 abstract class AbstractServicesManager : ServicesManager {
 
-    val logger = LoggerFactory.getLogger(javaClass)
+    val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     override var state = ServicesManager.State.DISABLED
 
@@ -30,14 +25,14 @@ abstract class AbstractServicesManager : ServicesManager {
     override val services
         get() = sortModules()
 
-    override fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
+    override fun <C : Any, S : C> registerService(service: S, vararg bindTo: Class<out C>) {
         if (service !is Service)
-            throw ClassIsNotServiceException(service::class)
+            throw ClassIsNotServiceException(service::class.java)
 
         // If services manager is enabled and bind override existing services,
         // then disable existing services and enable the new one
         if (state == ServicesManager.State.ENABLED) {
-            getServiceInternal(service::class)?.doDisable()
+            getServiceInternal(service::class.java)?.doDisable()
             bindTo.forEach { getServiceInternal(it)?.doDisable() }
             service.doEnable()
         }
@@ -45,7 +40,7 @@ abstract class AbstractServicesManager : ServicesManager {
         servicesCollection.add(service)
     }
 
-    fun getServiceInternal(serviceClass: KClass<*>): Service? {
+    fun getServiceInternal(serviceClass: Class<*>): Service? {
         val service = getServiceOrNull(serviceClass) ?: return null
         return service as? Service ?: throw ClassIsNotServiceException(serviceClass)
     }
@@ -132,7 +127,6 @@ abstract class AbstractServicesManager : ServicesManager {
             // Load modules that the current one depends on
             service.dependencies.after.forEach { afterModule ->
                 val afterService = getServiceInternal(afterModule) ?: throw ServiceNotFoundException(afterModule)
-                @Suppress("UNCHECKED_CAST")
                 addModule(afterService)
             }
 

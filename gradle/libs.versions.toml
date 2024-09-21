@@ -6,6 +6,7 @@ kotlinx-datetime = "0.6.1"
 kotlinx-io = "0.5.3"
 kotlin-logging = "7.0.0"
 stately = "2.1.0"
+bignum = "0.3.10"
 google-guava = "33.3.0-jre"
 slf4j = "2.0.16"
 licenser = "0.6.1"
@@ -23,6 +24,7 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io" }
 kotlin-logging = { module = "io.github.oshai:kotlin-logging", version.ref = "kotlin-logging" }
 stately-concurrency = { module = "co.touchlab:stately-concurrency", version.ref = "stately" }
+bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
 google-guava = { module = "com.google.guava:guava", version.ref = "google-guava" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }

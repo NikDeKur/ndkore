@@ -10,6 +10,8 @@
 
 package dev.nikdekur.ndkore.memory
 
+import com.ionspin.kotlin.bignum.integer.BigInteger
+
 
 /**
  * Represents an amount of memory in a specific unit.
@@ -32,7 +34,7 @@ package dev.nikdekur.ndkore.memory
  */
 data class MemoryAmount(
     val unit: MemoryUnit,
-    val amount: Long,
+    val amount: BigInteger,
 ) : Comparable<MemoryAmount> {
 
     /**
@@ -103,6 +105,8 @@ data class MemoryAmount(
      */
     fun convertTo(unit: MemoryUnit): MemoryAmount {
         if (this.unit == unit) return this
+        println("this.unit.bytes: ${this.unit.bytes}")
+        println("unit.bytes: ${unit.bytes}")
         return MemoryAmount(unit, amount * this.unit.bytes / unit.bytes)
     }
 
@@ -115,7 +119,7 @@ data class MemoryAmount(
          * @param value The amount of memory in the input unit.
          * @return A new `MemoryAmount` converted to the output unit.
          */
-        inline fun of(input: MemoryUnit, output: MemoryUnit, value: Long): MemoryAmount {
+        inline fun of(input: MemoryUnit, output: MemoryUnit, value: BigInteger): MemoryAmount {
             val memoryAmount = MemoryAmount(input, value)
             return memoryAmount.convertTo(output)
         }
@@ -127,7 +131,7 @@ data class MemoryAmount(
          * @param value The amount of memory in the specified unit.
          * @return A new `MemoryAmount`.
          */
-        inline fun of(input: MemoryUnit, value: Long): MemoryAmount {
+        inline fun of(input: MemoryUnit, value: BigInteger): MemoryAmount {
             return of(input, input, value)
         }
     }

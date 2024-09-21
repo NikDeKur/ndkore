@@ -6,6 +6,11 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
-package dev.nikdekur.ndkore.classfinder.dir1
+package dev.nikdekur.ndkore.reflect.classfinder
 
-class Dir1Class
+import dev.nikdekur.ndkore.reflect.ClassPathClassFinder
+
+
+class ClassPathClassFinderTest : ClassFinderTest {
+    override val finder = ClassPathClassFinder
+}

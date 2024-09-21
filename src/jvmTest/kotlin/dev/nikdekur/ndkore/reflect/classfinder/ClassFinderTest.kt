@@ -6,15 +6,15 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
-package dev.nikdekur.ndkore.classfinder
+package dev.nikdekur.ndkore.reflect.classfinder
 
-import dev.nikdekur.ndkore.classfinder.dir1.Dir1Class
-import dev.nikdekur.ndkore.classfinder.dir2.Dir2Class1
-import dev.nikdekur.ndkore.classfinder.dir2.Dir2Class2
-import dev.nikdekur.ndkore.classfinder.dir3.Dir3Class1
-import dev.nikdekur.ndkore.classfinder.dir3.Dir3Class2
-import dev.nikdekur.ndkore.classfinder.dir3.Dir3Class3
 import dev.nikdekur.ndkore.reflect.ClassFinder
+import dev.nikdekur.ndkore.reflect.classfinder.dir1.Dir1Class
+import dev.nikdekur.ndkore.reflect.classfinder.dir2.Dir2Class1
+import dev.nikdekur.ndkore.reflect.classfinder.dir2.Dir2Class2
+import dev.nikdekur.ndkore.reflect.classfinder.dir3.Dir3Class1
+import dev.nikdekur.ndkore.reflect.classfinder.dir3.Dir3Class2
+import dev.nikdekur.ndkore.reflect.classfinder.dir3.Dir3Class3
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

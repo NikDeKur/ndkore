@@ -11,10 +11,11 @@ package dev.nikdekur.ndkore.placeholder
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-inline fun PatternPlaceholderParserTest.getParser(symbol: String) = getParser(symbol, symbol)
 
 
 interface PatternPlaceholderParserTest {
+
+    fun PatternPlaceholderParserTest.getParser(symbol: String) = getParser(symbol, symbol)
 
     fun getParser(symbolR: String, symbolL: String): PatternPlaceholderParser
 

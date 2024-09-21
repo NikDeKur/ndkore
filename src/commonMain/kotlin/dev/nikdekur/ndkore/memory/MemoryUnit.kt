@@ -10,6 +10,8 @@
 
 package dev.nikdekur.ndkore.memory
 
+import com.ionspin.kotlin.bignum.integer.BigInteger
+
 /**
  * Represents a unit of memory. Each memory unit is defined by the number of bytes it contains.
  *
@@ -45,7 +47,7 @@ interface MemoryUnit {
     /**
      * The number of bytes in this memory unit.
      */
-    val bytes: Long
+    val bytes: BigInteger
 
     companion object {
         /**
@@ -54,27 +56,27 @@ interface MemoryUnit {
          * @param bytes The number of bytes in the custom memory unit.
          * @return A new memory unit with the specified number of bytes.
          */
-        inline fun unit(bytes: Long) = object : MemoryUnit {
-            override val bytes: Long = bytes
+        inline fun unit(bytes: BigInteger) = object : MemoryUnit {
+            override val bytes = bytes
         }
 
         /**
          * A memory unit representing one byte.
          */
-        val Byte = unit(1)
+        val Byte = unit(BigInteger.ONE)
 
         /**
          * A memory unit representing one kilobyte (1024 bytes).
          */
-        val KB = unit(1024)
+        val KB = unit(Byte.bytes * 1024)
 
         /**
-         * A memory unit representing one megabyte (1048576 bytes).
+         * A memory unit representing one megabyte (1,048,576 bytes).
          */
         val MB = unit(KB.bytes * 1024)
 
         /**
-         * A memory unit representing one gigabyte (1073741824 bytes).
+         * A memory unit representing one gigabyte (1,073,741,824 bytes).
          */
         val GB = unit(MB.bytes * 1024)
 
@@ -84,22 +86,22 @@ interface MemoryUnit {
         val TB = unit(GB.bytes * 1024)
 
         /**
-         * A memory unit representing one petabyte (1125899906842624 bytes).
+         * A memory unit representing one petabyte (1,125,899,906,842,624 bytes).
          */
         val PB = unit(TB.bytes * 1024)
 
         /**
-         * A memory unit representing one exabyte (1180591620717411303424 bytes).
+         * A memory unit representing one exabyte (1,180,591,620,717,411,303,424 bytes).
          */
         val EB = unit(PB.bytes * 1024)
 
         /**
-         * A memory unit representing one zettabyte (1208925819614629174706176 bytes).
+         * A memory unit representing one zetta-byte (1,208,925,819,614,629,174,706,176 bytes).
          */
         val ZB = unit(EB.bytes * 1024)
 
         /**
-         * A memory unit representing one yottabyte (1237940039285380274899124224 bytes).
+         * A memory unit representing one yotta-byte (1,237,940,039,285,380,274,899,124,224 bytes).
          */
         val YB = unit(ZB.bytes * 1024)
     }

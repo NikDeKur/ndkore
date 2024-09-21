@@ -6,10 +6,6 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
-package dev.nikdekur.ndkore.classfinder
+package dev.nikdekur.ndkore.reflect.classfinder.dir1
 
-import dev.nikdekur.ndkore.reflect.SimpleClassFinder
-
-class SimpleClassFinderTest : ClassFinderTest {
-    override val finder = SimpleClassFinder
-}
+class Dir1Class

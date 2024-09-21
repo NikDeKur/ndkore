@@ -108,16 +108,23 @@ open class PatternPlaceholderParser(
 
     override fun parse(string: String, placeholders: Map<String, Any?>): String {
         val sb = StringBuilder()
-
         var lastIndex = 0
+
         pattern.findAll(string).forEach { match ->
             sb.append(string.substring(lastIndex, match.range.first))
+
             val pathRaw = match.groupValues[1]
             val value = parseExpression(pathRaw, placeholders)
             sb.append(value ?: match.value)
+
             lastIndex = match.range.last + 1
         }
 
+        // Append the remaining part of the string
+        if (lastIndex < string.length)
+            sb.append(string.substring(lastIndex))
+
         return sb.toString()
     }
+
 }

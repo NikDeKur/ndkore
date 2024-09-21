@@ -6,6 +6,8 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
-package dev.nikdekur.ndkore.classfinder.dir2
+package dev.nikdekur.ndkore.reflect.classfinder.dir3
 
-class Dir2Class1
+class Dir3Class1
+class Dir3Class2
+class Dir3Class3

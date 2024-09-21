@@ -101,6 +101,7 @@ kotlin {
             compileOnly(libs.kotlinx.io.core)
             compileOnly(libs.kotlin.logging)
             compileOnly(libs.stately.concurrency)
+            compileOnly(libs.bignum)
 
             compileOnly(libs.kaml)
             compileOnly(libs.koin)
@@ -118,6 +119,8 @@ kotlin {
 
         commonTest.dependencies {
             implementation(libs.slf4j.api)
+            implementation(libs.kotlin.logging)
+            implementation(libs.bignum)
 
             implementation(kotlin("test"))
 

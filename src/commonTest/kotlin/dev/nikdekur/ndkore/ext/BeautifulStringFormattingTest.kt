@@ -24,11 +24,11 @@ class BeautifulStringFormattingTest {
 
     @Test
     fun testLongFormatting() {
-        val number = 1234567890123456789
+        val number = 1_234_567_890_123_456_789
         val formatted = number.toBeautifulString(
             rounding = 2
         )
-        assertEquals("1.23Q", formatted)
+        assertEquals("1.23Qi", formatted)
     }
 
     @Test

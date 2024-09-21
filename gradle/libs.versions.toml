@@ -1,12 +1,16 @@
 [versions]
 kotlin = "2.0.20"
-kotlinx-coroutines = "1.9.0-RC.2"
-kotlinx-serialization = "1.7.2"
+kotlinx-coroutines = "1.9.0"
+kotlinx-serialization = "1.7.3"
+kotlinx-datetime = "0.6.1"
+kotlinx-io = "0.5.3"
+kotlin-logging = "7.0.0"
+stately = "2.1.0"
 google-guava = "33.3.0-jre"
 slf4j = "2.0.16"
 licenser = "0.6.1"
 kaml = "0.61.0"
-koin = "4.0.0-RC1"
+koin = "4.0.0"
 jupiter = "5.11.0"
 
 [libraries]
@@ -15,6 +19,10 @@ kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref =
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotlinx-serialization-properties = { module = "org.jetbrains.kotlinx:kotlinx-serialization-properties", version.ref = "kotlinx-serialization" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io" }
+kotlin-logging = { module = "io.github.oshai:kotlin-logging", version.ref = "kotlin-logging" }
+stately-concurrency = { module = "co.touchlab:stately-concurrency", version.ref = "stately" }
 google-guava = { module = "com.google.guava:guava", version.ref = "google-guava" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
@@ -25,6 +33,6 @@ junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", vers
 junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "jupiter" }
 
 [plugins]
-kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 licenser = { id = "org.cadixdev.licenser", version.ref = "licenser" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

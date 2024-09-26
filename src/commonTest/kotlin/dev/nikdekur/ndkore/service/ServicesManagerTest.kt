@@ -21,9 +21,9 @@ interface App {
 
 class TestApp(override val manager: ServicesManager, override val flag: Boolean) : App
 
-interface ServicesManagerTest {
+abstract class ServicesManagerTest {
 
-    val app: App
+    abstract val app: App
     val manager
         get() = app.manager
 

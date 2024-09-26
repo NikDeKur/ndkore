@@ -64,18 +64,18 @@ package dev.nikdekur.ndkore.placeholder
  * println(result) // Output: Bob is 30 years old
  * ```
  */
-open class PatternPlaceholderParser(
-    val pattern: Regex,
-    val source: ValuesSource
+public open class PatternPlaceholderParser(
+    public val pattern: Regex,
+    public val source: ValuesSource
 ) : PlaceholderParser {
 
-    constructor(
+    public constructor(
         symbolLeft: String,
         symbolRight: String,
         source: ValuesSource
     ) : this(Regex("$symbolLeft(.*?)$symbolRight"), source)
 
-    constructor(symbol: String, source: ValuesSource) : this(symbol, symbol, source)
+    public constructor(symbol: String, source: ValuesSource) : this(symbol, symbol, source)
 
     override fun parseExpression(pathRaw: String, placeholders: Map<String, Any?>): String? {
         val parts = pathRaw.split(".")

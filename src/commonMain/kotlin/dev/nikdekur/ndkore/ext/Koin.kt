@@ -26,7 +26,7 @@ import org.koin.dsl.module
 import kotlin.reflect.KClass
 
 /** Wrapper for [org.koin.dsl.module] that immediately loads the module for the current [Koin] instance. **/
-inline fun KoinContext.loadModule(
+public inline fun KoinContext.loadModule(
     createdAtStart: Boolean = false,
     noinline moduleDeclaration: ModuleDeclaration,
 ): Module {
@@ -39,7 +39,7 @@ inline fun KoinContext.loadModule(
 }
 
 
-fun <T : Any> createDefinition(
+public fun <T : Any> createDefinition(
     clazz: KClass<T>,
     kind: Kind = Kind.Singleton,
     qualifier: Qualifier? = null,
@@ -59,7 +59,7 @@ fun <T : Any> createDefinition(
 
 
 @KoinInternalApi
-fun <T : Any> singleInstanceFactory(
+public fun <T : Any> singleInstanceFactory(
     clazz: KClass<T>,
     qualifier: Qualifier? = null,
     definition: Definition<T>,
@@ -76,7 +76,7 @@ fun <T : Any> singleInstanceFactory(
  * @param definition - definition function
  */
 @OptIn(KoinInternalApi::class)
-fun <T : Any> Module.single(
+public fun <T : Any> Module.single(
     clazz: KClass<T>,
     qualifier: Qualifier? = null,
     createdAtStart: Boolean = false,

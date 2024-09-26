@@ -22,23 +22,23 @@ import co.touchlab.stately.concurrency.AtomicInt
  * managing tasks.
  * Subclasses are responsible for implementing the task scheduling methods.
  */
-abstract class AbstractScheduler : Scheduler {
+public abstract class AbstractScheduler : Scheduler {
 
     /**
      * A thread-safe map that holds all the registered tasks with their unique IDs.
      */
-    val tasks = mutableMapOf<Int, SchedulerTask>()
+    public val tasks: MutableMap<Int, SchedulerTask> = mutableMapOf<Int, SchedulerTask>()
 
     // We assume that schedulers can use different threads to run tasks,
     // so we need to make thread-safe incrementation.
-    var tasksWas = AtomicInt(0)
+    public var tasksWas: AtomicInt = AtomicInt(0)
 
     /**
      * Generates the next unique task ID in a thread-safe manner.
      *
      * @return The next unique task ID.
      */
-    fun nextId(): Int {
+    public fun nextId(): Int {
         return tasksWas.incrementAndGet()
     }
 
@@ -47,7 +47,7 @@ abstract class AbstractScheduler : Scheduler {
      *
      * @param task The task to register.
      */
-    fun registerTask(task: SchedulerTask) {
+    public fun registerTask(task: SchedulerTask) {
         tasks[task.id] = task
     }
 
@@ -56,7 +56,7 @@ abstract class AbstractScheduler : Scheduler {
      *
      * @param taskId The ID of the task to unregister.
      */
-    fun unregisterTask(taskId: Int) {
+    public fun unregisterTask(taskId: Int) {
         tasks.remove(taskId)
     }
 

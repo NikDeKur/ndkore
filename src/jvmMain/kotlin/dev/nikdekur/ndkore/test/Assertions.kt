@@ -14,26 +14,26 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 
 
-inline fun assertEmpty(iterable: Iterable<*>) {
+public inline fun assertEmpty(iterable: Iterable<*>) {
     if (iterable is Collection<*>)
         assertEquals(0, iterable.size)
     val hasNext = iterable.iterator().hasNext()
     assertTrue(!hasNext)
 }
 
-inline fun assertEmpty(map: Map<*, *>) {
+public inline fun assertEmpty(map: Map<*, *>) {
     assertEquals(0, map.size)
 }
 
 
-inline fun assertSize(iterable: Iterable<*>, expected: Int) {
+public inline fun assertSize(iterable: Iterable<*>, expected: Int) {
     if (iterable is Collection<*>)
         assertEquals(expected, iterable.size)
 
     assertEquals(expected, iterable.count())
 }
 
-inline fun assertSize(map: Map<*, *>, expected: Int) {
+public inline fun assertSize(map: Map<*, *>, expected: Int) {
     assertEquals(expected, map.size)
 }
 

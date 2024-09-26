@@ -10,7 +10,7 @@ package dev.nikdekur.ndkore.spatial.kdtree
 
 import dev.nikdekur.ndkore.spatial.Point
 
-data class Node<T>(
+public data class Node<T>(
     var point: Point,
     var value: T,
     var left: Node<T>? = null,

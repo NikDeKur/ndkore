@@ -20,7 +20,7 @@ package dev.nikdekur.ndkore.ext
  * @return The enum constant of type `T`.
  * @throws IllegalArgumentException If no matching enum constant is found.
  */
-inline fun <reified T : Enum<T>> enumValueOf(name: String, ignoreCase: Boolean = false): T {
+public inline fun <reified T : Enum<T>> enumValueOf(name: String, ignoreCase: Boolean = false): T {
     return if (ignoreCase) {
         enumValues<T>().find { it.name.equals(name, ignoreCase = true) }
             ?: throw IllegalArgumentException("No enum constant ${T::class}.$name")

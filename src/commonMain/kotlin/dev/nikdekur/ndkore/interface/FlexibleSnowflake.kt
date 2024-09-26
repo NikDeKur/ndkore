@@ -8,6 +8,6 @@
 
 package dev.nikdekur.ndkore.`interface`
 
-interface FlexibleSnowflake<T> : Snowflake<T> {
+public interface FlexibleSnowflake<T> : Snowflake<T> {
     override var id: T
 }

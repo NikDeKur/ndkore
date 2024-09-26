@@ -35,33 +35,33 @@ package dev.nikdekur.ndkore.map.spread
  * // player3 will receive 200 coins, not 400, because the boss has only 1000 health
  * ```
  */
-interface SpreadMap<K : Any, V : Any> : Map<K, V> {
+public interface SpreadMap<K : Any, V : Any> : Map<K, V> {
 
     /**
      * Maximum value that could be stored in the map.
      *
      * If the sum of all values exceeds this value, the [onMax] action will be called.
      */
-    val max: () -> V
+    public val max: () -> V
 
     /**
      * Sum of all values in the map.
      *
      * Cannot be greater than the [max] value.
      */
-    val filled: V
+    public val filled: V
 
     /**
      * Number of values that could be added to the map.
      *
      * Usually its [max] - [filled]
      */
-    val left: V
+    public val left: V
 
     /**
      * Action that will be called when the sum of all values exceeds the [max] value.
      */
-    val onMax: (K) -> Unit
+    public val onMax: (K) -> Unit
 
     /**
      * Register a new value to the map.
@@ -72,7 +72,7 @@ interface SpreadMap<K : Any, V : Any> : Map<K, V> {
      * @param value Value to register
      * @see getValue
      */
-    fun register(key: K, value: V)
+    public fun register(key: K, value: V)
 
     /**
      * Check if the map is full.
@@ -80,12 +80,12 @@ interface SpreadMap<K : Any, V : Any> : Map<K, V> {
      * @return true if the sum of all values is equal or greater than the [max] value
      * @see max
      */
-    val isDone: Boolean
+    public val isDone: Boolean
 
     /**
      * Clear all values from the map.
      */
-    fun clear()
+    public fun clear()
 
     /**
      * Get the value by the key.
@@ -94,45 +94,45 @@ interface SpreadMap<K : Any, V : Any> : Map<K, V> {
      *
      * @param key Key of the value
      */
-    fun getValue(key: K): V
+    public fun getValue(key: K): V
 
     /**
      * Get the value by the key as a percentage (0-100) of the [max] value.
      *
      * Usually its getValue(key) / max
      */
-    fun getValuePercent(key: K): Double
+    public fun getValuePercent(key: K): Double
 
     /**
      * Get the value by the key as a percentage (0-1) of the [max] value.
      *
      * Usually its getValuePercent(key) / 100
      */
-    fun getValueMultiplier(key: K): Double
+    public fun getValueMultiplier(key: K): Double
 
     /**
      * Returns a map with keys and values as a percentage (0-100) of the [max] value.
      */
-    fun toPercent(): Map<K, Double>
+    public fun toPercent(): Map<K, Double>
 
     /**
      * Returns a map with keys and values as a multipliers (0-1) of the [max] value.
      */
-    fun toMultiplier(): Map<K, Double>
+    public fun toMultiplier(): Map<K, Double>
 
     /**
      * Split the value between all keys in the map.
      *
      * The value will be split by the percentage of the [max] value.
      */
-    fun split(value: V): Map<K, V>
+    public fun split(value: V): Map<K, V>
 
     /**
      * Split the value between all keys in the map and call the action for each key.
      *
      * The value will be split by the percentage of the [max] value.
      */
-    fun split(value: V, action: (K, V) -> Unit) {
+    public fun split(value: V, action: (K, V) -> Unit) {
         split(value).forEach { (key, value) -> action(key, value) }
     }
 }

@@ -11,7 +11,7 @@ package dev.nikdekur.ndkore.map.spread
 import dev.nikdekur.ndkore.ext.map
 import java.math.BigInteger
 
-open class SpreadBigIntegerMap<K : Any>(
+public open class SpreadBigIntegerMap<K : Any>(
     override val max: () -> BigInteger,
     override val onMax: (K) -> Unit = {}
 ) : AbstractSpreadMap<K, BigInteger>() {

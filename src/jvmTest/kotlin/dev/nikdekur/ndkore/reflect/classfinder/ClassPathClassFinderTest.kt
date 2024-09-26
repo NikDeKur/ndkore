@@ -11,6 +11,6 @@ package dev.nikdekur.ndkore.reflect.classfinder
 import dev.nikdekur.ndkore.reflect.ClassPathClassFinder
 
 
-class ClassPathClassFinderTest : ClassFinderTest {
+class ClassPathClassFinderTest : ClassFinderTest() {
     override val finder = ClassPathClassFinder
 }

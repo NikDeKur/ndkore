@@ -64,12 +64,12 @@ package dev.nikdekur.ndkore.scheduler
  * - The `cancelAllTasks()` method will affect all schedulers managed by the instance, so use it
  *   carefully depending on the context of your application.
  */
-open class SchedulerManager<H>(val factory: (H) -> Scheduler) {
+public open class SchedulerManager<H>(public val factory: (H) -> Scheduler) {
 
     /**
      * A concurrent map that holds the mapping between each unique key of type [H] and its corresponding [Scheduler] instance.
      */
-    val schedulers = mutableMapOf<H, Scheduler>()
+    public val schedulers: MutableMap<H, Scheduler> = mutableMapOf<H, Scheduler>()
 
     /**
      * Retrieves the scheduler associated with the specified key. If the scheduler does not exist, it is created
@@ -78,7 +78,7 @@ open class SchedulerManager<H>(val factory: (H) -> Scheduler) {
      * @param holder The unique key used to identify the scheduler.
      * @return The [Scheduler] instance associated with the specified key.
      */
-    fun getScheduler(holder: H): Scheduler {
+    public fun getScheduler(holder: H): Scheduler {
         return schedulers.getOrPut(holder) { factory(holder) }
     }
 
@@ -88,7 +88,7 @@ open class SchedulerManager<H>(val factory: (H) -> Scheduler) {
      * This method iterates over all schedulers and invokes their `cancelAllTasks()` method to stop
      * all ongoing tasks and perform any necessary cleanup.
      */
-    fun cancelAllTasks() {
+    public fun cancelAllTasks() {
         schedulers.values.forEach { it.cancelAllTasks() }
     }
 }

@@ -8,7 +8,7 @@ import dev.nikdekur.ndkore.service.ServicesManager
  *
  * Provides utility functions for working with services from Java.
  */
-object JavaServices {
+public object JavaServices {
 
     /**
      * Registers a service with the manager.
@@ -23,7 +23,11 @@ object JavaServices {
      * @param service The service to be registered.
      * @param bindTo One or more classes to which the service should be bound.
      */
-    fun <C : Any, S> registerService(manager: ServicesManager, service: S, vararg bindTo: Class<out C>) where S : C {
+    public fun <C : Any, S> registerService(
+        manager: ServicesManager,
+        service: S,
+        vararg bindTo: Class<out C>
+    ) where S : C {
         manager.registerService(service, *bindTo.map { it.kotlin }.toTArray())
     }
 
@@ -39,7 +43,7 @@ object JavaServices {
      * @param serviceClass The Class of the service to retrieve.
      * @return The service instance, or null if not found.
      */
-    fun <C : Any> getServiceOrNull(manager: ServicesManager, serviceClass: Class<out C>): C? {
+    public fun <C : Any> getServiceOrNull(manager: ServicesManager, serviceClass: Class<out C>): C? {
         return manager.getServiceOrNull(serviceClass.kotlin)
     }
 
@@ -54,7 +58,7 @@ object JavaServices {
      * @return The service instance.
      * @throws ServiceNotFoundException If the service is not found.
      */
-    fun <C : Any> getService(manager: ServicesManager, serviceClass: Class<out C>): C {
+    public fun <C : Any> getService(manager: ServicesManager, serviceClass: Class<out C>): C {
         return manager.getService(serviceClass.kotlin)
     }
 
@@ -67,7 +71,7 @@ object JavaServices {
      * @param C The type of the service to retrieve.
      * @return The service instance, or null if not found.
      */
-    fun <C : Any> getOrNull(component: ServicesComponent, clazz: Class<out C>) =
+    public fun <C : Any> getOrNull(component: ServicesComponent, clazz: Class<out C>): C? =
         getServiceOrNull(component.manager, clazz)
 
 
@@ -81,6 +85,6 @@ object JavaServices {
      * @return The service instance.
      * @throws ServiceNotFoundException If the service is not found.
      */
-    fun <C : Any> get(component: ServicesComponent, clazz: Class<out C>) =
+    public fun <C : Any> get(component: ServicesComponent, clazz: Class<out C>): C =
         getService(component.manager, clazz)
 }

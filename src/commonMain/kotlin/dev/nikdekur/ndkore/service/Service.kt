@@ -9,6 +9,7 @@
 
 package dev.nikdekur.ndkore.service
 
+import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
 
 
@@ -21,10 +22,10 @@ import io.github.oshai.kotlinlogging.KotlinLogging
  *
  * @see ServicesManager
  */
-abstract class Service : ServicesComponent {
+public abstract class Service : ServicesComponent {
 
-    open val logger = KotlinLogging.logger { }
-    open var state: State = State.Disabled
+    public open val logger: KLogger = KotlinLogging.logger { }
+    public open var state: State = State.Disabled
 
     /**
      * Dependencies that this service has.
@@ -32,7 +33,7 @@ abstract class Service : ServicesComponent {
      * [ServicesManager] will enable all dependencies in the order
      * to satisfy all dependencies of all services.
      */
-    open val dependencies: Dependencies
+    public open val dependencies: Dependencies
         get() = Dependencies.none()
 
     /**
@@ -42,7 +43,7 @@ abstract class Service : ServicesComponent {
      *
      * @see doEnable
      */
-    open fun onEnable() {
+    public open fun onEnable() {
         // Do nothing by default
     }
 
@@ -53,7 +54,7 @@ abstract class Service : ServicesComponent {
      *
      * @see doDisable
      */
-    open fun onDisable() {
+    public open fun onDisable() {
         // Do nothing by default
     }
 
@@ -62,7 +63,7 @@ abstract class Service : ServicesComponent {
      *
      * Calls [onEnable] function and catches all exceptions.
      */
-    open fun doEnable() {
+    public open fun doEnable() {
         state = State.Enabling
         try {
             onEnable()
@@ -78,7 +79,7 @@ abstract class Service : ServicesComponent {
      *
      * Calls [onDisable] function and catches all exceptions.
      */
-    open fun doDisable() {
+    public open fun doDisable() {
         state = State.Disabling
         try {
             onDisable()
@@ -94,22 +95,22 @@ abstract class Service : ServicesComponent {
      *
      * Calls [doDisable] and [doEnable] functions in sequence.
      */
-    open fun doReload() {
+    public open fun doReload() {
         doDisable()
         doEnable()
     }
 
 
-    sealed interface State {
-        data object Enabling : State
-        data class ErrorEnabling(val e: Exception) : State
-        data object Enabled : State
+    public sealed interface State {
+        public data object Enabling : State
+        public data class ErrorEnabling(val e: Exception) : State
+        public data object Enabled : State
 
-        data object Disabling : State
-        data class ErrorDisabling(val e: Exception) : State
-        data object Disabled : State
+        public data object Disabling : State
+        public data class ErrorDisabling(val e: Exception) : State
+        public data object Disabled : State
 
-        fun isErrored() = this is ErrorEnabling || this is ErrorDisabling
+        public fun isErrored(): Boolean = this is ErrorEnabling || this is ErrorDisabling
     }
 
 }

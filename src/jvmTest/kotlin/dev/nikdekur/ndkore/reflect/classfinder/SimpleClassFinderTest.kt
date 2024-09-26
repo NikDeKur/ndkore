@@ -10,6 +10,6 @@ package dev.nikdekur.ndkore.reflect.classfinder
 
 import dev.nikdekur.ndkore.reflect.SimpleClassFinder
 
-class SimpleClassFinderTest : ClassFinderTest {
+class SimpleClassFinderTest : ClassFinderTest() {
     override val finder = SimpleClassFinder
 }

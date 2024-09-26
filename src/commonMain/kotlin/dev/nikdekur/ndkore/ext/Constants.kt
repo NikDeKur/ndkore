@@ -8,25 +8,25 @@
 
 package dev.nikdekur.ndkore.ext
 
-object Patterns {
-    val RGB_1 = Regex("(\\d{1,3}) (\\d{1,3}) (\\d{1,3})")
-    val RGB_2 = Regex("(\\d{1,3}), (\\d{1,3}), (\\d{1,3})")
-    val RGB_3 = Regex("(\\d{1,3}); (\\d{1,3}); (\\d{1,3})")
-    val HEX_1 = Regex("([A-Za-z0-9]){6}")
-    val HEX_2 = Regex("#${HEX_1.pattern}")
-    val ALL_RGB = listOf(RGB_1, RGB_2, RGB_3)
-    val ALL_HEX = listOf(HEX_1, HEX_2)
-    val NOT_DIGITS = Regex("[^\\d.]")
-    val DIGITS = Regex("[\\d.]")
+public object Patterns {
+    public val RGB_1: Regex = Regex("(\\d{1,3}) (\\d{1,3}) (\\d{1,3})")
+    public val RGB_2: Regex = Regex("(\\d{1,3}), (\\d{1,3}), (\\d{1,3})")
+    public val RGB_3: Regex = Regex("(\\d{1,3}); (\\d{1,3}); (\\d{1,3})")
+    public val HEX_1: Regex = Regex("([A-Za-z0-9]){6}")
+    public val HEX_2: Regex = Regex("#${HEX_1.pattern}")
+    public val ALL_RGB: List<Regex> = listOf(RGB_1, RGB_2, RGB_3)
+    public val ALL_HEX: List<Regex> = listOf(HEX_1, HEX_2)
+    public val NOT_DIGITS: Regex = Regex("[^\\d.]")
+    public val DIGITS: Regex = Regex("[\\d.]")
 
-    val UUID = Regex("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$")
-    val WORD_SPLIT: Regex = Regex("\\s+")
+    public val UUID: Regex = Regex("^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$")
+    public val WORD_SPLIT: Regex = Regex("\\s+")
 
-    val REMOVE_TRAILING_COMA = Regex("\\.?0*$")
-    val NEXT_LINE_PATTERN = Regex("\n")
+    public val REMOVE_TRAILING_COMA: Regex = Regex("\\.?0*$")
+    public val NEXT_LINE_PATTERN: Regex = Regex("\n")
 }
 
-object Constants {
-    fun <T> alwaysTrue() = { _: T -> true }
-    fun <T> alwaysFalse() = { _: T -> false }
+public object Constants {
+    public fun <T> alwaysTrue(): (T) -> Boolean = { _: T -> true }
+    public fun <T> alwaysFalse(): (T) -> Boolean = { _: T -> false }
 }

@@ -20,7 +20,7 @@ import kotlin.time.TimeSource
  * @param operation The operation to measure the execution time for, accepting the current iteration index as a parameter.
  * @return The average time taken by the operation in nanoseconds.
  */
-inline fun TimeSource.measureAverageTime(iterations: Int, operation: (Int) -> Unit): Duration {
+public inline fun TimeSource.measureAverageTime(iterations: Int, operation: (Int) -> Unit): Duration {
     var totalTime = 0.seconds
     var index = 0
     while (index < iterations) {
@@ -39,7 +39,7 @@ inline fun TimeSource.measureAverageTime(iterations: Int, operation: (Int) -> Un
  * @param text The label to display before the measured time.
  * @param operation The operation to measure, accepting the current iteration index as a parameter.
  */
-inline fun TimeSource.printAverageExecTime(iterations: Int, text: String, operation: (Int) -> Unit) {
+public inline fun TimeSource.printAverageExecTime(iterations: Int, text: String, operation: (Int) -> Unit) {
     val time = measureAverageTime(iterations, operation)
     val elapsedTime = time / 1_000_000
     println("$text: ${elapsedTime.inWholeMilliseconds.format(6)} ms")
@@ -51,7 +51,7 @@ inline fun TimeSource.printAverageExecTime(iterations: Int, text: String, operat
  * @param iterations The number of times the operation should be executed.
  * @param operation The operation to measure, accepting the current iteration index as a parameter.
  */
-inline fun TimeSource.printAverageExecTime(iterations: Int, operation: (Int) -> Unit) =
+public inline fun TimeSource.printAverageExecTime(iterations: Int, operation: (Int) -> Unit) =
     printAverageExecTime(iterations, "Execution time", operation)
 
 /**
@@ -62,7 +62,7 @@ inline fun TimeSource.printAverageExecTime(iterations: Int, operation: (Int) -> 
  * @param operation The operation to measure the execution time for.
  * @return The result of the operation.
  */
-inline fun <T> TimeSource.printExecTime(text: String, operation: () -> T): T {
+public inline fun <T> TimeSource.printExecTime(text: String, operation: () -> T): T {
     val startTime = markNow()
     val r = operation()
     val elapsedTime = startTime.elapsedNow()
@@ -77,4 +77,4 @@ inline fun <T> TimeSource.printExecTime(text: String, operation: () -> T): T {
  * @param operation The operation to measure the execution time for.
  * @return The result of the operation.
  */
-inline fun <T> TimeSource.printExecTime(operation: () -> T) = printExecTime("Execution time", operation)
+public inline fun <T> TimeSource.printExecTime(operation: () -> T) = printExecTime("Execution time", operation)

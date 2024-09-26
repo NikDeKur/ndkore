@@ -17,7 +17,7 @@ import kotlinx.coroutines.runBlocking
  *
  * Returns the runtime object associated with the current Java application.
  */
-inline val runtime: Runtime
+public inline val runtime: Runtime
     get() = Runtime.getRuntime()
 
 /**
@@ -26,7 +26,7 @@ inline val runtime: Runtime
  * Has a link to the thread that is the shutdown hook and provides methods to remove it.
  */
 @JvmInline
-value class ShutdownHook(val thread: Thread) {
+public value class ShutdownHook(public val thread: Thread) {
     /**
      * Removes the shutdown hook.
      *
@@ -34,7 +34,7 @@ value class ShutdownHook(val thread: Thread) {
      *
      * @throws IllegalStateException if the virtual machine is already in the process of shutting down
      */
-    fun remove() = runtime.removeShutdownHook(thread)
+    public fun remove(): Boolean = runtime.removeShutdownHook(thread)
 
     /**
      * Tries to remove the shutdown hook.
@@ -45,7 +45,7 @@ value class ShutdownHook(val thread: Thread) {
      *
      * @return true if the shutdown hook was removed, false otherwise
      */
-    fun tryRemove() = try {
+    public fun tryRemove(): Boolean = try {
         remove()
         true
     } catch (e: IllegalStateException ) {
@@ -61,7 +61,7 @@ value class ShutdownHook(val thread: Thread) {
  * @param hook the hook to add
  * @return a [ShutdownHook] object representing the added shutdown hook
  */
-inline fun addShutdownHook(hook: Thread): ShutdownHook {
+public inline fun addShutdownHook(hook: Thread): ShutdownHook {
     runtime.addShutdownHook(hook)
     return ShutdownHook(hook)
 }
@@ -74,7 +74,7 @@ inline fun addShutdownHook(hook: Thread): ShutdownHook {
  * @param hook the hook to add
  * @return a [ShutdownHook] object representing the added shutdown hook
  */
-inline fun addShutdownHook(crossinline hook: () -> Unit): ShutdownHook {
+public inline fun addShutdownHook(crossinline hook: () -> Unit): ShutdownHook {
     return addShutdownHook(
         object : Thread() {
             override fun run() = hook()
@@ -93,7 +93,7 @@ inline fun addShutdownHook(crossinline hook: () -> Unit): ShutdownHook {
  * @param hook the hook to add
  * @return a [ShutdownHook] object representing the added shutdown hook
  */
-inline fun addBlockingShutdownHook(crossinline hook: suspend () -> Unit): ShutdownHook {
+public inline fun addBlockingShutdownHook(crossinline hook: suspend () -> Unit): ShutdownHook {
     return addShutdownHook {
         runBlocking {
             hook()

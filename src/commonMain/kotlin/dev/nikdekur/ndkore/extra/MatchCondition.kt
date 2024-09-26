@@ -8,7 +8,7 @@
 
 package dev.nikdekur.ndkore.extra
 
-enum class MatchCondition {
+public enum class MatchCondition {
     EQUALS,
     EQUALS_IGNORE_CASE,
     CONTAINS,
@@ -18,7 +18,7 @@ enum class MatchCondition {
     ENDSWITH,
     ENDSWITH_IGNORE_CASE;
 
-    fun match(string: String, otherString: String): Boolean {
+    public fun match(string: String, otherString: String): Boolean {
         return when (this) {
             EQUALS -> string == otherString
             EQUALS_IGNORE_CASE -> string.equals(otherString, ignoreCase = true)

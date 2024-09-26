@@ -10,4 +10,4 @@ package dev.nikdekur.ndkore.annotation
 
 @RequiresOptIn(level = RequiresOptIn.Level.WARNING)
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.CLASS)
-annotation class ExperimentalAPI
+public annotation class ExperimentalAPI

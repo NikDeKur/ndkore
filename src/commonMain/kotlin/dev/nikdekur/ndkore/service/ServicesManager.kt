@@ -21,7 +21,7 @@ import kotlin.reflect.KClass
  * Services provide an easy way to split the application into smaller, more manageable parts.
  * Which also have load and unload lifecycle methods.
  */
-interface ServicesManager : ServicesComponent {
+public interface ServicesManager : ServicesComponent {
 
     override val manager: ServicesManager
         get() = this
@@ -31,7 +31,7 @@ interface ServicesManager : ServicesComponent {
      *
      * @see State
      */
-    val state: State
+    public val state: State
 
     /**
      * A collection of all registered services.
@@ -41,7 +41,7 @@ interface ServicesManager : ServicesComponent {
      *
      * Guaranteed to return services in the order of their dependencies.
      */
-    val services: Collection<Service>
+    public val services: Collection<Service>
 
     /**
      * Registers a service with the manager.
@@ -56,7 +56,7 @@ interface ServicesManager : ServicesComponent {
      * @param service The service to be registered.
      * @param bindTo One or more classes to which the service should be bound.
      */
-    fun <C : Any, S> registerService(service: S, vararg bindTo: KClass<out C>) where S : C
+    public fun <C : Any, S> registerService(service: S, vararg bindTo: KClass<out C>) where S : C
 
     /**
      * Retrieves a service by its class, or returns null if it is not found.
@@ -70,7 +70,7 @@ interface ServicesManager : ServicesComponent {
      * @param serviceClass The KClass of the service to retrieve.
      * @return The service instance, or null if not found.
      */
-    fun <C : Any> getServiceOrNull(serviceClass: KClass<out C>): C?
+    public fun <C : Any> getServiceOrNull(serviceClass: KClass<out C>): C?
 
     /**
      * Retrieves a service by its class.
@@ -83,7 +83,7 @@ interface ServicesManager : ServicesComponent {
      * @return The service instance.
      * @throws ServiceNotFoundException If the service is not found.
      */
-    fun <C : Any> getService(serviceClass: KClass<out C>): C
+    public fun <C : Any> getService(serviceClass: KClass<out C>): C
 
     /**
      * Enable service manager.
@@ -91,7 +91,7 @@ interface ServicesManager : ServicesComponent {
      * This method will enable all registered services ([Service.doEnable])
      * and will enable every service in the correct order to satisfy all dependencies.
      */
-    fun enable()
+    public fun enable()
 
     /**
      * Disable service manager.
@@ -99,7 +99,7 @@ interface ServicesManager : ServicesComponent {
      * This method will disable all registered services ([Service.doDisable])
      * and will disable every service in the correct order to satisfy all dependencies.
      */
-    fun disable()
+    public fun disable()
 
 
     /**
@@ -110,13 +110,17 @@ interface ServicesManager : ServicesComponent {
      * @see enable
      * @see disable
      */
-    fun reload() {
+    public fun reload() {
         disable()
         enable()
     }
 
-
-    enum class State {
+    /**
+     * # Services Manager's State
+     *
+     * Represent the state of a Service Manager
+     */
+    public enum class State {
         ENABLING,
         ENABLED,
         DISABLING,
@@ -132,7 +136,7 @@ interface ServicesManager : ServicesComponent {
  * @param C The type of the service to retrieve.
  * @return The service instance, or null if not found.
  */
-inline fun <reified C : Any> ServicesManager.getServiceOrNull() = getServiceOrNull(C::class)
+public inline fun <reified C : Any> ServicesManager.getServiceOrNull() = getServiceOrNull(C::class)
 
 /**
  * Retrieves a service by its class.
@@ -144,4 +148,4 @@ inline fun <reified C : Any> ServicesManager.getServiceOrNull() = getServiceOrNu
  * @return The service instance.
  * @throws ServiceNotFoundException If the service is not found.
  */
-inline fun <reified C : Any> ServicesManager.getService() = getService(C::class)
+public inline fun <reified C : Any> ServicesManager.getService() = getService(C::class)

@@ -23,7 +23,7 @@ import java.lang.reflect.Method
  * its superclass hierarchy.
  * Additionally, it supports invoking methods and accessing the `Unsafe` instance.
  */
-object Reflect {
+public object Reflect {
 
     /**
      * Retrieves all fields of a class and its superclasses, along with their values from the given object.
@@ -37,7 +37,7 @@ object Reflect {
      * @param obj The object from which to retrieve the field values. If `null`, field values cannot be retrieved.
      * @return A map where the keys are field names and the values are the corresponding field values from the given object.
      */
-    fun getClassFields(clazz: Class<*>, obj: Any?): Map<String, Any?> {
+    public fun getClassFields(clazz: Class<*>, obj: Any?): Map<String, Any?> {
         val fieldsMap: HashMap<String, Any?> = HashMap()
         var objClass: Class<*>? = clazz
         while (objClass != null) {
@@ -61,7 +61,7 @@ object Reflect {
      * @param clazz The class from which to start retrieving methods.
      * @return A map where the keys are method names and the values are `Method` objects representing the methods.
      */
-    fun getClassMethods(clazz: Class<*>): HashMap<String, Method> {
+    public fun getClassMethods(clazz: Class<*>): HashMap<String, Method> {
         var objClass: Class<*>? = clazz
         val methodsMap: HashMap<String, Method> = HashMap()
 
@@ -86,7 +86,7 @@ object Reflect {
      * @param name The name of the field to search for.
      * @return The `Field` object representing the field if found, or `null` if the field does not exist.
      */
-    fun searchField(clazz: Class<*>, name: String): Field? {
+    public fun searchField(clazz: Class<*>, name: String): Field? {
         return try {
             clazz.getDeclaredField(name)
         } catch (_: NoSuchFieldException) {
@@ -105,7 +105,7 @@ object Reflect {
      * @param name The name of the field to search for.
      * @return The `Field` object representing the field if found, or `null` if the field does not exist.
      */
-    fun searchFieldRecursive(clazz: Class<*>, name: String): Field? {
+    public fun searchFieldRecursive(clazz: Class<*>, name: String): Field? {
         var objClass: Class<*>? = clazz
         while (objClass != null) {
             val field = try {
@@ -135,7 +135,7 @@ object Reflect {
      * @param classes The parameter types of the method.
      * @return The `Method` object representing the method if found, or `null` if the method does not exist.
      */
-    fun searchMethod(clazz: Class<*>, name: String, classes: Array<out Class<*>>): Method? {
+    public fun searchMethod(clazz: Class<*>, name: String, classes: Array<out Class<*>>): Method? {
         return try {
             clazz.getMethod(name, *classes)
         } catch (_: NoSuchMethodException) {
@@ -155,7 +155,7 @@ object Reflect {
      * @param classes The parameter types of the method.
      * @return The `Method` object representing the method if found, or `null` if the method does not exist.
      */
-    fun searchMethodRecursive(clazz: Class<*>, name: String, classes: Array<out Class<*>>): Method? {
+    public fun searchMethodRecursive(clazz: Class<*>, name: String, classes: Array<out Class<*>>): Method? {
         var objClass: Class<*>? = clazz
         while (objClass != null) {
             val method = try {
@@ -188,7 +188,7 @@ object Reflect {
      * @return A `ReflectResult` object containing the value of the field if found,
      * or `ReflectResult.Missing` if the field does not exist.
      */
-    fun getFieldValue(clazz: Class<*>, obj: Any?, name: String): ReflectResult {
+    public fun getFieldValue(clazz: Class<*>, obj: Any?, name: String): ReflectResult {
         val field = searchFieldRecursive(clazz, name)
         return if (field != null) {
             ReflectResult(field.withUnlock {
@@ -212,7 +212,7 @@ object Reflect {
      * @param name The name of the field whose value is to be set.
      * @param value The value to be set in the field.
      */
-    fun setFieldValue(clazz: Class<*>, obj: Any?, name: String, value: Any?) {
+    public fun setFieldValue(clazz: Class<*>, obj: Any?, name: String, value: Any?) {
         val field = searchFieldRecursive(clazz, name)
         field?.withUnlock {
             field[obj] = value
@@ -235,7 +235,13 @@ object Reflect {
      * @return A `ReflectResult` object containing the result of the method invocation if the method is found,
      * or `ReflectResult.Missing` if the method does not exist.
      */
-    inline fun callMethodTyped(clazz: Class<*>, obj: Any?, name: String, classes: Array<out Class<*>>, vararg args: Any?): ReflectResult {
+    public inline fun callMethodTyped(
+        clazz: Class<*>,
+        obj: Any?,
+        name: String,
+        classes: Array<out Class<*>>,
+        vararg args: Any?
+    ): ReflectResult {
         val method = searchMethodRecursive(clazz, name, classes) ?: return ReflectResult.Missing
         return ReflectResult(method.withUnlock {
             method.invoke(obj, *args)
@@ -258,7 +264,7 @@ object Reflect {
      * @return A `ReflectResult` object containing the result of the method invocation if the method is found,
      * or `ReflectResult.Missing` if the method does not exist.
      */
-    inline fun callMethod(clazz: Class<*>, obj: Any?, name: String, vararg args: Any?): ReflectResult {
+    public inline fun callMethod(clazz: Class<*>, obj: Any?, name: String, vararg args: Any?): ReflectResult {
         val classes = args.mapNotNull { it?.javaClass }.toTypedArray()
         return callMethodTyped(clazz, obj, name, classes, *args)
     }
@@ -274,7 +280,7 @@ object Reflect {
      * @return The `Unsafe` instance.
      * @throws IllegalAccessException If the `Unsafe` instance could not be accessed.
      */
-    fun getUnsafe(): Unsafe {
+    public fun getUnsafe(): Unsafe {
         val result = getFieldValue(Unsafe::class.java, null, "theUnsafe")
         if (result is ReflectResult.Missing) {
             throw IllegalAccessException("Failed to get Unsafe instance")

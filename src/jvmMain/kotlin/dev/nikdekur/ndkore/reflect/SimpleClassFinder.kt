@@ -37,9 +37,9 @@ import java.io.File
  * @see ClassFinder
  * @see ClassLoader
  */
-object SimpleClassFinder : ClassFinder {
+public object SimpleClassFinder : ClassFinder {
 
-    fun findClass(name: String): Class<*>? {
+    public fun findClass(name: String): Class<*>? {
         return try {
             Class.forName(name)
         } catch (e: ClassNotFoundException) {

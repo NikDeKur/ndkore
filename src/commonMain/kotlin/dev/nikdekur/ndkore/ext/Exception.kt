@@ -22,7 +22,7 @@ import kotlin.contracts.contract
  *
  * @throws Throwable Always rethrows the original [Throwable] after printing its stack trace.
  */
-inline fun Throwable.printStackAndThrow(): Nothing {
+public inline fun Throwable.printStackAndThrow(): Nothing {
     contract {
         returns() implies false
     }
@@ -42,7 +42,7 @@ inline fun Throwable.printStackAndThrow(): Nothing {
  * @return The first exception that was thrown, with any subsequent exceptions added as suppressed exceptions.
  * Returns `null` if no exceptions were thrown.
  */
-inline fun tryEverything(blocks: Iterable<() -> Unit>): Exception? {
+public inline fun tryEverything(blocks: Iterable<() -> Unit>): Exception? {
     var suppress: Exception? = null
     blocks.forEach {
         try {
@@ -67,7 +67,7 @@ inline fun tryEverything(blocks: Iterable<() -> Unit>): Exception? {
  * @return The first exception that was thrown, with any subsequent exceptions added as suppressed exceptions.
  * Returns `null` if no exceptions were thrown.
  */
-inline fun tryEverything(vararg blocks: () -> Unit) = tryEverything(blocks.toList())
+public inline fun tryEverything(vararg blocks: () -> Unit): Exception? = tryEverything(blocks.toList())
 
 /**
  * Safely iterates over an iterable, catching exceptions for each element.
@@ -81,7 +81,7 @@ inline fun tryEverything(vararg blocks: () -> Unit) = tryEverything(blocks.toLis
  * It receives the element and the exception as parameters.
  * @param block The function to be executed for each element.
  */
-inline fun <T> Iterable<T>.forEachSafe(onException: (Exception, T) -> Unit = { _, _ -> }, block: (T) -> Unit) {
+public inline fun <T> Iterable<T>.forEachSafe(onException: (Exception, T) -> Unit = { _, _ -> }, block: (T) -> Unit) {
     forEach {
         try {
             block(it)
@@ -103,7 +103,7 @@ inline fun <T> Iterable<T>.forEachSafe(onException: (Exception, T) -> Unit = { _
  * It receives the element and the exception as parameters.
  * @param block The function to be executed for each element.
  */
-inline fun <T> Iterable<T>.forEachSafe(onException: (Exception) -> Unit = {}, block: (T) -> Unit) {
+public inline fun <T> Iterable<T>.forEachSafe(onException: (Exception) -> Unit = {}, block: (T) -> Unit) {
     forEach {
         try {
             block(it)
@@ -125,7 +125,7 @@ inline fun <T> Iterable<T>.forEachSafe(onException: (Exception) -> Unit = {}, bl
  * It receives the element and the exception as parameters.
  * @param block The function to be executed for each element.
  */
-inline fun <T> Array<T>.forEachSafe(onException: (Exception, T) -> Unit = { _, _ -> }, block: (T) -> Unit) {
+public inline fun <T> Array<T>.forEachSafe(onException: (Exception, T) -> Unit = { _, _ -> }, block: (T) -> Unit) {
     forEach {
         try {
             block(it)
@@ -147,7 +147,7 @@ inline fun <T> Array<T>.forEachSafe(onException: (Exception, T) -> Unit = { _, _
  * It receives the element and the exception as parameters.
  * @param block The function to be executed for each element.
  */
-inline fun <T> Array<T>.forEachSafe(onException: (Exception) -> Unit = {}, block: (T) -> Unit) {
+public inline fun <T> Array<T>.forEachSafe(onException: (Exception) -> Unit = {}, block: (T) -> Unit) {
     forEach {
         try {
             block(it)
@@ -171,7 +171,7 @@ inline fun <T> Array<T>.forEachSafe(onException: (Exception) -> Unit = {}, block
  * It receives the entry and the exception as parameters.
  * @param block The function to be executed for each entry.
  */
-inline fun <K, V> Map<K, V>.forEachSafe(
+public inline fun <K, V> Map<K, V>.forEachSafe(
     onException: (Exception, Map.Entry<K, V>) -> Unit = { _, _ -> },
     block: (Map.Entry<K, V>) -> Unit,
 ) {

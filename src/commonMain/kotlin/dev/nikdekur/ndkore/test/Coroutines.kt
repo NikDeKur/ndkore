@@ -13,7 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
-suspend inline fun realDelay(timeMillis: Long, dispatcher: CoroutineDispatcher = Dispatchers.Default) {
+public suspend inline fun realDelay(timeMillis: Long, dispatcher: CoroutineDispatcher = Dispatchers.Default) {
     @Suppress("kotlin:S6311")
     withContext(dispatcher) {
         delay(timeMillis)

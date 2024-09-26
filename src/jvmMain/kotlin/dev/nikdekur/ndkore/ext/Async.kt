@@ -8,7 +8,7 @@ import java.util.concurrent.CompletableFuture
 /**
  * Completes this [CompletableFuture] with the Unit value.
  */
-inline fun CompletableFuture<Unit>.complete() = complete(Unit)
+public inline fun CompletableFuture<Unit>.complete() = complete(Unit)
 
 /**
  * Returns a new CompletableFuture that is already completed with the given value.
@@ -17,7 +17,7 @@ inline fun CompletableFuture<Unit>.complete() = complete(Unit)
  *
  * @receiver the value to be used to complete the future
  */
-inline val <T> T.completedFuture: CompletableFuture<T>
+public inline val <T> T.completedFuture: CompletableFuture<T>
     get() = CompletableFuture.completedFuture(this)
 
 
@@ -30,7 +30,7 @@ inline val <T> T.completedFuture: CompletableFuture<T>
  * @param supplier the function supplying the value to complete this `CompletableFuture`
  * @return `true` if this future completed normally, `false` if it was already completed exceptionally
  */
-inline fun <T> CompletableFuture<T>.complete(supplier: () -> T): Boolean {
+public inline fun <T> CompletableFuture<T>.complete(supplier: () -> T): Boolean {
     return try {
         complete(supplier())
     } catch (e: Throwable) {

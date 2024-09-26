@@ -27,7 +27,9 @@ package dev.nikdekur.ndkore.spatial
  *
  * @property azimuth The azimuth value corresponding to the cardinal direction, in degrees.
  */
-enum class CardinalDirection(val azimuth: Int) {
+public enum class CardinalDirection(
+    val azimuth: Int
+) {
     /** North direction with an azimuth of 0 degrees. */
     NORTH(0),
 
@@ -40,7 +42,7 @@ enum class CardinalDirection(val azimuth: Int) {
     /** West direction with an azimuth of 270 degrees. */
     WEST(270);
 
-    companion object {
+    public companion object {
         /**
          * Retrieves a [CardinalDirection] based on the provided string name.
          *
@@ -54,7 +56,7 @@ enum class CardinalDirection(val azimuth: Int) {
          * val direction = CardinalDirection.getByString("north") // Returns CardinalDirection.NORTH
          * ```
          */
-        fun getByString(name: String): CardinalDirection? {
+        public fun getByString(name: String): CardinalDirection? {
             return enumValueOf<CardinalDirection>(name.uppercase())
         }
 
@@ -71,7 +73,7 @@ enum class CardinalDirection(val azimuth: Int) {
          * val direction = CardinalDirection.getByIndex(1) // Returns CardinalDirection.EAST
          * ```
          */
-        fun getByIndex(index: Int): CardinalDirection? {
+        public fun getByIndex(index: Int): CardinalDirection? {
             return if (index in 0 until entries.size) entries[index] else null
         }
 
@@ -86,7 +88,7 @@ enum class CardinalDirection(val azimuth: Int) {
          * val direction = CardinalDirection.getByAzimuth(85) // Returns CardinalDirection.EAST
          * ```
          */
-        fun getByAzimuth(azimuth: Int): CardinalDirection {
+        public fun getByAzimuth(azimuth: Int): CardinalDirection {
             return when {
                 azimuth < 45 -> NORTH
                 azimuth < 135 -> EAST

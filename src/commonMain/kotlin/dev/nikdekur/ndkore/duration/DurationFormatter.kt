@@ -13,11 +13,10 @@ import kotlin.jvm.JvmStatic
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
-class DurationFormatter {
+public class DurationFormatter {
 
 
-
-    object RU : Formatter {
+    public object RU : Formatter {
         override fun format(duration: Duration): String {
             val years = duration.toInt(DurationUnit.DAYS) / 365
             val months = duration.toInt(DurationUnit.DAYS) % 365 / 30
@@ -58,16 +57,7 @@ class DurationFormatter {
     }
 
 
-
-
-
-
-
-
-
-
-
-    object EN : Formatter {
+    public object EN : Formatter {
         override fun format(duration: Duration): String {
             val years = duration.toInt(DurationUnit.DAYS) / 365
             val months = duration.toInt(DurationUnit.DAYS) % 365 / 30
@@ -107,7 +97,7 @@ class DurationFormatter {
     }
 
 
-    object UA : Formatter {
+    public object UA : Formatter {
         override fun format(duration: Duration): String {
             val years = duration.toInt(DurationUnit.DAYS) / 365
             val months = duration.toInt(DurationUnit.DAYS) % 365 / 30
@@ -148,7 +138,7 @@ class DurationFormatter {
         }
     }
 
-    object DE : Formatter {
+    public object DE : Formatter {
         override fun format(duration: Duration): String {
             val years = duration.toInt(DurationUnit.DAYS) / 365
             val months = duration.toInt(DurationUnit.DAYS) % 365 / 30
@@ -195,8 +185,7 @@ class DurationFormatter {
     }
 
 
-
-    companion object {
+    public companion object {
 
         private val formatters = mapOf(
             "RU" to RU,
@@ -209,12 +198,12 @@ class DurationFormatter {
         private val extraFormatters: MutableMap<String, Formatter> = HashMap()
 
         @JvmStatic
-        fun addExtraFormatter(language: String, formatter: Formatter) {
+        public fun addExtraFormatter(language: String, formatter: Formatter) {
             extraFormatters[language] = formatter
         }
 
         @JvmStatic
-        fun format(duration: Duration, language: String): String {
+        public fun format(duration: Duration, language: String): String {
             val formatter = formatters[language.uppercase()]
                 ?: throw UnsupportedLanguageException(language)
 
@@ -223,15 +212,15 @@ class DurationFormatter {
     }
 
 
+    public class UnsupportedLanguageException(language: String) :
+        RuntimeException("Support doesn't exists for '$language'")
 
-    class UnsupportedLanguageException(language: String) : RuntimeException("Support doesn't exists for '$language'")
-
-    fun interface Formatter {
-        fun format(duration: Duration): String
+    public fun interface Formatter {
+        public fun format(duration: Duration): String
     }
 
 
-    data class Configuration(
+    public data class Configuration(
         val allowMillis: Boolean = false,
         val allowSeconds: Boolean = true,
         val allowMinutes: Boolean = true,

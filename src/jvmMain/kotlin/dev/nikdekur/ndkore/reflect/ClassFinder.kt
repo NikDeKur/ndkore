@@ -36,7 +36,7 @@ package dev.nikdekur.ndkore.reflect
  * // - class com.example.package.AnotherClassName
  * ```
  */
-fun interface ClassFinder {
+public fun interface ClassFinder {
 
     /**
      * Finds classes in the specified package and calls the consumer for each class found.
@@ -46,5 +46,5 @@ fun interface ClassFinder {
      * @param consumer The consumer to call for each class found.
      * @see ClassLoader
      */
-    fun find(classLoader: ClassLoader, packageName: String, consumer: (Class<*>) -> Unit)
+    public fun find(classLoader: ClassLoader, packageName: String, consumer: (Class<*>) -> Unit)
 }

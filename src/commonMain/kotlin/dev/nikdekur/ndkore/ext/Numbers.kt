@@ -18,35 +18,35 @@ import kotlin.reflect.KClass
  *
  * @return the result of squaring this number.
  */
-inline fun Double.pow() = pow(2.0)
+public inline fun Double.pow() = pow(2.0)
 
 /**
  * Computes the square root of this number.
  *
  * @return the square root of this number.
  */
-inline fun Number.sqrt() = sqrt(this.toDouble())
+public inline fun Number.sqrt() = sqrt(this.toDouble())
 
 /**
  * Computes the cube root of this number.
  *
  * @return the cube root of this number.
  */
-inline fun Number.cbrt() = cbrt(this.toDouble())
+public inline fun Number.cbrt() = cbrt(this.toDouble())
 
 /**
  * Computes the absolute value of this number.
  *
  * @return the absolute value of this number.
  */
-inline fun Number.abs() = abs(this.toDouble())
+public inline fun Number.abs() = abs(this.toDouble())
 
 /**
  * Rounds this number up to the nearest integer.
  *
  * @return the smallest integer greater than or equal to this number.
  */
-inline fun Number.ceil() = ceil(this.toDouble())
+public inline fun Number.ceil() = ceil(this.toDouble())
 
 /**
  * Rounds this number down to the nearest integer.
@@ -54,7 +54,7 @@ inline fun Number.ceil() = ceil(this.toDouble())
  * @return the largest integer less than or equal to this number.
  */
 
-inline fun Number.floor() = floor(this.toDouble())
+public inline fun Number.floor() = floor(this.toDouble())
 
 //
 // TRIGONOMETRY
@@ -65,81 +65,81 @@ inline fun Number.floor() = floor(this.toDouble())
  *
  * @return the sine of this number.
  */
-inline fun Number.sin() = sin(this.toDouble())
+public inline fun Number.sin() = sin(this.toDouble())
 
 /**
  * Computes the cosine of this number (in radians).
  *
  * @return the cosine of this number.
  */
-inline fun Number.cos() = cos(this.toDouble())
+public inline fun Number.cos() = cos(this.toDouble())
 
 /**
  * Computes the tangent of this number (in radians).
  *
  * @return the tangent of this number.
  */
-inline fun Number.tan() = tan(this.toDouble())
+public inline fun Number.tan() = tan(this.toDouble())
 
 /**
  * Computes the arc sine of this number.
  *
  * @return the arc sine of this number.
  */
-inline fun Number.asin() = asin(this.toDouble())
+public inline fun Number.asin() = asin(this.toDouble())
 
 /**
  * Computes the arc cosine of this number.
  *
  * @return the arc cosine of this number.
  */
-inline fun Number.acos() = acos(this.toDouble())
+public inline fun Number.acos() = acos(this.toDouble())
 
 /**
  * Computes the arc tangent of this number.
  *
  * @return the arc tangent of this number.
  */
-inline fun Number.atan() = atan(this.toDouble())
+public inline fun Number.atan() = atan(this.toDouble())
 
 /**
  * Computes the hyperbolic sine of this number.
  *
  * @return the hyperbolic sine of this number.
  */
-inline fun Number.sinh() = sinh(this.toDouble())
+public inline fun Number.sinh() = sinh(this.toDouble())
 
 /**
  * Computes the hyperbolic cosine of this number.
  *
  * @return the hyperbolic cosine of this number.
  */
-inline fun Number.cosh() = cosh(this.toDouble())
+public inline fun Number.cosh() = cosh(this.toDouble())
 
 /**
  * Computes the hyperbolic tangent of this number.
  *
  * @return the hyperbolic tangent of this number.
  */
-inline fun Number.tanh() = tanh(this.toDouble())
+public inline fun Number.tanh() = tanh(this.toDouble())
 
 
-const val DEGREES_TO_RADIANS = 0.017453292519943295
-const val RADIANS_TO_DEGREES = 57.29577951308232
+public const val DEGREES_TO_RADIANS: Double = 0.017453292519943295
+public const val RADIANS_TO_DEGREES: Double = 57.29577951308232
 
 /**
  * Converts this number from radians to degrees.
  *
  * @return the equivalent value of this number in degrees.
  */
-inline fun Number.toDegrees() = this.toDouble() * RADIANS_TO_DEGREES
+public inline fun Number.toDegrees() = this.toDouble() * RADIANS_TO_DEGREES
 
 /**
  * Converts this number from degrees to radians.
  *
  * @return the equivalent value of this number in radians.
  */
-inline fun Number.toRadians() = this.toDouble() * DEGREES_TO_RADIANS
+public inline fun Number.toRadians() = this.toDouble() * DEGREES_TO_RADIANS
 
 //
 // Mathematical Operators
@@ -151,7 +151,7 @@ inline fun Number.toRadians() = this.toDouble() * DEGREES_TO_RADIANS
  * @param value the value to subtract from this number.
  * @return the result of subtracting the specified value from this number.
  */
-inline operator fun Number.minus(value: Number) = this.toDouble() - value.toDouble()
+public inline operator fun Number.minus(value: Number) = this.toDouble() - value.toDouble()
 
 /**
  * Multiplies this number by the specified value.
@@ -159,7 +159,7 @@ inline operator fun Number.minus(value: Number) = this.toDouble() - value.toDoub
  * @param value the value to multiply this number by.
  * @return the result of multiplying this number by the specified value.
  */
-inline operator fun Number.times(value: Number) = this.toDouble() * value.toDouble()
+public inline operator fun Number.times(value: Number) = this.toDouble() * value.toDouble()
 
 /**
  * Divides this number by the specified value.
@@ -167,7 +167,7 @@ inline operator fun Number.times(value: Number) = this.toDouble() * value.toDoub
  * @param value the value to divide this number by.
  * @return the result of dividing this number by the specified value.
  */
-inline operator fun Number.div(value: Number) = this.toDouble() / value.toDouble()
+public inline operator fun Number.div(value: Number) = this.toDouble() / value.toDouble()
 
 /**
  * Computes the remainder of dividing this number by the specified value.
@@ -175,7 +175,7 @@ inline operator fun Number.div(value: Number) = this.toDouble() / value.toDouble
  * @param value the divisor.
  * @return the remainder of dividing this number by the specified value.
  */
-inline operator fun Number.rem(value: Number) = this.toDouble() % value.toDouble()
+public inline operator fun Number.rem(value: Number) = this.toDouble() % value.toDouble()
 
 
 
@@ -185,7 +185,7 @@ inline operator fun Number.rem(value: Number) = this.toDouble() % value.toDouble
  * @param value the value to compare this number with.
  * @return a negative integer, zero, or a positive integer as this number is less than, equal to, or greater than the specified value.
  */
-inline operator fun Number.compareTo(value: Number) = toDouble().compareTo(value.toDouble())
+public inline operator fun Number.compareTo(value: Number) = toDouble().compareTo(value.toDouble())
 
 /**
  * Casts this number to the specified type.
@@ -195,7 +195,7 @@ inline operator fun Number.compareTo(value: Number) = toDouble().compareTo(value
  * @throws IllegalArgumentException if the specified type is not supported.
  */
 @Suppress("UNCHECKED_CAST")
-fun <T : Number> Number.castTo(clazz: KClass<T>): T {
+public fun <T : Number> Number.castTo(clazz: KClass<T>): T {
     return when (clazz) {
         Byte::class -> toByte()
         Short::class -> toShort()
@@ -216,7 +216,7 @@ fun <T : Number> Number.castTo(clazz: KClass<T>): T {
  *
  * Used in the [round] function.
  */
-enum class RoundingMode {
+public enum class RoundingMode {
     /**
      * Always rounds towards positive infinity.
      * Example: 1.5 becomes 2.0, -1.5 becomes -1.0.
@@ -251,7 +251,7 @@ enum class RoundingMode {
     HALF_EVEN
 }
 
-fun Double.round(
+public fun Double.round(
     decimalPlaces: Int,
     strategy: RoundingMode = RoundingMode.HALF_UP
 ): Double {
@@ -293,7 +293,7 @@ fun Double.round(
  * @param roundingMode the rounding mode to apply.
  * @return the formatted string representation of this number.
  */
-fun Number.format(
+public fun Number.format(
     places: Int,
     roundingMode: RoundingMode = RoundingMode.HALF_UP
 ): String {
@@ -304,7 +304,128 @@ fun Number.format(
         .replace(Patterns.REMOVE_TRAILING_COMA, "")
 }
 
-val NUMBER_UNITS = arrayOf("K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc", "Ud", "Dd", "Td", "Qad", "Qid", "Sxd", "Spd", "Ocd", "Nod", "Vg", "Uvg", "Dvg", "Tvg", "Qavg", "Qivg", "Sxvg", "Spvg", "Ocvg", "Novg", "Tg", "Utg", "Dtg", "Ttg", "Qatg", "Qitg", "Sxtg", "Sptg", "Octg", "Notg", "Qaa", "Uqaa", "Dqaa", "Tqaa", "Qaqaa", "Qiqaa", "Sxqaa", "Spqaa", "Ocqaa", "Noqaa", "Qia", "Uqia", "Dqia", "Tqia", "Qaqia", "Qiqia", "Sxqia", "Spqia", "Ocqia", "Noqia", "Sx", "U", "D", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc", "Ud", "Dd", "Td", "Qad", "Qid", "Sxd", "Spd", "Ocd", "Nod", "Vg", "Uvg", "Dvg", "Tvg", "Qavg", "Qivg", "Sxvg", "Spvg", "Ocvg", "Novg", "Tg", "Utg", "Dtg", "Ttg", "Qatg", "Qitg", "Sxtg", "Sptg", "Octg", "Notg", "Qaa", "Uqaa", "Dqaa", "Tqaa", "Qaqaa", "Qiqaa", "Sxqaa", "Spqaa", "Ocqaa", "Noqaa", "Qia", "Uqia", "Dqia", "Tqia", "Qaqia", "Qiqia", "Sxqia", "Spqia", "Ocqia", "Noqia")
+public val NUMBER_UNITS: Array<String> = arrayOf(
+    "K",
+    "M",
+    "B",
+    "T",
+    "Qa",
+    "Qi",
+    "Sx",
+    "Sp",
+    "Oc",
+    "No",
+    "Dc",
+    "Ud",
+    "Dd",
+    "Td",
+    "Qad",
+    "Qid",
+    "Sxd",
+    "Spd",
+    "Ocd",
+    "Nod",
+    "Vg",
+    "Uvg",
+    "Dvg",
+    "Tvg",
+    "Qavg",
+    "Qivg",
+    "Sxvg",
+    "Spvg",
+    "Ocvg",
+    "Novg",
+    "Tg",
+    "Utg",
+    "Dtg",
+    "Ttg",
+    "Qatg",
+    "Qitg",
+    "Sxtg",
+    "Sptg",
+    "Octg",
+    "Notg",
+    "Qaa",
+    "Uqaa",
+    "Dqaa",
+    "Tqaa",
+    "Qaqaa",
+    "Qiqaa",
+    "Sxqaa",
+    "Spqaa",
+    "Ocqaa",
+    "Noqaa",
+    "Qia",
+    "Uqia",
+    "Dqia",
+    "Tqia",
+    "Qaqia",
+    "Qiqia",
+    "Sxqia",
+    "Spqia",
+    "Ocqia",
+    "Noqia",
+    "Sx",
+    "U",
+    "D",
+    "T",
+    "Qa",
+    "Qi",
+    "Sx",
+    "Sp",
+    "Oc",
+    "No",
+    "Dc",
+    "Ud",
+    "Dd",
+    "Td",
+    "Qad",
+    "Qid",
+    "Sxd",
+    "Spd",
+    "Ocd",
+    "Nod",
+    "Vg",
+    "Uvg",
+    "Dvg",
+    "Tvg",
+    "Qavg",
+    "Qivg",
+    "Sxvg",
+    "Spvg",
+    "Ocvg",
+    "Novg",
+    "Tg",
+    "Utg",
+    "Dtg",
+    "Ttg",
+    "Qatg",
+    "Qitg",
+    "Sxtg",
+    "Sptg",
+    "Octg",
+    "Notg",
+    "Qaa",
+    "Uqaa",
+    "Dqaa",
+    "Tqaa",
+    "Qaqaa",
+    "Qiqaa",
+    "Sxqaa",
+    "Spqaa",
+    "Ocqaa",
+    "Noqaa",
+    "Qia",
+    "Uqia",
+    "Dqia",
+    "Tqia",
+    "Qaqia",
+    "Qiqia",
+    "Sxqia",
+    "Spqia",
+    "Ocqia",
+    "Noqia"
+)
 
 
 /**
@@ -316,7 +437,7 @@ val NUMBER_UNITS = arrayOf("K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No
  * @param units the array of units to use.
  * @return the human-readable string representation of this number with units.
  */
-fun Number.toBeautifulString(
+public fun Number.toBeautifulString(
     rounding: Int = 2,
     roundingMode: RoundingMode = RoundingMode.HALF_UP,
     units: Array<String> = NUMBER_UNITS,
@@ -339,7 +460,7 @@ fun Number.toBeautifulString(
  * @param units the array of units to use.
  * @return the double value represented by the string.
  */
-fun fromBeautifulString(string: String, units: Array<String> = NUMBER_UNITS): Double {
+public fun fromBeautifulString(string: String, units: Array<String> = NUMBER_UNITS): Double {
     val number = string.replace(Patterns.NOT_DIGITS, "").toDouble()
     val unit = string.replace(Patterns.DIGITS, "")
 
@@ -356,49 +477,49 @@ fun fromBeautifulString(string: String, units: Array<String> = NUMBER_UNITS): Do
  *
  * @return a list of Bytes.
  */
-inline fun Iterable<Number>.toByte() = map { it.toByte() }
+public inline fun Iterable<Number>.toByte() = map { it.toByte() }
 
 /**
  * Converts this Iterable of Numbers to a list of Shorts.
  *
  * @return a list of Shorts.
  */
-inline fun Iterable<Number>.toShort() = map { it.toShort() }
+public inline fun Iterable<Number>.toShort() = map { it.toShort() }
 
 /**
  * Converts this Iterable of Numbers to a list of Ints.
  *
  * @return a list of Ints.
  */
-inline fun Iterable<Number>.toInt() = map { it.toInt() }
+public inline fun Iterable<Number>.toInt() = map { it.toInt() }
 
 /**
  * Converts this Iterable of Numbers to a list of Longs.
  *
  * @return a list of Longs.
  */
-inline fun Iterable<Number>.toLong() = map { it.toLong() }
+public inline fun Iterable<Number>.toLong() = map { it.toLong() }
 
 /**
  * Converts this Iterable of Numbers to a list of Floats.
  *
  * @return a list of Floats.
  */
-inline fun Iterable<Number>.toFloat() = map { it.toFloat() }
+public inline fun Iterable<Number>.toFloat() = map { it.toFloat() }
 
 /**
  * Converts this Iterable of Numbers to a list of Doubles.
  *
  * @return a list of Doubles.
  */
-inline fun Iterable<Number>.toDouble() = map { it.toDouble() }
+public inline fun Iterable<Number>.toDouble() = map { it.toDouble() }
 
 /**
  * Checks if this number is odd.
  *
  * @return true if this number is odd, false otherwise.
  */
-inline val Number.isOdd: Boolean
+public inline val Number.isOdd: Boolean
     get() = toInt() % 2 == 0
 
 /**
@@ -406,14 +527,14 @@ inline val Number.isOdd: Boolean
  *
  * @return 1 if this Boolean is true, 0 if false.
  */
-inline fun Boolean.toByte(): Byte = if (this) 1 else 0
+public inline fun Boolean.toByte(): Byte = if (this) 1 else 0
 
 /**
  * Converts this number to a Boolean.
  *
  * @return true if this number is not zero, false otherwise.
  */
-inline fun Number.toBoolean() = this != 0
+public inline fun Number.toBoolean() = this != 0
 
 /**
  * Computes the squared distance between two points in 3D space.
@@ -426,7 +547,14 @@ inline fun Number.toBoolean() = this != 0
  * @param toZ the z-coordinate of the second point.
  * @return the squared distance between the two points.
  */
-inline fun distanceSquared(fromX: Double, fromY: Double, fromZ: Double, toX: Double, toY: Double, toZ: Double): Double {
+public inline fun distanceSquared(
+    fromX: Double,
+    fromY: Double,
+    fromZ: Double,
+    toX: Double,
+    toY: Double,
+    toZ: Double
+): Double {
     return (toX - fromX).pow(2) + (toY - fromY).pow(2) + (toZ - fromZ).pow(2)
 }
 

@@ -12,29 +12,31 @@ package dev.nikdekur.ndkore.ext
 
 import org.slf4j.Logger
 import org.slf4j.event.Level
+import kotlin.time.TimeSource
+import kotlin.time.TimedValue
 
-inline fun Logger.log(level: Level, msg: String) = atLevel(level).log(msg)
+public inline fun Logger.log(level: Level, msg: String) = atLevel(level).log(msg)
 
-inline fun Logger.log(level: Level, msg: () -> String) = log(level, msg())
-inline fun Logger.trace(msg: () -> String) = trace(msg())
-inline fun Logger.debug(msg: () -> String) = debug(msg())
-inline fun Logger.info(msg: () -> String) = info(msg())
-inline fun Logger.warn(msg: () -> String) = warn(msg())
-inline fun Logger.error(msg: () -> String) = error(msg())
+public inline fun Logger.log(level: Level, msg: () -> String) = log(level, msg())
+public inline fun Logger.trace(msg: () -> String) = trace(msg())
+public inline fun Logger.debug(msg: () -> String) = debug(msg())
+public inline fun Logger.info(msg: () -> String) = info(msg())
+public inline fun Logger.warn(msg: () -> String) = warn(msg())
+public inline fun Logger.error(msg: () -> String) = error(msg())
 
 
-inline fun Logger.log(level: Level, throwable: Throwable, msg: () -> String) =
+public inline fun Logger.log(level: Level, throwable: Throwable, msg: () -> String) =
     atLevel(level).setCause(throwable).log(msg())
 
-inline fun Logger.trace(throwable: Throwable, msg: () -> String) = trace(msg(), throwable)
-inline fun Logger.debug(throwable: Throwable, msg: () -> String) = debug(msg(), throwable)
-inline fun Logger.info(throwable: Throwable, msg: () -> String) = info(msg(), throwable)
-inline fun Logger.warn(throwable: Throwable, msg: () -> String) = warn(msg(), throwable)
-inline fun Logger.error(throwable: Throwable, msg: () -> String) = error(msg(), throwable)
+public inline fun Logger.trace(throwable: Throwable, msg: () -> String) = trace(msg(), throwable)
+public inline fun Logger.debug(throwable: Throwable, msg: () -> String) = debug(msg(), throwable)
+public inline fun Logger.info(throwable: Throwable, msg: () -> String) = info(msg(), throwable)
+public inline fun Logger.warn(throwable: Throwable, msg: () -> String) = warn(msg(), throwable)
+public inline fun Logger.error(throwable: Throwable, msg: () -> String) = error(msg(), throwable)
 
-inline fun <T> Logger.recordTiming(level: Level = Level.INFO, name: String, block: () -> T): T =
-    recordTimingImpl({ log(level, it) }, name, block)
-
-
-inline fun <T> Logger.recordTimingNano(level: Level, name: String, block: () -> T): T =
-    recordTimingNanoImpl({ log(level, it) }, name, block)
+public inline fun <T> Logger.recordTiming(
+    source: TimeSource,
+    name: String,
+    level: Level = Level.INFO,
+    block: () -> T
+): TimedValue<T> = source.recordTimingImpl({ log(level, it) }, name, block)

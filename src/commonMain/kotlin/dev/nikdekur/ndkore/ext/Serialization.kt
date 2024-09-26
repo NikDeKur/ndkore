@@ -16,7 +16,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlin.time.Duration
 
-object LenientDurationSerializer : KSerializer<Duration> {
+public object LenientDurationSerializer : KSerializer<Duration> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("LenientDuration", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: Duration) {

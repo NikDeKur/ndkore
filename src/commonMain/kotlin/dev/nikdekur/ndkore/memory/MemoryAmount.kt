@@ -32,7 +32,7 @@ import com.ionspin.kotlin.bignum.integer.BigInteger
  * @property unit The unit of memory (e.g., bytes, kilobytes).
  * @property amount The amount of memory in the specified unit.
  */
-data class MemoryAmount(
+public data class MemoryAmount(
     val unit: MemoryUnit,
     val amount: BigInteger,
 ) : Comparable<MemoryAmount> {
@@ -43,7 +43,7 @@ data class MemoryAmount(
      * @param memory The memory amount to add.
      * @return A new `MemoryAmount` representing the sum.
      */
-    operator fun plus(memory: MemoryAmount): MemoryAmount {
+    public operator fun plus(memory: MemoryAmount): MemoryAmount {
         return MemoryAmount(unit, amount + memory.amount)
     }
 
@@ -53,7 +53,7 @@ data class MemoryAmount(
      * @param memory The memory amount to subtract.
      * @return A new `MemoryAmount` representing the difference.
      */
-    operator fun minus(memory: MemoryAmount): MemoryAmount {
+    public operator fun minus(memory: MemoryAmount): MemoryAmount {
         return MemoryAmount(unit, amount - memory.amount)
     }
 
@@ -63,7 +63,7 @@ data class MemoryAmount(
      * @param memory The memory amount to multiply by.
      * @return A new `MemoryAmount` representing the product.
      */
-    operator fun times(memory: MemoryAmount): MemoryAmount {
+    public operator fun times(memory: MemoryAmount): MemoryAmount {
         return MemoryAmount(unit, amount * memory.amount)
     }
 
@@ -73,7 +73,7 @@ data class MemoryAmount(
      * @param memory The memory amount to divide by.
      * @return A new `MemoryAmount` representing the quotient.
      */
-    operator fun div(memory: MemoryAmount): MemoryAmount {
+    public operator fun div(memory: MemoryAmount): MemoryAmount {
         return MemoryAmount(unit, amount / memory.amount)
     }
 
@@ -83,7 +83,7 @@ data class MemoryAmount(
      * @param memory The memory amount to divide by.
      * @return A new `MemoryAmount` representing the remainder.
      */
-    operator fun rem(memory: MemoryAmount): MemoryAmount {
+    public operator fun rem(memory: MemoryAmount): MemoryAmount {
         return MemoryAmount(unit, amount % memory.amount)
     }
 
@@ -103,14 +103,12 @@ data class MemoryAmount(
      * @param unit The memory unit to convert to.
      * @return A new `MemoryAmount` representing the converted amount.
      */
-    fun convertTo(unit: MemoryUnit): MemoryAmount {
+    public fun convertTo(unit: MemoryUnit): MemoryAmount {
         if (this.unit == unit) return this
-        println("this.unit.bytes: ${this.unit.bytes}")
-        println("unit.bytes: ${unit.bytes}")
         return MemoryAmount(unit, amount * this.unit.bytes / unit.bytes)
     }
 
-    companion object {
+    public companion object {
         /**
          * Creates a `MemoryAmount` by converting from one unit to another.
          *
@@ -119,7 +117,7 @@ data class MemoryAmount(
          * @param value The amount of memory in the input unit.
          * @return A new `MemoryAmount` converted to the output unit.
          */
-        inline fun of(input: MemoryUnit, output: MemoryUnit, value: BigInteger): MemoryAmount {
+        public inline fun of(input: MemoryUnit, output: MemoryUnit, value: BigInteger): MemoryAmount {
             val memoryAmount = MemoryAmount(input, value)
             return memoryAmount.convertTo(output)
         }
@@ -131,7 +129,7 @@ data class MemoryAmount(
          * @param value The amount of memory in the specified unit.
          * @return A new `MemoryAmount`.
          */
-        inline fun of(input: MemoryUnit, value: BigInteger): MemoryAmount {
+        public inline fun of(input: MemoryUnit, value: BigInteger): MemoryAmount {
             return of(input, input, value)
         }
     }

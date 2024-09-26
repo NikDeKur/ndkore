@@ -12,9 +12,11 @@ import dev.nikdekur.ndkore.ext.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
-class ConsoleExecutor(val dispatcher: CoroutineDispatcher) {
+public class ConsoleExecutor(
+    public val dispatcher: CoroutineDispatcher
+) {
 
-    suspend fun run(command: List<String>): CommandResult {
+    public suspend fun run(command: List<String>): CommandResult {
         return withContext(dispatcher) {
             val process = ProcessBuilder(command)
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
@@ -31,7 +33,7 @@ class ConsoleExecutor(val dispatcher: CoroutineDispatcher) {
     }
 
 
-    suspend fun run(command: String): CommandResult {
+    public suspend fun run(command: String): CommandResult {
         val commandsList = command.split(Patterns.WORD_SPLIT)
         return run(commandsList)
     }

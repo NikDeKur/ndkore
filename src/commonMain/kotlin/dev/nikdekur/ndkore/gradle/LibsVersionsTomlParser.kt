@@ -11,12 +11,15 @@ package dev.nikdekur.ndkore.gradle
 import dev.nikdekur.ndkore.ext.isBlankOrEmpty
 import kotlinx.serialization.json.Json
 
-class LibsVersionsTomlParser(val json: Json, val text: String) {
+public class LibsVersionsTomlParser(
+    public val json: Json,
+    public val text: String
+) {
 
-    val versions = HashMap<String, String>()
-    val libraries = mutableListOf<Library>()
+    public val versions: MutableMap<String, String> = mutableMapOf<String, String>()
+    public val libraries: MutableList<Library> = mutableListOf<Library>()
 
-    fun parse() {
+    public fun parse() {
         var part = Part.NONE
 
         val lines = text.lineSequence()
@@ -65,7 +68,7 @@ class LibsVersionsTomlParser(val json: Json, val text: String) {
     }
 
 
-    fun parseVersion(string: String) {
+    public fun parseVersion(string: String) {
         val data = string
             .replace(" ", "")
             .replace("'", "")
@@ -78,7 +81,7 @@ class LibsVersionsTomlParser(val json: Json, val text: String) {
         versions[key] = value
     }
 
-    fun parseDependency(string: String) {
+    public fun parseDependency(string: String) {
         val stringData = string
             .replace(" ", "")
             .split("=", limit = 2)
@@ -112,7 +115,7 @@ class LibsVersionsTomlParser(val json: Json, val text: String) {
     }
 
 
-    enum class Part {
+    public enum class Part {
         VERSIONS,
         LIBRARIES,
         BUNDLES,

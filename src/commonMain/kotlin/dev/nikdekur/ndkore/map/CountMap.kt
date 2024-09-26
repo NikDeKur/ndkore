@@ -11,18 +11,18 @@
 package dev.nikdekur.ndkore.map
 
 
-typealias CountMap<K> = Map<K, Int>
-typealias MutableCountMap<K> = MutableMap<K, Int>
+public typealias CountMap<K> = Map<K, Int>
+public typealias MutableCountMap<K> = MutableMap<K, Int>
 
-inline fun <K> MutableCountMap<K>.increment(key: K) {
+public inline fun <K> MutableCountMap<K>.increment(key: K) {
     val count = get(key, 0)
     this[key] = count + 1
 }
 
-fun <K> MutableCountMap<K>.reset(key: K) {
+public fun <K> MutableCountMap<K>.reset(key: K) {
     remove(key)
 }
 
-inline fun <K> CountMap<K>.get(key: K, default: Int = 0): Int {
+public inline fun <K> CountMap<K>.get(key: K, default: Int = 0): Int {
     return getOrElse(key) { default }
 }

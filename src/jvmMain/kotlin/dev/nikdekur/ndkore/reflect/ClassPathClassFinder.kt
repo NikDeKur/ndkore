@@ -38,7 +38,7 @@ import com.google.common.reflect.ClassPath
  * @see ClassLoader
  * @see com.google.common.reflect.ClassPath
  */
-object ClassPathClassFinder : ClassFinder {
+public object ClassPathClassFinder : ClassFinder {
 
     override fun find(classLoader: ClassLoader, packageName: String, consumer: (Class<*>) -> Unit) {
         ClassPath.from(classLoader)

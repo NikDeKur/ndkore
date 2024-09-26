@@ -18,14 +18,14 @@ package dev.nikdekur.ndkore.reflect
  *
  * @property value The result of the reflection operation.
  */
-open class ReflectResult(val value: Any?) {
+public open class ReflectResult(public val value: Any?) {
 
     /**
      * Determines whether the result is missing.
      *
      * @return `true` if the result is missing, `false` otherwise.
      */
-    inline fun isMissing(): Boolean = this is Missing
+    public inline fun isMissing(): Boolean = this is Missing
 
     /**
      * Represents a result indicating that the reflection operation did not yield a result.
@@ -33,5 +33,5 @@ open class ReflectResult(val value: Any?) {
      * This singleton object is used to signify that the expected result was not found
      * or that no valid result is available.
      */
-    data object Missing : ReflectResult(null)
+    public data object Missing : ReflectResult(null)
 }

@@ -10,7 +10,7 @@ package dev.nikdekur.ndkore.map.spread
 
 import dev.nikdekur.ndkore.ext.map
 
-open class SpreadDoubleMap<K : Any>(
+public open class SpreadDoubleMap<K : Any>(
     override val max: () -> Double,
     override val onMax: (K) -> Unit = {}
 ) : AbstractSpreadMap<K, Double>() {

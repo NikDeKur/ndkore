@@ -3,7 +3,7 @@
 
 package dev.nikdekur.ndkore.ext
 
-inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String): T? =
+public inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String): T? =
     try {
         enumValueOf<T>(name)
     } catch (e: IllegalArgumentException) {
@@ -19,7 +19,7 @@ inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String): T? =
  * @param obj The object to convert to string.
  * @return The string representation of the object.
  */
-inline fun buildRepresentation(obj: Any): String {
+public inline fun buildRepresentation(obj: Any): String {
     val clazz = obj.javaClass
 
     val values = HashMap<String, Any?>()

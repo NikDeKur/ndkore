@@ -84,8 +84,8 @@ import kotlin.reflect.KClass
  *
  * @property context The Koin context.
  */
-class KoinServicesManager(
-    val context: KoinContext
+public class KoinServicesManager(
+    public val context: KoinContext
 ) : AbstractServicesManager() {
 
 
@@ -98,7 +98,7 @@ class KoinServicesManager(
 
 
     @Suppress("UNCHECKED_CAST")
-    inline fun <I : Any> Module.reg(service: Service, vararg bindTo: KClass<*>) {
+    public inline fun <I : Any> Module.reg(service: Service, vararg bindTo: KClass<*>) {
         val moduleClass = service::class as KClass<I>
         val service = service as I
         val definition = single(clazz = moduleClass) { service }

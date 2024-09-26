@@ -8,11 +8,11 @@
 
 package dev.nikdekur.ndkore.spatial
 
-interface Shape<T> {
+public interface Shape<T> {
 
-    fun getMinPoint(o: T): Point
-    fun getMaxPoint(o: T): Point
-    fun contains(obj: T, point: Point): Boolean
-    fun distanceSquared(from: T, to: Point): Double
-    fun intersects(obj: T, min: Point, max: Point): Boolean
+    public fun getMinPoint(o: T): Point
+    public fun getMaxPoint(o: T): Point
+    public fun contains(obj: T, point: Point): Boolean
+    public fun distanceSquared(from: T, to: Point): Double
+    public fun intersects(obj: T, min: Point, max: Point): Boolean
 }

@@ -6,6 +6,8 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
+@file:Suppress("NOTHING_TO_INLINE")
+
 package dev.nikdekur.ndkore.placeholder
 
 import kotlin.jvm.JvmStatic
@@ -48,7 +50,7 @@ import kotlin.jvm.JvmStatic
  * println(placeholder.getPlaceholder("greeting")) // Output: Hello
  * ```
  */
-interface Placeholder {
+public interface Placeholder {
 
     /**
      * Retrieves the value associated with the specified key from the source.
@@ -56,11 +58,11 @@ interface Placeholder {
      * @param key The key whose associated value is to be retrieved.
      * @return The value associated with the key, or [ValuesSource.NotFound] if the key does not exist in the source.
      */
-    fun getPlaceholder(key: String): Any? {
+    public fun getPlaceholder(key: String): Any? {
         return ValuesSource.NotFound
     }
 
-    companion object {
+    public companion object {
         /**
          * Creates a `Placeholder` implementation that uses the provided map for value retrieval.
          *
@@ -68,7 +70,7 @@ interface Placeholder {
          * @return A `Placeholder` instance backed by the map.
          */
         @JvmStatic
-        fun of(map: Map<String, Any>): Placeholder {
+        public fun of(map: Map<String, Any>): Placeholder {
             return object : Placeholder {
                 override fun getPlaceholder(key: String): Any? {
                     return map[key]
@@ -86,7 +88,7 @@ interface Placeholder {
          * @return A `Placeholder` instance initialized with the provided pairs.
          */
         @JvmStatic
-        inline fun of(vararg pair: Pair<String, Any>): Placeholder {
+        public inline fun of(vararg pair: Pair<String, Any>): Placeholder {
             return of(mapOf(*pair))
         }
 
@@ -98,7 +100,7 @@ interface Placeholder {
          * @return A `Placeholder` instance for the single key-value pair.
          */
         @JvmStatic
-        inline fun ofSingle(key: String, value: Any): Placeholder {
+        public inline fun ofSingle(key: String, value: Any): Placeholder {
             return of(key to value)
         }
     }

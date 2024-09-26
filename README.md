@@ -34,7 +34,7 @@ for more information, please refer to KDocs.
 
 As ndkore based on Kotlin, it technically can be used in Java projects,
 but some features might not work as expected,
-Ex: inline functions, reified types, etc.
+Ex: public inline functions, reified types, etc.
 
 ## Installation
 

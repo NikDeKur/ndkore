@@ -8,7 +8,7 @@
 
 package dev.nikdekur.ndkore.`interface`
 
-interface Prioritizable {
-    val priority: Int
+public interface Prioritizable {
+    public val priority: Int
         get() = 0
 }

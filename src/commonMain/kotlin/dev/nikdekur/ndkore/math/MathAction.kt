@@ -10,14 +10,14 @@ package dev.nikdekur.ndkore.math
 
 import dev.nikdekur.ndkore.ext.addProcent
 
-enum class MathAction {
+public enum class MathAction {
     SET,
     PLUS,
     MINUS,
     PLUS_PROCENT,
     MINUS_PROCENT;
 
-    fun apply(val1: Double, val2: Double): Double {
+    public fun apply(val1: Double, val2: Double): Double {
         return when (this) {
             SET -> val2
             PLUS -> val1 + val2

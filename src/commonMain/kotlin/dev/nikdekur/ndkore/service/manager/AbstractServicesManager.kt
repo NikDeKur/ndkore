@@ -9,18 +9,19 @@
 package dev.nikdekur.ndkore.service.manager
 
 import dev.nikdekur.ndkore.service.*
+import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlin.reflect.KClass
 
-abstract class AbstractServicesManager : ServicesManager {
+public abstract class AbstractServicesManager : ServicesManager {
 
-    val logger = KotlinLogging.logger {}
+    public val logger: KLogger = KotlinLogging.logger {}
 
-    override var state = ServicesManager.State.DISABLED
+    override var state: ServicesManager.State = ServicesManager.State.DISABLED
 
-    val servicesCollection = LinkedHashSet<Service>()
+    public val servicesCollection: MutableSet<Service> = LinkedHashSet<Service>()
 
-    override val services
+    override val services: Collection<Service>
         get() = sortModules()
 
     override fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
@@ -38,7 +39,7 @@ abstract class AbstractServicesManager : ServicesManager {
         servicesCollection.add(service)
     }
 
-    fun getServiceInternal(serviceClass: KClass<*>): Service? {
+    public fun getServiceInternal(serviceClass: KClass<*>): Service? {
         val service = getServiceOrNull(serviceClass) ?: return null
         return service as? Service ?: throw ClassIsNotServiceException(serviceClass)
     }
@@ -85,13 +86,13 @@ abstract class AbstractServicesManager : ServicesManager {
     }
 
 
-    fun reload(service: Service) {
+    public fun reload(service: Service) {
         service.onDisable()
         service.onEnable()
     }
 
 
-    fun sortModules(): Collection<Service> {
+    public fun sortModules(): Collection<Service> {
         val firstModules = mutableListOf<Service>()
         val lastModules = mutableListOf<Service>()
         val middleModules = mutableListOf<Service>()

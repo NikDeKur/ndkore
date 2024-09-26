@@ -23,7 +23,7 @@ import kotlin.reflect.KClass
  *
  * @return the array casted to non-nullable
  */
-inline fun <T> Array<T?>.notNull(): Array<T> {
+public inline fun <T> Array<T?>.notNull(): Array<T> {
     return this as Array<T>
 }
 
@@ -36,7 +36,7 @@ inline fun <T> Array<T?>.notNull(): Array<T> {
  *
  * @return the array created from the collection
  */
-inline fun <reified T> Collection<T>.toTArray(): Array<out T> {
+public inline fun <reified T> Collection<T>.toTArray(): Array<out T> {
     val array = arrayOfNulls<T>(size)
     this.forEachIndexed { index, item ->
         array[index] = item
@@ -54,7 +54,7 @@ inline fun <reified T> Collection<T>.toTArray(): Array<out T> {
  *
  * @return the array created from the collection of collections
  */
-inline fun <reified T> Collection<Collection<T>>.toTArray(): Array<Array<out T>> {
+public inline fun <reified T> Collection<Collection<T>>.toTArray(): Array<Array<out T>> {
     val main = arrayOfNulls<Array<out T>>(size)
     this.forEachIndexed { index, item ->
         main[index] = item.toTArray()
@@ -70,7 +70,7 @@ inline fun <reified T> Collection<Collection<T>>.toTArray(): Array<Array<out T>>
  *
  * @return true if the item was added
  */
-inline fun <T> MutableCollection<T>.addIfNotContains(item: T): Boolean {
+public inline fun <T> MutableCollection<T>.addIfNotContains(item: T): Boolean {
     val willBeAdded = !contains(item)
     if (willBeAdded)
         add(item)
@@ -86,7 +86,7 @@ inline fun <T> MutableCollection<T>.addIfNotContains(item: T): Boolean {
  *
  * @return the collection casted to a different type
  */
-inline fun <T, R> Collection<T>.cast(): Collection<R> = this as Collection<R>
+public inline fun <T, R> Collection<T>.cast(): Collection<R> = this as Collection<R>
 
 
 /**
@@ -100,13 +100,13 @@ inline fun <T, R> Collection<T>.cast(): Collection<R> = this as Collection<R>
  *
  * @return An optimized list
  */
-inline fun <T> List<T>.optimize(): List<T> = when (size) {
+public inline fun <T> List<T>.optimize(): List<T> = when (size) {
     0 -> emptyList()
     1 -> listOf(this[0])
     else -> this
 }
 
-inline fun <T> MutableCollection<T>.removeIf(predicate: (T) -> Boolean): Boolean {
+public inline fun <T> MutableCollection<T>.removeIf(predicate: (T) -> Boolean): Boolean {
     val iterator = iterator()
     var modified = false
     while (iterator.hasNext()) {
@@ -124,7 +124,7 @@ inline fun <T> MutableCollection<T>.removeIf(predicate: (T) -> Boolean): Boolean
  * @param predicate a predicate which returns `true` for elements to be removed.
  * @return `true` if any elements were removed from this collection, `false` otherwise.
  */
-inline fun <T> MutableCollection<T>.removeIfNot(crossinline predicate: (T) -> Boolean): Boolean {
+public inline fun <T> MutableCollection<T>.removeIfNot(crossinline predicate: (T) -> Boolean): Boolean {
     return removeIf { !predicate(it) }
 }
 
@@ -134,7 +134,7 @@ inline fun <T> MutableCollection<T>.removeIfNot(crossinline predicate: (T) -> Bo
  * @param fromClass the class of the elements to be removed.
  * @return `true` if any elements were removed from this collection, `false` otherwise.
  */
-inline fun <T : Any> MutableCollection<T>.removeIfAssignable(fromClass: KClass<out T>): Boolean {
+public inline fun <T : Any> MutableCollection<T>.removeIfAssignable(fromClass: KClass<out T>): Boolean {
     return removeIf { fromClass.isInstance(it) }
 }
 
@@ -144,7 +144,7 @@ inline fun <T : Any> MutableCollection<T>.removeIfAssignable(fromClass: KClass<o
  * @param fromClass the class of the elements to be retained.
  * @return `true` if any elements were removed from this collection, `false` otherwise.
  */
-inline fun <T : Any> MutableCollection<T>.removeIfNotAssignable(fromClass: KClass<out T>): Boolean {
+public inline fun <T : Any> MutableCollection<T>.removeIfNotAssignable(fromClass: KClass<out T>): Boolean {
     return removeIf { !fromClass.isInstance(it) }
 }
 
@@ -153,14 +153,14 @@ inline fun <T : Any> MutableCollection<T>.removeIfNotAssignable(fromClass: KClas
  *
  * @return a set containing only this element.
  */
-inline fun <T> T.toSingletonSet() = setOf(this)
+public inline fun <T> T.toSingletonSet() = setOf(this)
 
 /**
  * Returns a singleton list containing only this element.
  *
  * @return a list containing only this element.
  */
-inline fun <T> T.toSingletonList() = listOf(this)
+public inline fun <T> T.toSingletonList() = listOf(this)
 
 
 
@@ -173,7 +173,7 @@ inline fun <T> T.toSingletonList() = listOf(this)
  * @see Prioritizable
  * @see sortedByDescending
  */
-inline fun <T> List<T>.sortByPriority(): List<T> where T : Prioritizable {
+public inline fun <T> List<T>.sortByPriority(): List<T> where T : Prioritizable {
     return sortedByDescending { it.priority }
 }
 
@@ -191,7 +191,7 @@ inline fun <T> List<T>.sortByPriority(): List<T> where T : Prioritizable {
  * @param toIndexExclusive The end index of the sublist
  * @return A sublist of the list
  */
-inline fun <T> List<T>.sub(fromIndexInclusive: Int, toIndexExclusive: Int): List<T> {
+public inline fun <T> List<T>.sub(fromIndexInclusive: Int, toIndexExclusive: Int): List<T> {
     val start = if (fromIndexInclusive < 0) 0 else fromIndexInclusive
     if (size < toIndexExclusive) return subList(0, size)
     return subList(start, toIndexExclusive)
@@ -207,7 +207,7 @@ inline fun <T> List<T>.sub(fromIndexInclusive: Int, toIndexExclusive: Int): List
  *
  * @param action The action to perform on each element
  */
-fun <T> List<T>.mutableForEach(action: (T) -> Unit) {
+public inline fun <T> List<T>.mutableForEach(action: (T) -> Unit) {
     var index = 0
 
     while (index < size) {
@@ -228,7 +228,7 @@ fun <T> List<T>.mutableForEach(action: (T) -> Unit) {
  *
  * @param action The action to perform on each element
  */
-fun <T> List<T>.mutableForEachIndexed(action: (Int, T) -> Unit) {
+public inline fun <T> List<T>.mutableForEachIndexed(action: (Int, T) -> Unit) {
     var index = 0
 
     while (index < size) {
@@ -252,7 +252,7 @@ fun <T> List<T>.mutableForEachIndexed(action: (Int, T) -> Unit) {
  * @param onError The method to call if the action throws an exception
  * @param action The action to perform on each element
  */
-fun <T> List<T>.mutableSafeForEach(onError: (T, Exception) -> Unit, action: (T) -> Unit) {
+public inline fun <T> List<T>.mutableSafeForEach(onError: (T, Exception) -> Unit, action: (T) -> Unit) {
     var index = 0
 
     while (index < size) {
@@ -277,7 +277,7 @@ fun <T> List<T>.mutableSafeForEach(onError: (T, Exception) -> Unit, action: (T) 
  * @param from the iterable containing elements to be matched and copied.
  * @return this mutable collection with the matched elements added.
  */
-inline fun <T : MutableCollection<String>> T.copyPartialMatches(token: String, from: Iterable<String>): T {
+public inline fun <T : MutableCollection<String>> T.copyPartialMatches(token: String, from: Iterable<String>): T {
     from
         .filter { it.startsWith(token, ignoreCase = true) }
         .forEach { e: String -> add(e) }
@@ -289,7 +289,7 @@ inline fun <T : MutableCollection<String>> T.copyPartialMatches(token: String, f
  *
  * @param token the token to match at the beginning of each element.
  */
-inline fun <T : MutableCollection<String>> T.filterPartialMatches(token: String) {
+public inline fun <T : MutableCollection<String>> T.filterPartialMatches(token: String) {
     removeIf {
         !it.startsWith(token, ignoreCase = true)
     }
@@ -301,7 +301,7 @@ inline fun <T : MutableCollection<String>> T.filterPartialMatches(token: String)
  * @param elements the elements to add to this collection.
  * @return `true` if the collection was modified as a result of the operation, `false` otherwise.
  */
-inline fun <T> MutableCollection<T>.addAll(vararg elements: T) = addAll(elements)
+public inline fun <T> MutableCollection<T>.addAll(vararg elements: T) = addAll(elements)
 
 /**
  * Returns a list containing a specified number of random elements from this list.
@@ -311,7 +311,7 @@ inline fun <T> MutableCollection<T>.addAll(vararg elements: T) = addAll(elements
  * @return a list containing the specified number of random elements.
  * @throws IllegalArgumentException if the amount is less than 0.
  */
-fun <T> List<T>.random(random: Random, amount: Int): List<T> {
+public inline fun <T> List<T>.random(random: Random, amount: Int): List<T> {
     require(amount >= 0) { "amount cannot be less than 0" }
     if (amount == 0) return emptyList()
 
@@ -333,7 +333,7 @@ fun <T> List<T>.random(random: Random, amount: Int): List<T> {
  * @return A list of non-null elements
  * @see listOfNotNull
  */
-inline fun <T> notNullListOf(vararg elements: T?): List<T> {
+public inline fun <T> notNullListOf(vararg elements: T?): List<T> {
     val list = mutableListOf<T>()
     elements.forEach { if (it != null) list.add(it) }
     return list
@@ -346,7 +346,7 @@ inline fun <T> notNullListOf(vararg elements: T?): List<T> {
  *
  * @param elements The elements to add to the list
  */
-inline fun <T> MutableList<T>.addAllNotNull(vararg elements: T?) {
+public inline fun <T> MutableList<T>.addAllNotNull(vararg elements: T?) {
     elements.forEach { if (it != null) add(it) }
 }
 
@@ -358,7 +358,7 @@ inline fun <T> MutableList<T>.addAllNotNull(vararg elements: T?) {
  * @return the first element that is an instance of the specified class
  * @throws NoSuchElementException if no such element is found
  */
-inline fun <reified T> Iterable<*>.firstInstance() = first { it is T } as T
+public inline fun <reified T> Iterable<*>.firstInstance() = first { it is T } as T
 
 /**
  * Find the first element in iterable that is an instance of the specified class or null if no such element is found.
@@ -367,4 +367,4 @@ inline fun <reified T> Iterable<*>.firstInstance() = first { it is T } as T
  * @return the first element that is an instance of the specified class or null if no such element is found
  * @throws NoSuchElementException if no such element is found
  */
-inline fun <reified T> Iterable<*>.firstInstanceOrNull() = firstOrNull { it is T } as? T
+public inline fun <reified T> Iterable<*>.firstInstanceOrNull() = firstOrNull { it is T } as? T

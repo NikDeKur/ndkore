@@ -23,14 +23,14 @@ import kotlin.reflect.KClass
  * @param last True if this module should be loaded as last as possible by other dependencies
  * @see Service
  */
-data class Dependencies(
+public data class Dependencies(
     val before: List<KClass<out Any>>,
     val after: List<KClass<out Any>>,
     val first: Boolean = false,
     val last: Boolean = false,
 ) {
 
-    companion object {
+    public companion object {
         /**
          * Creates a new instance of [Dependencies] with the given modules that should be loaded before this module.
          *
@@ -38,7 +38,7 @@ data class Dependencies(
          * @return New instance of [Dependencies]
          */
         @JvmStatic
-        fun after(vararg modules: KClass<out Any>) =
+        public fun after(vararg modules: KClass<out Any>): Dependencies =
             Dependencies(emptyList(), modules.toList(), first = false, last = false)
 
         /**
@@ -48,7 +48,7 @@ data class Dependencies(
          * @return New instance of [Dependencies]
          */
         @JvmStatic
-        fun before(vararg modules: KClass<out Any>) =
+        public fun before(vararg modules: KClass<out Any>): Dependencies =
             Dependencies(modules.toList(), emptyList(), first = false, last = false)
 
         private val EMPTY by lazy {
@@ -67,7 +67,7 @@ data class Dependencies(
          * @return Empty instance of [Dependencies]
          */
         @JvmStatic
-        fun none() = EMPTY
+        public fun none(): Dependencies = EMPTY
 
         /**
          * Returns an instance of [Dependencies] that should be loaded as first as possible by other dependencies.
@@ -75,7 +75,7 @@ data class Dependencies(
          * @return Instance of [Dependencies] that should be loaded as first as possible by other dependencies
          */
         @JvmStatic
-        fun first() = FIRST
+        public fun first(): Dependencies = FIRST
 
         /**
          * Returns an instance of [Dependencies] that should be loaded as last as possible by other dependencies.
@@ -83,39 +83,39 @@ data class Dependencies(
          * @return Instance of [Dependencies] that should be loaded as last as possible by other dependencies
          */
         @JvmStatic
-        fun last() = LAST
+        public fun last(): Dependencies = LAST
     }
 }
 
 
-class DependenciesBuilder {
+public class DependenciesBuilder {
     private val before = mutableListOf<KClass<out Any>>()
     private val after = mutableListOf<KClass<out Any>>()
     private var first = false
     private var last = false
 
-    fun first() {
+    public fun first() {
         first = true
     }
 
-    fun last() {
+    public fun last() {
         last = true
     }
 
-    fun before(vararg services: KClass<out Any>) {
+    public fun before(vararg services: KClass<out Any>) {
         before.addAll(services)
     }
 
-    fun after(vararg services: KClass<out Any>) {
+    public fun after(vararg services: KClass<out Any>) {
         after.addAll(services)
     }
 
 
-    fun build() = Dependencies(before, after, first, last)
+    public fun build(): Dependencies = Dependencies(before, after, first, last)
 }
 
 @NdkoreDSL
-inline fun dependencies(block: DependenciesBuilder.() -> Unit): Dependencies {
+public inline fun dependencies(block: DependenciesBuilder.() -> Unit): Dependencies {
     val builder = DependenciesBuilder()
     builder.block()
     return builder.build()

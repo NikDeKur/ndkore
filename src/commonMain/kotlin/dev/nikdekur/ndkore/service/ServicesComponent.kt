@@ -27,12 +27,12 @@ import kotlin.properties.ReadOnlyProperty
  *
  * @see ServicesManager
  */
-interface ServicesComponent {
+public interface ServicesComponent {
 
     /**
      * The manager that manages this service.
      */
-    val manager: ServicesManager
+    public val manager: ServicesManager
 }
 
 /**
@@ -43,7 +43,7 @@ interface ServicesComponent {
  * @param C The type of the service to retrieve.
  * @return The service instance, or null if not found.
  */
-inline fun <reified C : Any> ServicesComponent.getOrNull() = manager.getServiceOrNull<C>()
+public inline fun <reified C : Any> ServicesComponent.getOrNull() = manager.getServiceOrNull<C>()
 
 /**
  * Retrieves a service by its class.
@@ -55,7 +55,7 @@ inline fun <reified C : Any> ServicesComponent.getOrNull() = manager.getServiceO
  * @return The service instance.
  * @throws ServiceNotFoundException If the service is not found.
  */
-inline fun <reified C : Any> ServicesComponent.get() = manager.getService<C>()
+public inline fun <reified C : Any> ServicesComponent.get() = manager.getService<C>()
 
 /**
  * Return a property delegate that provides a service instance.
@@ -65,7 +65,8 @@ inline fun <reified C : Any> ServicesComponent.get() = manager.getService<C>()
  * @param C The type of the service to inject.
  * @return A property delegate that provides the service instance, which might return null if no service found.
  */
-inline fun <reified C : Any> ServicesComponent.injectOrNull() = ReadOnlyProperty<Any?, C?> { _, _ -> getOrNull() }
+public inline fun <reified C : Any> ServicesComponent.injectOrNull() =
+    ReadOnlyProperty<Any?, C?> { _, _ -> getOrNull() }
 
 /**
  * Return a property delegate that provides a service instance.
@@ -76,6 +77,6 @@ inline fun <reified C : Any> ServicesComponent.injectOrNull() = ReadOnlyProperty
  * @return A property delegate that provides the service instance.
  * @throws ServiceNotFoundException If the service is not found.
  */
-inline fun <reified C : Any> ServicesComponent.inject() = ReadOnlyProperty<Any?, C> { _, _ -> get() }
+public inline fun <reified C : Any> ServicesComponent.inject() = ReadOnlyProperty<Any?, C> { _, _ -> get() }
 
 

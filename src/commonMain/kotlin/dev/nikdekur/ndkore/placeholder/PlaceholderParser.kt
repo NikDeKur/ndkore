@@ -42,7 +42,7 @@ package dev.nikdekur.ndkore.placeholder
  * println(result) // Output: Hello, Jane! Your balance is 100.
  * ```
  */
-interface PlaceholderParser {
+public interface PlaceholderParser {
 
     /**
      * Parses an expression containing placeholders and returns the resolved value as a string.
@@ -52,7 +52,7 @@ interface PlaceholderParser {
      *                      the corresponding replacement values.
      * @return The resolved value as a string, or null if the path could not be resolved.
      */
-    fun parseExpression(path: String, placeholders: Map<String, Any?>): String?
+    public fun parseExpression(path: String, placeholders: Map<String, Any?>): String?
 
     /**
      * Parses the entire string with placeholders, replacing them with their corresponding values from the map.
@@ -61,7 +61,7 @@ interface PlaceholderParser {
      * @param placeholders A map of key-value pairs where keys are placeholder names and values are their replacements.
      * @return The string with all placeholders replaced with their values.
      */
-    fun parse(string: String, placeholders: Map<String, Any?>): String
+    public fun parse(string: String, placeholders: Map<String, Any?>): String
 }
 
 /**
@@ -73,6 +73,6 @@ interface PlaceholderParser {
  *                      their replacements.
  * @return The string with placeholders replaced based on the provided pairs.
  */
-inline fun PlaceholderParser.parse(string: String, vararg placeholders: Pair<String, Any?>): String {
+public inline fun PlaceholderParser.parse(string: String, vararg placeholders: Pair<String, Any?>): String {
     return parse(string, placeholders.toMap())
 }

@@ -38,7 +38,7 @@ import dev.nikdekur.ndkore.`interface`.Snowflake
  * task.cancel()
  * ```
  */
-interface SchedulerTask : Snowflake<Int> {
+public interface SchedulerTask : Snowflake<Int> {
 
     /**
      * Cancels the task.
@@ -49,7 +49,7 @@ interface SchedulerTask : Snowflake<Int> {
      *
      * @see isCancelled
      */
-    fun cancel()
+    public fun cancel()
 
     /**
      * Checks if the task has been cancelled.
@@ -58,6 +58,6 @@ interface SchedulerTask : Snowflake<Int> {
      *
      * @return `true` if the task has been cancelled, `false` otherwise.
      */
-    fun isCancelled(): Boolean
+    public fun isCancelled(): Boolean
 
 }

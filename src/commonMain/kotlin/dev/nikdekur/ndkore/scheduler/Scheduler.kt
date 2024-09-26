@@ -6,6 +6,8 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
+@file:Suppress("NOTHING_TO_INLINE")
+
 package dev.nikdekur.ndkore.scheduler
 
 import kotlin.time.Duration
@@ -17,7 +19,7 @@ import kotlin.time.Duration
  *
  * Different implementations can be used depending on the requirements of the project.
  */
-interface Scheduler {
+public interface Scheduler {
 
     /**
      * Starts a task in the scheduler.
@@ -25,7 +27,7 @@ interface Scheduler {
      * @param task The task to be executed.
      * @return The task object.
      */
-    fun runTask(task: suspend () -> Unit): SchedulerTask
+    public fun runTask(task: suspend () -> Unit): SchedulerTask
 
     /**
      * Starts a task with a specified interval.
@@ -35,7 +37,7 @@ interface Scheduler {
      * @param task The task to be executed.
      * @return The task object.
      */
-    fun runTaskTimer(delay: Duration, interval: Duration, task: suspend () -> Unit): SchedulerTask
+    public fun runTaskTimer(delay: Duration, interval: Duration, task: suspend () -> Unit): SchedulerTask
 
     /**
      * Starts the execution of a task after a specified time has elapsed.
@@ -44,20 +46,20 @@ interface Scheduler {
      * @param task The task to be executed.
      * @return The task object.
      */
-    fun runTaskLater(delay: Duration, task: suspend () -> Unit): SchedulerTask
+    public fun runTaskLater(delay: Duration, task: suspend () -> Unit): SchedulerTask
 
 
     /**
      * Cancels all running tasks.
      */
-    fun cancelAllTasks()
+    public fun cancelAllTasks()
 
     /**
      * Shuts down the scheduler.
      *
      * Scheduler should not be used after this method is called.
      */
-    fun shutdown()
+    public fun shutdown()
 }
 
 /**
@@ -67,7 +69,7 @@ interface Scheduler {
  * @param task The task to be executed.
  * @return The task object.
  */
-inline fun Scheduler.runTaskTimer(
+public inline fun Scheduler.runTaskTimer(
     interval: Duration,
     noinline task: suspend () -> Unit
 ) = runTaskTimer(interval, interval, task)

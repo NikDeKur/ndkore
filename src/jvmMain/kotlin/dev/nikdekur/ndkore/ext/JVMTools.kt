@@ -17,9 +17,9 @@ import java.util.jar.JarEntry
 import java.util.jar.JarFile
 
 
-class FileNotFoundException(fileName: String) : RuntimeException(fileName)
+public class FileNotFoundException(fileName: String) : RuntimeException(fileName)
 
-fun getResource(relativePath: String): File {
+public fun getResource(relativePath: String): File {
     val classLoader = Thread.currentThread().contextClassLoader
     val resourceUrl = classLoader.getResource(relativePath)
     return if (resourceUrl != null) {
@@ -29,7 +29,7 @@ fun getResource(relativePath: String): File {
     }
 }
 
-fun getResourcePath(relativePath: String): String {
+public fun getResourcePath(relativePath: String): String {
     val classLoader = Thread.currentThread().contextClassLoader
     val resourceUrl = classLoader.getResource(relativePath)
     return if (resourceUrl != null) {
@@ -39,7 +39,7 @@ fun getResourcePath(relativePath: String): String {
     }
 }
 
-fun findFileInJar(jarClass: Class<*>, filePath: String): File? {
+public fun findFileInJar(jarClass: Class<*>, filePath: String): File? {
     // Get the path to the JAR-file
     val jarPath = jarClass.protectionDomain.codeSource.location.path
     JarFile(jarPath).use { jarFile ->

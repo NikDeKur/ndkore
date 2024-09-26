@@ -8,8 +8,8 @@
 
 package dev.nikdekur.ndkore.map.spread
 
-abstract class AbstractSpreadMap<K : Any, V : Any>(
-    val map: MutableMap<K, V> = mutableMapOf(),
+public abstract class AbstractSpreadMap<K : Any, V : Any>(
+    public val map: MutableMap<K, V> = mutableMapOf(),
 ) : SpreadMap<K, V>, MutableMap<K, V> by map {
 
     override val isDone: Boolean

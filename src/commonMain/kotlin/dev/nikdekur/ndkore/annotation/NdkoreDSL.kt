@@ -14,4 +14,4 @@ package dev.nikdekur.ndkore.annotation
  * For more complex DLS syntax in the library, other annotations can be used to mark.
  */
 @DslMarker
-annotation class NdkoreDSL
+public annotation class NdkoreDSL

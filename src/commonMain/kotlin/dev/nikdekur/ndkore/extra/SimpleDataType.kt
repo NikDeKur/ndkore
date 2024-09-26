@@ -11,7 +11,7 @@ package dev.nikdekur.ndkore.extra
 import kotlin.jvm.JvmStatic
 
 
-enum class SimpleDataType {
+public enum class SimpleDataType {
     STRING,
     INT,
     LONG,
@@ -24,7 +24,7 @@ enum class SimpleDataType {
 
     ;
 
-    fun convert(string: String): Any {
+    public fun convert(string: String): Any {
         return when (this) {
             STRING -> string
             INT -> string.toInt()
@@ -38,7 +38,7 @@ enum class SimpleDataType {
         }
     }
 
-    fun convertOrNull(string: String): Any? {
+    public fun convertOrNull(string: String): Any? {
         return when (this) {
             STRING -> string
             INT -> string.toIntOrNull()
@@ -53,15 +53,15 @@ enum class SimpleDataType {
     }
 
 
-    companion object {
+    public companion object {
 
         @JvmStatic
-        fun fromStringOrNull(type: String): SimpleDataType? {
+        public fun fromStringOrNull(type: String): SimpleDataType? {
             return entries.firstOrNull { it.name.equals(type, ignoreCase = true) }
         }
 
         @JvmStatic
-        fun fromString(type: String): SimpleDataType {
+        public fun fromString(type: String): SimpleDataType {
             return fromStringOrNull(type) ?: throw IllegalArgumentException("Unknown type: $type")
         }
     }

@@ -8,11 +8,11 @@
 
 package dev.nikdekur.ndkore.math
 
-class Ratio(val ratio: Iterable<Int>) {
+public class Ratio(public val ratio: Iterable<Int>) {
 
-    constructor(vararg ratio: Int) : this(ratio.toList())
+    public constructor(vararg ratio: Int) : this(ratio.toList())
 
-    fun split(number: Int): List<Int> {
+    public fun split(number: Int): List<Int> {
         val oneEl: Int = number / ratio.sum()
         return ratio.map { it * oneEl }
     }

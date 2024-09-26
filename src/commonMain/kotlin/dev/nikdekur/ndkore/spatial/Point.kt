@@ -19,14 +19,14 @@ import kotlin.jvm.JvmField
  * @property y The y-coordinate of the point.
  * @property z The z-coordinate of the point.
  */
-data class Point(var x: Int, var y: Int, var z: Int) : Comparable<Point> {
+public data class Point(var x: Int, var y: Int, var z: Int) : Comparable<Point> {
 
     /**
      * Creates and returns a copy of this point.
      *
      * @return A clone of this point.
      */
-    fun clone() = Point(x, y, z)
+    public fun clone(): Point = Point(x, y, z)
 
     /**
      * Adds the coordinates of another point to this point.
@@ -34,7 +34,7 @@ data class Point(var x: Int, var y: Int, var z: Int) : Comparable<Point> {
      * @param other The point to add.
      * @return A new point representing the result of the addition.
      */
-    operator fun plus(other: Point): Point = Point(x + other.x, y + other.y, z + other.z)
+    public operator fun plus(other: Point): Point = Point(x + other.x, y + other.y, z + other.z)
 
     /**
      * Subtracts the coordinates of another point from this point.
@@ -42,7 +42,7 @@ data class Point(var x: Int, var y: Int, var z: Int) : Comparable<Point> {
      * @param other The point to subtract.
      * @return A new point representing the result of the subtraction.
      */
-    operator fun minus(other: Point): Point = Point(x - other.x, y - other.y, z - other.z)
+    public operator fun minus(other: Point): Point = Point(x - other.x, y - other.y, z - other.z)
 
     /**
      * Multiplies the coordinates of this point by a scalar value.
@@ -50,7 +50,7 @@ data class Point(var x: Int, var y: Int, var z: Int) : Comparable<Point> {
      * @param other The scalar value to multiply by.
      * @return A new point representing the result of the multiplication.
      */
-    operator fun times(other: Int): Point = Point(x * other, y * other, z * other)
+    public operator fun times(other: Int): Point = Point(x * other, y * other, z * other)
 
     /**
      * Divides the coordinates of this point by a scalar value.
@@ -58,14 +58,14 @@ data class Point(var x: Int, var y: Int, var z: Int) : Comparable<Point> {
      * @param other The scalar value to divide by.
      * @return A new point representing the result of the division.
      */
-    operator fun div(other: Int): Point = Point(x / other, y / other, z / other)
+    public operator fun div(other: Int): Point = Point(x / other, y / other, z / other)
 
     /**
      * Calculates the squared length (magnitude) of this point from the origin in 3D space.
      *
      * @return The squared length of this point.
      */
-    fun lengthSquared(): Int {
+    public fun lengthSquared(): Int {
         return (x * x + y * y + z * z)
     }
 
@@ -74,7 +74,7 @@ data class Point(var x: Int, var y: Int, var z: Int) : Comparable<Point> {
      *
      * @return The squared length of this point in 2D.
      */
-    fun lengthSquared2D(): Int {
+    public fun lengthSquared2D(): Int {
         return (x * x + z * z)
     }
 
@@ -84,11 +84,11 @@ data class Point(var x: Int, var y: Int, var z: Int) : Comparable<Point> {
      * @param point The other point.
      * @return The squared distance between the two points.
      */
-    inline fun distanceSquared(point: Point): Double {
+    public inline fun distanceSquared(point: Point): Double {
         return distanceSquared(x, y, z, point.x, point.y, point.z)
     }
 
-    override fun compareTo(other: Point): Int {
+    public override fun compareTo(other: Point): Int {
         return when {
             x != other.x -> x - other.x
             y != other.y -> y - other.y
@@ -96,10 +96,10 @@ data class Point(var x: Int, var y: Int, var z: Int) : Comparable<Point> {
         }
     }
 
-    companion object {
+    public companion object {
 
         @JvmField
-        val ZERO = Point(0, 0, 0)
+        public val ZERO: Point = Point(0, 0, 0)
 
 
         /**
@@ -109,7 +109,7 @@ data class Point(var x: Int, var y: Int, var z: Int) : Comparable<Point> {
          * @param point2 The second point.
          * @return A new point representing the middle point between the two given points.
          */
-        inline fun middlePoint(point1: Point, point2: Point): Point {
+        public inline fun middlePoint(point1: Point, point2: Point): Point {
             return Point((point1.x + point2.x) / 2, (point1.y + point2.y) / 2, (point1.z + point2.z) / 2)
         }
     }
@@ -126,7 +126,7 @@ data class Point(var x: Int, var y: Int, var z: Int) : Comparable<Point> {
  * @param z2 The z-coordinate of the second point.
  * @return The squared distance between the two points.
  */
-inline fun distanceSquared(
+public inline fun distanceSquared(
     x1: Int, y1: Int, z1: Int,
     x2: Int, y2: Int, z2: Int,
 ): Double {

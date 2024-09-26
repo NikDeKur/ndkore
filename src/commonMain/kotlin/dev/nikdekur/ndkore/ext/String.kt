@@ -15,7 +15,7 @@ import dev.nikdekur.ndkore.extra.MatchCondition
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-inline fun String.removeDoubleSpaces(): String {
+public inline fun String.removeDoubleSpaces(): String {
     var s = this
     while (s.contains("  ")) {
         s = s.replace("  ", " ")
@@ -23,30 +23,30 @@ inline fun String.removeDoubleSpaces(): String {
     return s
 }
 
-inline fun String.match(condition: MatchCondition, otherString: String): Boolean {
+public inline fun String.match(condition: MatchCondition, otherString: String): Boolean {
     return condition.match(this, otherString)
 }
 
-inline fun String.asCamelCaseGetter() =
+public inline fun String.asCamelCaseGetter() =
     if (this.isEmpty()) {
         "get"
     } else {
         "get${this[0].uppercase()}${this.substring(1)}"
     }
 
-inline fun String.isBlankOrEmpty(): Boolean {
+public inline fun String.isBlankOrEmpty(): Boolean {
     return isBlank() || isEmpty()
 }
 
-inline fun String.isUUID(): Boolean {
+public inline fun String.isUUID(): Boolean {
     return this.matches(Patterns.UUID)
 }
 
-inline fun String.toUUID(): Uuid {
+public inline fun String.toUUID(): Uuid {
     return Uuid.parse(this)
 }
 
-inline fun String.toUUIDOrNull(): Uuid? {
+public inline fun String.toUUIDOrNull(): Uuid? {
     return try {
         this.toUUID()
     } catch (e: IllegalArgumentException) {
@@ -54,7 +54,7 @@ inline fun String.toUUIDOrNull(): Uuid? {
     }
 }
 
-inline fun String.toBooleanSmart(): Boolean {
+public inline fun String.toBooleanSmart(): Boolean {
     return when (this) {
         "true", "1", "yes", "on" -> true
         "false", "0", "no", "off" -> false
@@ -62,7 +62,7 @@ inline fun String.toBooleanSmart(): Boolean {
     }
 }
 
-inline fun String.toBooleanSmartOrNull(): Boolean? {
+public inline fun String.toBooleanSmartOrNull(): Boolean? {
     return when (this) {
         "true", "1", "yes", "on" -> true
         "false", "0", "no", "off" -> false
@@ -71,7 +71,7 @@ inline fun String.toBooleanSmartOrNull(): Boolean? {
 }
 
 
-inline fun String.capitalizeFirstLetter(): String {
+public inline fun String.capitalizeFirstLetter(): String {
     return if (this.isEmpty()) {
         this
     } else {

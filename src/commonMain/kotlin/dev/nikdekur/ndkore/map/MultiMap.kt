@@ -10,14 +10,14 @@
 
 package dev.nikdekur.ndkore.map
 
-typealias MultiMap<K1, K2, V> = Map<K1, Map<K2, V>>
-typealias MutableMultiMap<K1, K2, V> = MutableMap<K1, MutableMap<K2, V>>
+public typealias MultiMap<K1, K2, V> = Map<K1, Map<K2, V>>
+public typealias MutableMultiMap<K1, K2, V> = MutableMap<K1, MutableMap<K2, V>>
 
-inline operator fun <K1, K2, V> MultiMap<K1, K2, V>.get(k1: K1, k2: K2): V? {
+public inline operator fun <K1, K2, V> MultiMap<K1, K2, V>.get(k1: K1, k2: K2): V? {
     return get(k1)?.get(k2)
 }
 
-inline fun <K1, K2, V> MultiMap<K1, K2, V>.getOrDefault(
+public inline fun <K1, K2, V> MultiMap<K1, K2, V>.getOrDefault(
     k1: K1,
     k2: K2,
     default: V? = null
@@ -25,11 +25,11 @@ inline fun <K1, K2, V> MultiMap<K1, K2, V>.getOrDefault(
     return get(k1)?.get(k2) ?: default
 }
 
-inline fun <K1, K2, V> MultiMap<K1, K2, V>.contains(k1: K1, k2: K2): Boolean {
+public inline fun <K1, K2, V> MultiMap<K1, K2, V>.contains(k1: K1, k2: K2): Boolean {
     return get(k1)?.containsKey(k2) == true
 }
 
-inline fun <K1, K2, V> MutableMultiMap<K1, K2, V>.put(
+public inline fun <K1, K2, V> MutableMultiMap<K1, K2, V>.put(
     k1: K1,
     k2: K2,
     value: V,
@@ -41,7 +41,7 @@ inline fun <K1, K2, V> MutableMultiMap<K1, K2, V>.put(
 
 
 @Suppress("kotlin:S6524")
-inline fun <K1, K2, V> MutableMultiMap<K1, K2, V>.remove(k1: K1, k2: K2): V? {
+public inline fun <K1, K2, V> MutableMultiMap<K1, K2, V>.remove(k1: K1, k2: K2): V? {
     return get(k1)?.remove(k2)
 }
 

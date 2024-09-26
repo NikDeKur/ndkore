@@ -12,11 +12,11 @@ import dev.nikdekur.ndkore.service.Service
 import dev.nikdekur.ndkore.service.ServiceNotFoundException
 import kotlin.reflect.KClass
 
-open class RuntimeServicesManager : AbstractServicesManager() {
+public open class RuntimeServicesManager(
+    public val servicesMap: MutableMap<String, Service> = LinkedHashMap()
+) : AbstractServicesManager() {
 
-    val servicesMap = LinkedHashMap<String, Service>()
-
-    open fun classId(clazz: KClass<*>): String = clazz.toString()
+    public open fun classId(clazz: KClass<*>): String = clazz.toString()
 
     override fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
         super.registerService(service, *bindTo)

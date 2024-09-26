@@ -53,7 +53,9 @@ import kotlin.time.Duration
  *
  * @property scope The [CoroutineScope] in which the tasks will be run.
  */
-open class CoroutineScheduler(val scope: CoroutineScope) : AbstractScheduler(), CoroutineScope by scope {
+public open class CoroutineScheduler(
+    public val scope: CoroutineScope
+) : AbstractScheduler(), CoroutineScope by scope {
 
     override fun runTask(task: suspend () -> Unit): SchedulerTask {
         val taskId = nextId()
@@ -102,7 +104,7 @@ open class CoroutineScheduler(val scope: CoroutineScope) : AbstractScheduler(), 
         return newTask(taskId, job)
     }
 
-    fun newTask(id: Int, job: Job): SchedulerTask {
+    public fun newTask(id: Int, job: Job): SchedulerTask {
         val task = object : SchedulerTask {
             override fun cancel() {
                 try {
@@ -128,7 +130,7 @@ open class CoroutineScheduler(val scope: CoroutineScope) : AbstractScheduler(), 
     }
 
 
-    companion object {
+    public companion object {
         /**
          * Creates a [CoroutineScheduler] with a [SupervisorJob] in the provided [CoroutineContext].
          *
@@ -136,7 +138,7 @@ open class CoroutineScheduler(val scope: CoroutineScope) : AbstractScheduler(), 
          * @return A new instance of [CoroutineScheduler].
          */
         @JvmStatic
-        inline fun fromSupervisor(context: CoroutineContext) =
+        public inline fun fromSupervisor(context: CoroutineContext): CoroutineScheduler =
             CoroutineScheduler(CoroutineScope(context + SupervisorJob()))
 
         /**
@@ -145,7 +147,7 @@ open class CoroutineScheduler(val scope: CoroutineScope) : AbstractScheduler(), 
          */
         @JvmStatic
         @DelicateCoroutinesApi
-        val Global by lazy {
+        public val Global: CoroutineScheduler by lazy {
             CoroutineScheduler(GlobalScope)
         }
     }

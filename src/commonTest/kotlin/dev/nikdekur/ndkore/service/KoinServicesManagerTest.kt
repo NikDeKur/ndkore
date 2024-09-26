@@ -12,7 +12,7 @@ import dev.nikdekur.ndkore.koin.SimpleKoinContext
 import dev.nikdekur.ndkore.service.manager.KoinServicesManager
 import kotlin.test.BeforeTest
 
-class KoinServicesManagerTest : ServicesManagerTest {
+class KoinServicesManagerTest : ServicesManagerTest() {
 
     override lateinit var app: App
 

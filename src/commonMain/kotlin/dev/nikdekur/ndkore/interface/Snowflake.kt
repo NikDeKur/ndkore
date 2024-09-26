@@ -8,6 +8,6 @@
 
 package dev.nikdekur.ndkore.`interface`
 
-interface Snowflake<T> {
-    val id: T
+public interface Snowflake<T> {
+    public val id: T
 }

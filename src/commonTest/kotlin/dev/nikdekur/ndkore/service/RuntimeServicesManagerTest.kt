@@ -11,7 +11,7 @@ package dev.nikdekur.ndkore.service
 import dev.nikdekur.ndkore.service.manager.RuntimeServicesManager
 import kotlin.test.BeforeTest
 
-class RuntimeServicesManagerTest : ServicesManagerTest {
+class RuntimeServicesManagerTest : ServicesManagerTest() {
 
     override lateinit var app: App
 

@@ -8,7 +8,7 @@
 
 package dev.nikdekur.ndkore.command
 
-data class CommandResult(
+public data class CommandResult(
     val commands: List<String>,
     val output: List<String>,
     val errorOutput: List<String>,

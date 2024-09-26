@@ -44,7 +44,9 @@ import kotlin.time.Duration
  *
  * @param executor The [ScheduledExecutorService] to be used for scheduling tasks.
  */
-open class ExecutorScheduler(val executor: ScheduledExecutorService) : AbstractScheduler() {
+public open class ExecutorScheduler(
+    public val executor: ScheduledExecutorService
+) : AbstractScheduler() {
 
     override fun runTask(task: suspend () -> Unit): SchedulerTask {
         val taskId = nextId()
@@ -118,7 +120,7 @@ open class ExecutorScheduler(val executor: ScheduledExecutorService) : AbstractS
     /**
      * Shutdown the executor service immediately, attempting to stop all actively executing tasks.
      */
-    fun shutdownNow() {
+    public fun shutdownNow() {
         tasks.clear()
         executor.shutdownNow()
     }
@@ -139,7 +141,7 @@ open class ExecutorScheduler(val executor: ScheduledExecutorService) : AbstractS
      * @param time The maximum time to wait.
      * @param unit The time unit of the time argument.
      */
-    fun shutdown(time: Long, unit: TimeUnit) {
+    public fun shutdown(time: Long, unit: TimeUnit) {
         tasks.clear()
         executor.awaitTermination(time, unit)
     }
@@ -162,7 +164,7 @@ open class ExecutorScheduler(val executor: ScheduledExecutorService) : AbstractS
     }
 
 
-    companion object {
+    public companion object {
         /**
          * Creates an [ExecutorScheduler] with a thread pool of the specified size.
          *
@@ -170,7 +172,7 @@ open class ExecutorScheduler(val executor: ScheduledExecutorService) : AbstractS
          * @return A new instance of [ExecutorScheduler].
          */
         @JvmStatic
-        fun threadPool(size: Int): ExecutorScheduler {
+        public fun threadPool(size: Int): ExecutorScheduler {
             return ExecutorScheduler(Executors.newScheduledThreadPool(size))
         }
 
@@ -180,7 +182,7 @@ open class ExecutorScheduler(val executor: ScheduledExecutorService) : AbstractS
          * @return A new instance of [ExecutorScheduler].
          */
         @JvmStatic
-        fun singleThread(): ExecutorScheduler {
+        public fun singleThread(): ExecutorScheduler {
             return ExecutorScheduler(Executors.newSingleThreadScheduledExecutor())
         }
     }

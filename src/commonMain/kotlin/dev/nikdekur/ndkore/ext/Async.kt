@@ -26,7 +26,7 @@ import kotlinx.coroutines.sync.withPermit
  * @param T the type of the deferred value
  * @return the result value of the deferred
  */
-suspend inline fun <T> Deferred<T>.smartAwait(): T {
+public suspend inline fun <T> Deferred<T>.smartAwait(): T {
     return try {
         await()
     } catch (e: CancellationException) {
@@ -51,7 +51,7 @@ suspend inline fun <T> Deferred<T>.smartAwait(): T {
  * @param block the function to be executed concurrently
  * @return a list of [Deferred] that represent the coroutines running the [block]
  */
-inline fun <T, R> CoroutineScope.parallel(
+public inline fun <T, R> CoroutineScope.parallel(
     parallelism: Int,
     collection: Iterable<T>,
     crossinline block: suspend (T) -> R
@@ -83,4 +83,4 @@ inline fun <T, R> CoroutineScope.parallel(
  * Implementation note: how exactly time is tracked is an implementation detail of [CoroutineDispatcher] in the context.
  * @param timeMillis time in milliseconds.
  */
-suspend inline fun delay(timeMillis: Number) = kotlinx.coroutines.delay(timeMillis.toLong())
+public suspend inline fun delay(timeMillis: Number): Unit = kotlinx.coroutines.delay(timeMillis.toLong())

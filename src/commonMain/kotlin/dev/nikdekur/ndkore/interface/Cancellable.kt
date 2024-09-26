@@ -8,19 +8,19 @@
 
 package dev.nikdekur.ndkore.`interface`
 
-interface Cancellable {
+public interface Cancellable {
 
     /**
      * Whether the operation is cancelled.
      */
-    var isCancel: Boolean
+    public var isCancel: Boolean
 
     /**
      * Cancels the operation.
      *
      * @see isCancel
      */
-    fun cancel() {
+    public fun cancel() {
         isCancel = true
     }
 }

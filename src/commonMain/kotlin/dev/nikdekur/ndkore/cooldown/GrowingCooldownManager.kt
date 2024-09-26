@@ -22,14 +22,14 @@ import kotlin.time.Duration.Companion.minutes
  * @param policy The policy to use for growing cooldowns.
  * @param onCooldownUpdate The callback to call when the cooldown is updated.
  */
-class GrowingCooldownManager<K>(
-    val policy: GrowPolicy,
-    val onCooldownUpdate: (K, Duration) -> Unit
+public class GrowingCooldownManager<K>(
+    public val policy: GrowPolicy,
+    public val onCooldownUpdate: (K, Duration) -> Unit
 ) {
 
     private val steps = mutableMapOf<K, Int>()
     // Key to cooldown end time (ms)
-    val cooldowns = mutableMapOf<K, Instant>()
+    public val cooldowns: MutableMap<K, Instant> = mutableMapOf<K, Instant>()
 
     private fun increaseStep(key: K): Int {
         var step = steps.getOrElse(key) { 0 } + 1
@@ -53,7 +53,7 @@ class GrowingCooldownManager<K>(
      * @param step The step to get the cooldown for.
      * @return The cooldown for the given key and step.
      */
-    fun getCooldown(k: K, step: Int): Duration {
+    public fun getCooldown(k: K, step: Int): Duration {
         return try {
             policy.getCooldown(step)
         } catch (e: Exception) {
@@ -67,18 +67,18 @@ class GrowingCooldownManager<K>(
         }
     }
 
-    fun step(key: K) {
+    public fun step(key: K) {
         val step = increaseStep(key)
         val cooldown = getCooldown(key, step)
         cooldowns[key] = policy.clock.now().plus(cooldown)
         onCooldownUpdate(key, cooldown)
     }
 
-    fun resetStep(key: K) {
+    public fun resetStep(key: K) {
         steps.remove(key)
     }
 
-    fun hasCooldown(key: K): Boolean {
+    public fun hasCooldown(key: K): Boolean {
         val cooldown = cooldowns[key] ?: return false
 
         if (policy.clock.now() > cooldown) {

@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "dev.nikdekur"
-version = "1.4.0"
+version = "1.4.2"
 
 val authorId: String by project
 val authorName: String by project
@@ -53,7 +53,7 @@ repositories {
 }
 
 kotlin {
-    // explicitApi()
+    explicitApi()
 
     val javaVersion = JavaVersion.VERSION_1_8
     jvm {
@@ -67,9 +67,9 @@ kotlin {
     }
 
     // iOS
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
+    // iosX64()
+    // iosArm64()
+    // iosSimulatorArm64()
 
     // Desktop
     // mingwX64()
@@ -92,19 +92,25 @@ kotlin {
     sourceSets {
 
         commonMain.dependencies {
-            compileOnly(libs.kotlinx.coroutines)
-            compileOnly(libs.kotlin.reflect)
-            compileOnly(libs.kotlinx.serialization.core)
-            compileOnly(libs.kotlinx.serialization.json)
-            compileOnly(libs.kotlinx.serialization.properties)
-            compileOnly(libs.kotlinx.datetime)
-            compileOnly(libs.kotlinx.io.core)
-            compileOnly(libs.kotlin.logging)
-            compileOnly(libs.stately.concurrency)
-            compileOnly(libs.bignum)
 
-            compileOnly(libs.kaml)
-            compileOnly(libs.koin)
+            // Kotlin require both api and compileOnly for some of the targets
+
+            val dependencies = listOf(
+                libs.kotlinx.coroutines.core,
+                libs.kotlinx.serialization.core,
+                libs.kotlinx.serialization.json,
+                libs.kotlinx.serialization.properties,
+                libs.kotlinx.datetime,
+                libs.kotlinx.io.core,
+                libs.kotlin.logging,
+                libs.stately.concurrency,
+                libs.bignum,
+                libs.kaml,
+                libs.koin
+            ).forEach {
+                compileOnly(it)
+                api(it)
+            }
         }
 
         jvmMain.dependencies {
@@ -157,6 +163,20 @@ if (repoUsername.isNullOrBlank() || repoPassword.isNullOrBlank()) {
 }
 
 publishing {
+
+    repositories {
+        maven {
+            name = "ndk-repo"
+            url = uri("https://repo.nikdekur.tech/releases")
+            credentials {
+                username = repoUsername
+                password = repoPassword
+            }
+        }
+
+        mavenLocal()
+    }
+
     publications {
         create<MavenPublication>("maven") {
             groupId = project.group.toString()
@@ -171,19 +191,10 @@ publishing {
                     }
                 }
             }
+
+            from(components["kotlin"])
         }
     }
 
-    repositories {
-        maven {
-            name = "ndk-repo"
-            url = uri("https://repo.nikdekur.tech/releases")
-            credentials {
-                username = repoUsername
-                password = repoPassword
-            }
-        }
 
-        mavenLocal()
-    }
 }

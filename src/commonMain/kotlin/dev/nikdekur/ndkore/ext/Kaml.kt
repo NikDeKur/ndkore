@@ -6,6 +6,8 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
+@file:Suppress("NOTHING_TO_INLINE")
+
 package dev.nikdekur.ndkore.ext
 
 import com.charleskorn.kaml.Yaml
@@ -26,7 +28,7 @@ import kotlin.reflect.typeOf
  * @param clazz the class of the configuration object.
  * @return the configuration object decoded from the YAML string.
  */
-inline fun <T : Any> Yaml.loadConfig(text: String, type: KType): T {
+public inline fun <T : Any> Yaml.loadConfig(text: String, type: KType): T {
     @Suppress("UNCHECKED_CAST")
     val serializer = serializersModule.serializer(type) as KSerializer<T>
     return decodeFromString(serializer, text)
@@ -44,4 +46,4 @@ inline fun <T : Any> Yaml.loadConfig(text: String, type: KType): T {
  * @param text the YAML formatted string containing the configuration.
  * @return the configuration object decoded from the YAML string.
  */
-inline fun <reified T : Any> Yaml.loadConfig(text: String): T = loadConfig(text, typeOf<T>())
+public inline fun <reified T : Any> Yaml.loadConfig(text: String): T = loadConfig(text, typeOf<T>())

@@ -13,7 +13,7 @@ import dev.nikdekur.ndkore.ext.r_CallMethod
 import dev.nikdekur.ndkore.ext.r_GetField
 import dev.nikdekur.ndkore.reflect.ReflectResult
 
-object JVMReflectValuesSource : ValuesSource {
+public object JVMReflectValuesSource : ValuesSource {
 
     override fun findValue(obj: Any, name: String): Any? {
         if (obj is Placeholder) {

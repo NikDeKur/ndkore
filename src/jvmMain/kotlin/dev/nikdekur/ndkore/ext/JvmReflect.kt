@@ -26,7 +26,7 @@ import kotlin.reflect.KTypeProjection
  * @param name The fully qualified name of the class to find.
  * @return The `Class` object if found, or `null` if the class does not exist.
  */
-inline fun findClass(name: String): Class<*>? {
+public inline fun findClass(name: String): Class<*>? {
     return try {
         Class.forName(name)
     } catch (e: ClassNotFoundException) {
@@ -41,7 +41,7 @@ inline fun findClass(name: String): Class<*>? {
  * @param name The name of the field to search for.
  * @return The `Field` object representing the field if found, or `null` if the field does not exist.
  */
-inline fun Class<*>.searchField(name: String): Field? {
+public inline fun Class<*>.searchField(name: String): Field? {
     return Reflect.searchField(this, name)
 }
 
@@ -52,7 +52,7 @@ inline fun Class<*>.searchField(name: String): Field? {
  * @param name The name of the field to search for.
  * @return The `Field` object representing the field if found, or `null` if the field does not exist.
  */
-inline fun Class<*>.searchFieldRecursive(name: String): Field? {
+public inline fun Class<*>.searchFieldRecursive(name: String): Field? {
     return Reflect.searchFieldRecursive(this, name)
 }
 
@@ -64,7 +64,7 @@ inline fun Class<*>.searchFieldRecursive(name: String): Field? {
  * @param classes The parameter types of the method.
  * @return The `Method` object representing the method if found, or `null` if the method does not exist.
  */
-inline fun Class<*>.searchMethod(name: String, classes: Array<out Class<*>>): Method? {
+public inline fun Class<*>.searchMethod(name: String, classes: Array<out Class<*>>): Method? {
     return Reflect.searchMethod(this, name, classes)
 }
 
@@ -77,7 +77,7 @@ inline fun Class<*>.searchMethod(name: String, classes: Array<out Class<*>>): Me
  * @param classes The parameter types of the method.
  * @return The `Method` object representing the method if found, or `null` if the method does not exist.
  */
-inline fun Class<*>.searchMethodRecursive(name: String, classes: Array<out Class<*>>): Method? {
+public inline fun Class<*>.searchMethodRecursive(name: String, classes: Array<out Class<*>>): Method? {
     return Reflect.searchMethodRecursive(this, name, classes)
 }
 
@@ -87,7 +87,7 @@ inline fun Class<*>.searchMethodRecursive(name: String, classes: Array<out Class
  * @receiver The object from which to retrieve the field values.
  * @return A map where the keys are field names and the values are the corresponding field values.
  */
-inline val Any.r_ClassFields: Map<String, Any?>
+public inline val Any.r_ClassFields: Map<String, Any?>
     get() = Reflect.getClassFields(javaClass, this)
 
 /**
@@ -96,7 +96,7 @@ inline val Any.r_ClassFields: Map<String, Any?>
  * @receiver The object from which to retrieve the methods.
  * @return A map where the keys are method names and the values are `Method` objects representing the methods.
  */
-inline val Any.r_ClassMethods: HashMap<String, Method>
+public inline val Any.r_ClassMethods: HashMap<String, Method>
     get() = Reflect.getClassMethods(javaClass)
 
 /**
@@ -108,7 +108,7 @@ inline val Any.r_ClassMethods: HashMap<String, Method>
  * or `ReflectResult.Missing` if the field does not exist.
  */
 @Suppress("FunctionName", "kotlin:S100")
-inline fun Any.r_GetField(name: String) = Reflect.getFieldValue(javaClass, this, name)
+public inline fun Any.r_GetField(name: String) = Reflect.getFieldValue(javaClass, this, name)
 
 /**
  * Extension function to set the value of a field in the object.
@@ -118,7 +118,7 @@ inline fun Any.r_GetField(name: String) = Reflect.getFieldValue(javaClass, this,
  * @param value The value to be set in the field.
  */
 @Suppress("FunctionName", "kotlin:S100")
-inline fun Any.r_SetField(name: String, value: Any?) = Reflect.setFieldValue(javaClass, this, name, value)
+public inline fun Any.r_SetField(name: String, value: Any?) = Reflect.setFieldValue(javaClass, this, name, value)
 
 /**
  * Extension function to invoke a method with specified arguments and return the result.
@@ -136,7 +136,7 @@ inline fun Any.r_SetField(name: String, value: Any?) = Reflect.setFieldValue(jav
  * or `ReflectResult.Missing` if the method does not exist.
  */
 @Suppress("FunctionName", "kotlin:S100")
-inline fun Any.r_CallMethodTyped(name: String, classes: Array<out Class<*>>, vararg args: Any?): ReflectResult {
+public inline fun Any.r_CallMethodTyped(name: String, classes: Array<out Class<*>>, vararg args: Any?): ReflectResult {
     return Reflect.callMethodTyped(javaClass, this, name, classes, *args)
 }
 
@@ -156,7 +156,7 @@ inline fun Any.r_CallMethodTyped(name: String, classes: Array<out Class<*>>, var
  * or `ReflectResult.Missing` if the method does not exist.
  */
 @Suppress("FunctionName", "kotlin:S100")
-inline fun Any.r_CallMethod(name: String, vararg args: Any?): ReflectResult {
+public inline fun Any.r_CallMethod(name: String, vararg args: Any?): ReflectResult {
     val classes = args.mapNotNull { it?.javaClass }.toTypedArray()
     return Reflect.callMethodTyped(javaClass, this, name, classes, *args)
 }
@@ -168,7 +168,7 @@ inline fun Any.r_CallMethod(name: String, vararg args: Any?): ReflectResult {
  * @param annotation The class of the annotation to search for.
  * @return A list of `Method` objects representing the methods that have the specified annotation.
  */
-fun <T> Class<T>.getMethodsWithAnnotation(annotation: Class<out Annotation>): List<Method> {
+public fun <T> Class<T>.getMethodsWithAnnotation(annotation: Class<out Annotation>): List<Method> {
     val methods = mutableListOf<Method>()
     for (method in declaredMethods) {
         if (method.isAnnotationPresent(annotation))
@@ -183,7 +183,7 @@ fun <T> Class<T>.getMethodsWithAnnotation(annotation: Class<out Annotation>): Li
  * @param annotations An iterable of annotation classes to search for.
  * @return A list of `Method` objects representing the methods that have all the specified annotations.
  */
-fun <T> Class<T>.getMethodsWithAnnotations(annotations: Iterable<Class<out Annotation>>): List<Method> {
+public fun <T> Class<T>.getMethodsWithAnnotations(annotations: Iterable<Class<out Annotation>>): List<Method> {
     val methods = mutableListOf<Method>()
     for (method in declaredMethods) {
         if (annotations.all { method.isAnnotationPresent(it) })
@@ -199,7 +199,7 @@ fun <T> Class<T>.getMethodsWithAnnotations(annotations: Iterable<Class<out Annot
  * @param args The arguments to pass to the constructor.
  * @return A new instance of the class.
  */
-fun <T : Any> Class<T>.constructTyped(types: Array<out Class<*>>, vararg args: Any): T {
+public fun <T : Any> Class<T>.constructTyped(types: Array<out Class<*>>, vararg args: Any): T {
     val constructor = getConstructor(*types)
     return constructor.newInstance(*args)
 }
@@ -210,7 +210,7 @@ fun <T : Any> Class<T>.constructTyped(types: Array<out Class<*>>, vararg args: A
  * @param args The arguments to pass to the constructor.
  * @return A new instance of the class.
  */
-fun <T : Any> Class<T>.construct(vararg args: Any): T {
+public fun <T : Any> Class<T>.construct(vararg args: Any): T {
     val constructor = getConstructor(*args.map { it.javaClass }.toTypedArray())
     return constructor.newInstance(*args)
 }
@@ -221,7 +221,7 @@ fun <T : Any> Class<T>.construct(vararg args: Any): T {
  * @param classes An iterable of parameter type arrays to search for.
  * @return The `Constructor` object if found, or `null` if no matching constructor exists.
  */
-fun <T : Any> Class<T>.getAnyConstructor(classes: Iterable<Array<out Class<*>>>): Constructor<T>? {
+public fun <T : Any> Class<T>.getAnyConstructor(classes: Iterable<Array<out Class<*>>>): Constructor<T>? {
     for (clazz in classes) {
         try {
             return getDeclaredConstructor(*clazz)
@@ -239,7 +239,7 @@ fun <T : Any> Class<T>.getAnyConstructor(classes: Iterable<Array<out Class<*>>>)
  * @param block The block of code to execute.
  * @return The result of the block of code.
  */
-inline fun <T> AccessibleObject.withUnlock(block: () -> T): T {
+public inline fun <T> AccessibleObject.withUnlock(block: () -> T): T {
     val accessible = isAccessible
     if (!accessible) isAccessible = true
     return try {
@@ -255,7 +255,7 @@ inline fun <T> AccessibleObject.withUnlock(block: () -> T): T {
  * @return The singleton instance if present, or `null` if the field does not exist or is not accessible.
  */
 @Suppress("UNCHECKED_CAST")
-inline fun <T> Class<T>.getInstanceFieldOrNull(): T? {
+public inline fun <T> Class<T>.getInstanceFieldOrNull(): T? {
     return try {
         getField("INSTANCE")[null] as? T
     } catch (e: NoSuchFieldException) {
@@ -269,7 +269,7 @@ inline fun <T> Class<T>.getInstanceFieldOrNull(): T? {
  * @return The singleton instance.
  * @throws IllegalStateException If the instance field does not exist or is not accessible.
  */
-inline fun <T> Class<T>.getInstanceField(): T {
+public inline fun <T> Class<T>.getInstanceField(): T {
     return getInstanceFieldOrNull()
         ?: throw IllegalStateException("No INSTANCE field in ${this.name}. Make sure it's a Kotlin 'object'.")
 }
@@ -281,7 +281,7 @@ inline fun <T> Class<T>.getInstanceField(): T {
  * @return The `Class` object representing the nested class.
  * @throws ClassNotFoundException If the nested class does not exist.
  */
-inline fun <reified T> getNestedClass(name: String): Class<*> {
+public inline fun <reified T> getNestedClass(name: String): Class<*> {
     return Class.forName("${T::class.java.name}\$${name}")
 }
 
@@ -293,7 +293,7 @@ inline fun <reified T> getNestedClass(name: String): Class<*> {
  * Could be obtained by [Class.getProtectionDomain]
  * @return The `File` object representing the JAR file.
  */
-inline fun resolveJar(protectionDomain: ProtectionDomain): File {
+public inline fun resolveJar(protectionDomain: ProtectionDomain): File {
     return File(protectionDomain.codeSource.location.toURI())
 }
 
@@ -303,7 +303,7 @@ inline fun resolveJar(protectionDomain: ProtectionDomain): File {
  * @param directory The directory to search for in the JAR file.
  * @return The `File` object representing the JAR file.
  */
-inline fun JarFile.getEntries(directory: String): List<JarEntry> {
+public inline fun JarFile.getEntries(directory: String): List<JarEntry> {
     val path = "$directory/"
     return entries()
         .asSequence()
@@ -323,7 +323,7 @@ inline fun JarFile.getEntries(directory: String): List<JarEntry> {
  * @param annotations The annotations of the type (field annotations).
  * @return A new `KType` object.
  */
-inline fun KType(
+public inline fun KType(
     classifier: KClassifier,
     isMarkedNullable: Boolean = false,
     arguments: List<KTypeProjection> = emptyList(),

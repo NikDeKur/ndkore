@@ -15,4 +15,4 @@ package dev.nikdekur.ndkore.annotation
     message = "This is a delicate API and its use requires care." +
             " Make sure you fully read and understand documentation of the declaration that is marked as a delicate API."
 )
-annotation class DelicateAPI
+public annotation class DelicateAPI

@@ -12,21 +12,21 @@ import kotlinx.datetime.Clock
 import kotlin.math.ln
 import kotlin.time.Duration
 
-abstract class GrowPolicy {
+public abstract class GrowPolicy {
 
-    abstract val clock: Clock
+    public abstract val clock: Clock
 
     /**
      * The maximum step that can be reached.
      */
-    open val maxStep: Int = Int.MAX_VALUE
+    public open val maxStep: Int = Int.MAX_VALUE
 
-    open val stepOnError: Int = 1
+    public open val stepOnError: Int = 1
 
     /**
      * The step to set when the maximum step is reached.
      */
-    open val stepOnMax: Int = 1
+    public open val stepOnMax: Int = 1
 
     /**
      * Get the cooldown for the given step.
@@ -34,10 +34,10 @@ abstract class GrowPolicy {
      * @param step The step to get the cooldown for.
      * @return The cooldown for the given step.
      */
-    abstract fun getCooldown(step: Int): Duration
+    public abstract fun getCooldown(step: Int): Duration
 
-    companion object {
-        fun linear(clock: Clock, base: Duration): GrowPolicy {
+    public companion object {
+        public fun linear(clock: Clock, base: Duration): GrowPolicy {
             return object : GrowPolicy() {
                 override val clock = clock
                 override val maxStep: Int = Int.MAX_VALUE / base.inWholeMilliseconds.toInt()
@@ -45,7 +45,7 @@ abstract class GrowPolicy {
             }
         }
 
-        fun exponential(clock: Clock, base: Duration, maxStep: Int? = null): GrowPolicy {
+        public fun exponential(clock: Clock, base: Duration, maxStep: Int? = null): GrowPolicy {
             return object : GrowPolicy() {
                 override val clock = clock
                 override val maxStep: Int = maxStep ?: (ln(Int.MAX_VALUE.toDouble()) / ln(2.0)).toInt()
@@ -53,7 +53,7 @@ abstract class GrowPolicy {
             }
         }
 
-        fun constant(clock: Clock, base: Duration): GrowPolicy {
+        public fun constant(clock: Clock, base: Duration): GrowPolicy {
             return object : GrowPolicy() {
                 override val clock = clock
                 override fun getCooldown(step: Int) = base

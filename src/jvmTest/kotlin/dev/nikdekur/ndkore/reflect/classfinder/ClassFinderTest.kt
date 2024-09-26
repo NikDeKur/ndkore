@@ -18,9 +18,9 @@ import dev.nikdekur.ndkore.reflect.classfinder.dir3.Dir3Class3
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-interface ClassFinderTest {
+abstract class ClassFinderTest {
 
-    val finder: ClassFinder
+    abstract val finder: ClassFinder
 
     @Test
     fun `test find one class`() {

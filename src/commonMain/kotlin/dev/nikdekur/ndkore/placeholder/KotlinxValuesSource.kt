@@ -16,8 +16,8 @@ import kotlinx.serialization.properties.Properties
 import kotlinx.serialization.serializer
 
 @ExperimentalAPI
-class KotlinxValuesSource(
-    val properties: Properties
+public class KotlinxValuesSource(
+    public val properties: Properties
 ) : ValuesSource {
 
     override fun findValue(obj: Any, name: String): Any? {

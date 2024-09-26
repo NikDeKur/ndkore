@@ -6,6 +6,8 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
+@file:Suppress("NOTHING_TO_INLINE")
+
 package dev.nikdekur.ndkore.spatial.kdtree
 
 import dev.nikdekur.ndkore.spatial.Point
@@ -67,7 +69,7 @@ import kotlin.math.pow
  * as they may affect the efficiency of subsequent queries. Additionally, ensure that the point and value types
  * used with the tree are compatible with the operations defined.
  */
-open class KDTreeImpl<T> : MutableKDTree<T> {
+public open class KDTreeImpl<T> : MutableKDTree<T> {
     private var root: Node<T>? = null
 
     override var size: Int = 0

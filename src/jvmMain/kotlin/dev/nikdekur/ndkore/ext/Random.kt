@@ -1,17 +1,9 @@
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- *
- * Copyright (c) 2024-present "Nik De Kur"
- */
-
+@file:JvmName("RandomJvmKt")
 @file:Suppress("NOTHING_TO_INLINE")
 
 package dev.nikdekur.ndkore.ext
 
-import kotlin.random.Random
-
+import java.util.Random
 
 /**
  * Returns a random number between 0.0 and 1.0.
@@ -25,11 +17,6 @@ public inline fun Random.randomPercent(): Double {
  */
 public inline fun Random.randomBigPercent(): Double {
     return nextDouble() * 100
-}
-
-
-public inline fun requireGreater(num1: Number, num2: Number) {
-    require(num1 <= num2) { "max must be greater than min" }
 }
 
 /**

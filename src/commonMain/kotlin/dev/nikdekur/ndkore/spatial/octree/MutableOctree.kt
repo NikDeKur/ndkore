@@ -28,7 +28,7 @@ import dev.nikdekur.ndkore.spatial.Shape
  * mutableOctree.insert(data)
  * ```
  */
-interface MutableOctree<T> : Octree<T> {
+public interface MutableOctree<T> : Octree<T> {
 
     /**
      * Inserts a new node data object into the Octree.
@@ -37,7 +37,7 @@ interface MutableOctree<T> : Octree<T> {
      *
      * @param data The node data object to insert.
      */
-    fun insert(data: NodeData<T>)
+    public fun insert(data: NodeData<T>)
 
     /**
      * Inserts a new value with its corresponding shape into the Octree.
@@ -48,7 +48,7 @@ interface MutableOctree<T> : Octree<T> {
      * @param value The value to insert.
      * @param shape The shape corresponding to the value.
      */
-    fun insert(value: T, shape: Shape<T>) {
+    public fun insert(value: T, shape: Shape<T>) {
         val nodeData = NodeData(value, shape)
         insert(nodeData)
     }

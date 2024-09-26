@@ -10,13 +10,10 @@
 
 package dev.nikdekur.ndkore.ext
 
-inline fun input(text: String): String {
+public inline fun input(text: String): String {
     print(text)
     return readln()
 }
 
 
-
-typealias CompAny = Comparable<Any>
-
-inline infix fun <K, V> K.singleMap(value: V): Map<K, V> = mapOf(this to value)
+public typealias CompAny = Comparable<Any>

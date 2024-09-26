@@ -13,7 +13,7 @@ package dev.nikdekur.ndkore.placeholder
  *
  * An interface that is used in the placeholders system to find value at a path in an object.
  */
-fun interface ValuesSource {
+public fun interface ValuesSource {
 
     /**
      * Finds a value at a path in an object.
@@ -25,10 +25,10 @@ fun interface ValuesSource {
      * @param name The path to find the value at.
      * @return The value at the path in the object or [NotFound] if no value found at the path
      */
-    fun findValue(obj: Any, name: String): Any?
+    public fun findValue(obj: Any, name: String): Any?
 
     /**
      * An object indicating that no result found on a path.
      */
-    data object NotFound
+    public data object NotFound
 }

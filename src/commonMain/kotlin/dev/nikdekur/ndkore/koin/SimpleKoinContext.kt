@@ -20,7 +20,7 @@ import org.koin.dsl.KoinAppDeclaration
  *
  * This contains the [KoinApplication] and its [Koin] instance for dependency injection.
  */
-class SimpleKoinContext : KoinContext {
+public class SimpleKoinContext : KoinContext {
 
     /** The current [Koin] instance. */
     private var koin: Koin? = null
@@ -39,7 +39,7 @@ class SimpleKoinContext : KoinContext {
     override fun getOrNull(): Koin? = koin
 
     /** Gets the [KoinApplication] or null if the [KoinApplication] has not yet been started. */
-    fun getKoinApplicationOrNull(): KoinApplication? = koinApp
+    public fun getKoinApplicationOrNull(): KoinApplication? = koinApp
 
     /**
      * Registers a [KoinApplication] to as the current one for this context.

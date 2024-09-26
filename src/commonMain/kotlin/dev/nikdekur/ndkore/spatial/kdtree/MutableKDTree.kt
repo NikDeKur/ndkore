@@ -51,7 +51,7 @@ import dev.nikdekur.ndkore.spatial.Point
  * Additionally, modifications to the k-d tree should be performed with consideration for the impact on query
  * performance. Frequent updates can affect the efficiency of nearest neighbor searches and range queries.
  */
-interface MutableKDTree<T> : KDTree<T> {
+public interface MutableKDTree<T> : KDTree<T> {
 
     /**
      * Inserts a new point with an associated value into the k-d tree.
@@ -68,7 +68,7 @@ interface MutableKDTree<T> : KDTree<T> {
      *
      * @note Ensure that the tree is properly balanced after insertion to maintain efficient query performance.
      */
-    fun insert(point: Point, value: T)
+    public fun insert(point: Point, value: T)
 
     /**
      * Removes a point and its associated value from the k-d tree.
@@ -84,7 +84,7 @@ interface MutableKDTree<T> : KDTree<T> {
      *
      * @note The removal process may require rebalancing the tree or restructuring it to maintain search efficiency.
      */
-    fun remove(point: Point)
+    public fun remove(point: Point)
 
     /**
      * Clears all elements from the k-d tree.
@@ -97,6 +97,6 @@ interface MutableKDTree<T> : KDTree<T> {
      *
      * @note After clearing the tree, all search operations will return empty results until new elements are inserted.
      */
-    fun clear()
+    public fun clear()
 
 }

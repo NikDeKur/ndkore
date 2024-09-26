@@ -11,7 +11,7 @@ package dev.nikdekur.ndkore.placeholder
 import dev.nikdekur.ndkore.placeholder.PatternPlaceholderParserTest.Member
 import dev.nikdekur.ndkore.placeholder.PatternPlaceholderParserTest.User
 
-class ReflectPatternPlaceholderParserTest : PatternPlaceholderParserTest {
+class ReflectPatternPlaceholderParserTest : PatternPlaceholderParserTest() {
 
     val source = JVMReflectValuesSource
 

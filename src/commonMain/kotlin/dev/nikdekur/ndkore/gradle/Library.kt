@@ -8,7 +8,7 @@
 
 package dev.nikdekur.ndkore.gradle
 
-data class Library(
+public data class Library(
     val group: String,
     val artifactId: String,
     val version: String,

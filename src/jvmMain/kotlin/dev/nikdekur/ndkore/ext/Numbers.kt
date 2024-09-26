@@ -11,7 +11,7 @@ import java.math.BigInteger
  * @param value the value to subtract from this BigInteger.
  * @return the result of subtracting the specified value from this BigInteger.
  */
-inline operator fun BigInteger.minus(value: BigInteger): BigInteger = this.subtract(value)
+public inline operator fun BigInteger.minus(value: BigInteger): BigInteger = this.subtract(value)
 
 /**
  * Adds the specified BigInteger value to this BigInteger.
@@ -19,7 +19,7 @@ inline operator fun BigInteger.minus(value: BigInteger): BigInteger = this.subtr
  * @param value the value to add to this BigInteger.
  * @return the result of adding the specified value to this BigInteger.
  */
-inline operator fun BigInteger.plus(value: BigInteger): BigInteger = this.add(value)
+public inline operator fun BigInteger.plus(value: BigInteger): BigInteger = this.add(value)
 
 /**
  * Divides this BigInteger by the specified BigInteger value.
@@ -27,7 +27,7 @@ inline operator fun BigInteger.plus(value: BigInteger): BigInteger = this.add(va
  * @param value the divisor.
  * @return the result of dividing this BigInteger by the specified value.
  */
-inline operator fun BigInteger.div(value: BigInteger): BigInteger = this.divide(value)
+public inline operator fun BigInteger.div(value: BigInteger): BigInteger = this.divide(value)
 
 
 /**
@@ -35,5 +35,5 @@ inline operator fun BigInteger.div(value: BigInteger): BigInteger = this.divide(
  *
  * @return true if this BigInteger is zero, false otherwise.
  */
-inline val BigInteger.isZero
+public inline val BigInteger.isZero
     get() = this == BigInteger.ZERO

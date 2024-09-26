@@ -57,12 +57,12 @@ import dev.nikdekur.ndkore.spatial.Point
  * nearest neighbor searches but may not be as efficient for certain types of range queries compared to other
  * data structures.
  */
-interface KDTree<T> {
+public interface KDTree<T> {
 
     /**
      * The number of points stored in the k-d tree.
      */
-    val size: Int
+    public val size: Int
 
 
     /**
@@ -79,7 +79,7 @@ interface KDTree<T> {
      *
      * @note The accuracy of the result depends on the quality of the k-d tree implementation and how well the tree is balanced.
      */
-    fun nearestNeighbor(point: Point): T?
+    public fun nearestNeighbor(point: Point): T?
 
 
     /**
@@ -99,7 +99,7 @@ interface KDTree<T> {
      * @note Performance may vary based on the number of neighbors requested and the structure of the k-d tree. Ensure
      *       the tree is well-balanced for optimal search efficiency.
      */
-    fun nearestNeighbors(point: Point, n: Int): List<T>
+    public fun nearestNeighbors(point: Point, n: Int): List<T>
 
 
     /**
@@ -119,7 +119,7 @@ interface KDTree<T> {
      * @note The efficiency of the range search depends on the size of the radius and the distribution of points in the k-d tree.
      *       Consider balancing the tree and optimizing the search strategy to improve performance.
      */
-    fun rangeSearch(center: Point, radius: Double): List<T>
+    public fun rangeSearch(center: Point, radius: Double): List<T>
 
 
     /**
@@ -139,9 +139,8 @@ interface KDTree<T> {
      * @note The performance of the range search may be influenced by the size of the box and the distribution of points in the k-d tree.
      *       Proper tree balancing and optimization strategies can enhance search efficiency.
      */
-    fun rangeSearch(min: Point, max: Point): List<T>
-
+    public fun rangeSearch(min: Point, max: Point): List<T>
 }
 
-inline fun KDTree<*>.isEmpty() = size == 0
-inline fun KDTree<*>.isNotEmpty() = !isEmpty()
+public inline fun KDTree<*>.isEmpty() = size == 0
+public inline fun KDTree<*>.isNotEmpty() = !isEmpty()

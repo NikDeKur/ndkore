@@ -12,12 +12,11 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 
+fun PatternPlaceholderParserTest.getParser(symbol: String) = getParser(symbol, symbol)
 
-interface PatternPlaceholderParserTest {
+abstract class PatternPlaceholderParserTest {
 
-    fun PatternPlaceholderParserTest.getParser(symbol: String) = getParser(symbol, symbol)
-
-    fun getParser(symbolR: String, symbolL: String): PatternPlaceholderParser
+    abstract fun getParser(symbolR: String, symbolL: String): PatternPlaceholderParser
 
     @Test
     fun singlePlaceholderResolvedCorrectly() {
@@ -82,7 +81,7 @@ interface PatternPlaceholderParserTest {
         val age: Int
     }
 
-    fun getUser(name: String, age: Int): User
+    abstract fun getUser(name: String, age: Int): User
 
     @Test
     fun parseFromClass() {
@@ -104,7 +103,7 @@ interface PatternPlaceholderParserTest {
         val user: User
     }
 
-    fun getMember(user: User): Member
+    abstract fun getMember(user: User): Member
 
     @Test
     fun parseFromNestedClass() {

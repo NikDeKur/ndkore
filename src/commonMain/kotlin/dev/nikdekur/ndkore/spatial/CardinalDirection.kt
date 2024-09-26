@@ -28,7 +28,7 @@ package dev.nikdekur.ndkore.spatial
  * @property azimuth The azimuth value corresponding to the cardinal direction, in degrees.
  */
 public enum class CardinalDirection(
-    val azimuth: Int
+    public val azimuth: Int
 ) {
     /** North direction with an azimuth of 0 degrees. */
     NORTH(0),

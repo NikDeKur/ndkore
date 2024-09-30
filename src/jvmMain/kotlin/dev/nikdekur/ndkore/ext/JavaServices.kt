@@ -1,5 +1,6 @@
 package dev.nikdekur.ndkore.ext
 
+import dev.nikdekur.ndkore.service.ServiceNotFoundException
 import dev.nikdekur.ndkore.service.ServicesComponent
 import dev.nikdekur.ndkore.service.ServicesManager
 

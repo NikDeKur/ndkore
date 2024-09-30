@@ -254,6 +254,7 @@ abstract class ServicesManagerTest {
             assertEquals(true, loadedFirst)
         })
 
+        // Right order: service1, service2
         manager.registerService(service1, ConfigurableService1Impl::class)
         manager.registerService(service2, ConfigurableService::class)
         manager.enable()
@@ -274,6 +275,7 @@ abstract class ServicesManagerTest {
             assertEquals(false, loadedFirst)
         })
 
+        // Right order:
         manager.registerService(service2, ConfigurableService::class)
         manager.registerService(service1, ConfigurableService1Impl::class)
         manager.enable()
@@ -281,10 +283,10 @@ abstract class ServicesManagerTest {
 
 
     @Test
-    fun dependencyAfterLoadTest() {
+    fun dependencyDependencyLoadTest() {
         var loadedFirst = false
         var loadedSecond = false
-        val service1 = ConfigurableService1Impl(app, Dependencies.after(ConfigurableService::class), onTestLoad = {
+        val service1 = ConfigurableService1Impl(app, Dependencies.dependsOn(ConfigurableService::class), onTestLoad = {
             loadedFirst = true
             assertEquals(true, loadedSecond)
         })
@@ -294,30 +296,9 @@ abstract class ServicesManagerTest {
             assertEquals(false, loadedFirst)
         })
 
-        manager.registerService(service1, ConfigurableService1Impl::class)
-        manager.registerService(service2, ConfigurableService::class)
-        manager.enable()
-    }
-
-
-    @Test
-    fun dependencyBeforeLoadTest() {
-        var loadedFirst = false
-        var loadedSecond = false
-        val service1 =
-            ConfigurableService1Impl(app, Dependencies.before(ConfigurableService::class), onTestLoad = {
-            loadedFirst = true
-            assertEquals(true, loadedSecond)
-        })
-
-        val service2 = ConfigurableService1Impl(app, onTestLoad = {
-            loadedSecond = true
-            assertEquals(false, loadedFirst)
-        })
-
-        manager.registerService(service1, ConfigurableService1Impl::class)
-        manager.registerService(service2, ConfigurableService::class)
         // right order: service2, service1
+        manager.registerService(service1, ConfigurableService1Impl::class)
+        manager.registerService(service2, ConfigurableService::class)
         manager.enable()
     }
 
@@ -365,13 +346,13 @@ abstract class ServicesManagerTest {
 
     @Test
     fun testServicesListReturnListInOrderOfDependencies() {
-        val service1 = SomeService1Impl(app, Dependencies.after(SomeService2::class))
+        val service1 = SomeService1Impl(app, Dependencies.dependsOn(SomeService2::class))
         val service2 = SomeService2Impl(app)
 
 
+        // Right order: service2, service1
         manager.registerService(service1, SomeService1::class)
         manager.registerService(service2, SomeService2::class)
-        manager.enable()
         assertContentEquals(listOf(service2, service1), manager.services)
     }
 
@@ -389,7 +370,7 @@ abstract class ServicesManagerTest {
 
     @Test
     fun selfDependencyTest() {
-        val service = ConfigurableService1Impl(app, Dependencies.after(ConfigurableService1Impl::class))
+        val service = ConfigurableService1Impl(app, Dependencies.dependsOn(ConfigurableService1Impl::class))
         manager.registerService(service, ConfigurableService1Impl::class)
         assertFailsWith<CircularDependencyException> {
             manager.enable()
@@ -398,12 +379,14 @@ abstract class ServicesManagerTest {
 
     @Test
     fun recursiveDependencyTest() {
-        val service1 = ConfigurableService1Impl(app, Dependencies.after(ConfigurableService::class))
-        val service2 = ConfigurableService1Impl(app, Dependencies.after(ConfigurableService1Impl::class))
-        manager.registerService(service1, ConfigurableService::class)
-        manager.registerService(service2, ConfigurableService1Impl::class)
-        assertFailsWith<CircularDependencyException> {
+        val service1 = ConfigurableService1Impl(app, Dependencies.dependsOn(ConfigurableService2Impl::class))
+        val service2 = ConfigurableService2Impl(app, Dependencies.dependsOn(ConfigurableService1Impl::class))
+        manager.registerService(service1, ConfigurableService1Impl::class)
+        manager.registerService(service2, ConfigurableService2Impl::class)
+        val exception = assertFailsWith<CircularDependencyException> {
             manager.enable()
         }
+
+        assertEquals(exception.service, service1)
     }
 }

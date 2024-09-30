@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "dev.nikdekur"
-version = "1.4.2"
+version = "1.4.3"
 
 val authorId: String by project
 val authorName: String by project
@@ -80,11 +80,13 @@ kotlin {
 
     // Web
     js {
+        moduleName = project.name
         browser()
         nodejs()
     }
 
     wasmJs {
+        moduleName = project.name + "Wasm"
         browser()
         nodejs()
     }
@@ -93,7 +95,7 @@ kotlin {
 
         commonMain.dependencies {
 
-            // Kotlin require both api and compileOnly for some of the targets
+            // Kotlin require both api and compileOnly for some targets
 
             val dependencies = listOf(
                 libs.kotlinx.coroutines.core,
@@ -106,7 +108,8 @@ kotlin {
                 libs.stately.concurrency,
                 libs.bignum,
                 libs.kaml,
-                libs.koin
+                libs.koin,
+                kotlin("test")
             ).forEach {
                 compileOnly(it)
                 api(it)
@@ -128,6 +131,7 @@ kotlin {
             implementation(libs.kotlin.logging)
             implementation(libs.bignum)
 
+            implementation(libs.kotlinx.coroutines.test)
             implementation(kotlin("test"))
 
             // Logback is not supported on jdk-8

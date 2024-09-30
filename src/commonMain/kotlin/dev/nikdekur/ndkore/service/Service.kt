@@ -1,17 +1,9 @@
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- *
- * Copyright (c) 2024-present "Nik De Kur"
- */
-
+@file:Suppress("NOTHING_TO_INLINE")
 
 package dev.nikdekur.ndkore.service
 
-import io.github.oshai.kotlinlogging.KLogger
-import io.github.oshai.kotlinlogging.KotlinLogging
-
+import dev.nikdekur.ndkore.service.Service.State.ErrorDisabling
+import dev.nikdekur.ndkore.service.Service.State.ErrorEnabling
 
 /**
  * A service that can be registered to the [ServicesManager].
@@ -22,10 +14,12 @@ import io.github.oshai.kotlinlogging.KotlinLogging
  *
  * @see ServicesManager
  */
-public abstract class Service : ServicesComponent {
+public interface Service : ServicesComponent {
 
-    public open val logger: KLogger = KotlinLogging.logger { }
-    public open var state: State = State.Disabled
+    /**
+     * Current state of the service.
+     */
+    public val state: State
 
     /**
      * Dependencies that this service has.
@@ -33,85 +27,92 @@ public abstract class Service : ServicesComponent {
      * [ServicesManager] will enable all dependencies in the order
      * to satisfy all dependencies of all services.
      */
-    public open val dependencies: Dependencies
-        get() = Dependencies.none()
-
-    /**
-     * Function that will be called when the service is enabling.
-     *
-     * May throw an exception which will be caught in [doEnable]
-     *
-     * @see doEnable
-     */
-    public open fun onEnable() {
-        // Do nothing by default
-    }
-
-    /**
-     * Function that will be called when the service is disabling.
-     *
-     * May throw an exception which will be caught in [doDisable]
-     *
-     * @see doDisable
-     */
-    public open fun onDisable() {
-        // Do nothing by default
-    }
+    public val dependencies: Dependencies
 
     /**
      * Enables the service.
      *
-     * Calls [onEnable] function and catches all exceptions.
+     * Catch all exceptions and change the state.
      */
-    public open fun doEnable() {
-        state = State.Enabling
-        try {
-            onEnable()
-            state = State.Enabled
-        } catch (e: Exception) {
-            logger.error(e) { "Failed to enable service: ${this::class.simpleName}" }
-            state = State.ErrorEnabling(e)
-        }
-    }
+    public fun doEnable()
 
     /**
      * Disables the service.
      *
-     * Calls [onDisable] function and catches all exceptions.
+     * Catch all exceptions and change the state.
      */
-    public open fun doDisable() {
-        state = State.Disabling
-        try {
-            onDisable()
-            state = State.Disabled
-        } catch (e: Exception) {
-            logger.error(e) { "Failed to disable service: ${this::class.simpleName}" }
-            state = State.ErrorDisabling(e)
-        }
-    }
+    public fun doDisable()
 
     /**
      * Reloads the service.
      *
-     * Calls [doDisable] and [doEnable] functions in sequence.
+     * Catch all exceptions and change the state.
+     *
+     * By default, equivalent to calling [doDisable] and [doEnable].
      */
-    public open fun doReload() {
+    public fun doReload() {
         doDisable()
         doEnable()
     }
 
-
+    /**
+     * # State
+     *
+     * State of the service.
+     */
     public sealed interface State {
+        /**
+         * Service is enabling.
+         *
+         * Usually due to [doEnable] being called.
+         */
         public data object Enabling : State
-        public data class ErrorEnabling(val e: Exception) : State
+
+        /**
+         * Service failed to enable.
+         *
+         * Can be due to an exception thrown in [doEnable].
+         *
+         * @param error the error that occurred
+         */
+        public data class ErrorEnabling(val error: Throwable) : State
+
+        /**
+         * Service is enabled.
+         *
+         * No errors occurred during enabling.
+         */
         public data object Enabled : State
 
+
+        /**
+         * Service is disabling.
+         *
+         * Usually due to [doDisable] being called.
+         */
         public data object Disabling : State
-        public data class ErrorDisabling(val e: Exception) : State
+
+        /**
+         * Service failed to disable.
+         *
+         * Can be due to an exception thrown in [doDisable].
+         *
+         * @param error the error that occurred
+         */
+        public data class ErrorDisabling(val error: Throwable) : State
+
+        /**
+         * Service is disabled.
+         *
+         * No errors occurred during disabling.
+         */
         public data object Disabled : State
-
-        public fun isErrored(): Boolean = this is ErrorEnabling || this is ErrorDisabling
     }
-
 }
 
+/**
+ * Check if the service is in an error state.
+ *
+ * @return true if the service is in an error state
+ */
+public inline fun Service.State.isErrored(): Boolean = this is ErrorEnabling || this is ErrorDisabling

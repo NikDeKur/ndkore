@@ -88,7 +88,7 @@ public interface ServicesManager : ServicesComponent {
     /**
      * Enable service manager.
      *
-     * This method will enable all registered services ([Service.doEnable])
+     * This method will enable all registered services ([AbstractService.doEnable])
      * and will enable every service in the correct order to satisfy all dependencies.
      */
     public fun enable()
@@ -96,7 +96,7 @@ public interface ServicesManager : ServicesComponent {
     /**
      * Disable service manager.
      *
-     * This method will disable all registered services ([Service.doDisable])
+     * This method will disable all registered services ([AbstractService.doDisable])
      * and will disable every service in the correct order to satisfy all dependencies.
      */
     public fun disable()

@@ -8,12 +8,68 @@
 
 package dev.nikdekur.ndkore.service.manager
 
-import dev.nikdekur.ndkore.service.Service
+import dev.nikdekur.ndkore.service.AbstractService
 import dev.nikdekur.ndkore.service.ServiceNotFoundException
+import dev.nikdekur.ndkore.service.ServicesManager
 import kotlin.reflect.KClass
 
+/**
+ * # Runtime Services Manager
+ *
+ * [ServicesManager] implementation using a simple Map to store services.
+ *
+ * Use this implementation if you don't want to use Koin for dependency injection.
+ *
+ * ### Example Usage:
+ * ```
+ * // Define a simple service interface
+ * interface MyService {
+ *     fun doSomething()
+ * }
+ *
+ * // Implementation of the service
+ * class MyServiceImpl(override val servicesManager: ServicesManager) : AbstractService(), MyService {
+ *     override fun doSomething() {
+ *         println("Doing something!")
+ *     }
+ *
+ *     override fun onEnable() {
+ *         println("Service loaded!")
+ *     }
+ *
+ *     override fun onDisable() {
+ *         println("Service unloaded!")
+ *     }
+ * }
+ *
+ * fun main() {
+ *     // Initialize the ServicesManager with the constructor default map
+ *     val serviceManager: ServicesManager = RuntimeServicesManager()
+ *
+ *     // Register the service with the service manager
+ *     val myService = MyServiceImpl(serviceManager)
+ *     serviceManager.registerService(myService, MyService::class)
+ *
+ *     // Enable all registered services
+ *     serviceManager.enable()
+ *
+ *     // Retrieve and use the service
+ *     val service: MyService = serviceManager.getService(MyService::class)
+ *     service.doSomething()
+ *
+ *     // Inject the service lazily
+ *     val injectedService by serviceManager.inject<MyService>()
+ *     injectedService.doSomething()
+ *
+ *     // Disable all registered services
+ *     serviceManager.disable()
+ * }
+ * ```
+ *
+ * @property servicesMap Map of services to store and manage
+ */
 public open class RuntimeServicesManager(
-    public val servicesMap: MutableMap<String, Service> = LinkedHashMap()
+    public val servicesMap: MutableMap<String, AbstractService> = LinkedHashMap()
 ) : AbstractServicesManager() {
 
     public open fun classId(clazz: KClass<*>): String = clazz.toString()
@@ -21,7 +77,8 @@ public open class RuntimeServicesManager(
     override fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
         super.registerService(service, *bindTo)
 
-        service as Service
+        service as AbstractService
+
 
         bindTo.forEach { clazz ->
             val id = classId(clazz)

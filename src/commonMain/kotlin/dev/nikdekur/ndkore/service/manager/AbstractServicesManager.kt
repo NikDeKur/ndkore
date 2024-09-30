@@ -13,16 +13,28 @@ import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlin.reflect.KClass
 
+/**
+ * # Abstract Services Manager
+ *
+ * Abstract implementation of [ServicesManager].
+ * Handles service registration, enabling, disabling, sorting, and other predefined methods.
+ *
+ * Doesn't handle services storing, it should be implemented in subclasses.
+ *
+ * Common implementations: [RuntimeServicesManager], [KoinServicesManager]
+ *
+ * @see ServicesManager
+ */
 public abstract class AbstractServicesManager : ServicesManager {
 
     public val logger: KLogger = KotlinLogging.logger {}
 
     override var state: ServicesManager.State = ServicesManager.State.DISABLED
 
-    public val servicesCollection: MutableSet<Service> = LinkedHashSet<Service>()
+    public val servicesCollection: MutableSet<ServiceRef> = LinkedHashSet()
 
     override val services: Collection<Service>
-        get() = sortModules()
+        get() = sortServices()
 
     override fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
         if (service !is Service)
@@ -36,7 +48,8 @@ public abstract class AbstractServicesManager : ServicesManager {
             service.doEnable()
         }
 
-        servicesCollection.add(service)
+        val reference = ServiceRef(service, bindTo)
+        servicesCollection.add(reference)
     }
 
     public fun getServiceInternal(serviceClass: KClass<*>): Service? {
@@ -53,9 +66,10 @@ public abstract class AbstractServicesManager : ServicesManager {
 
         state = ServicesManager.State.ENABLING
 
-        val sorted = sortModules()
+        val sorted = sortServices()
         logger.info { "Load order: ${sorted.joinToString { it::class.simpleName ?: "UnknownClassName" }}" }
         sorted.forEach {
+            println("Loading module: ${it::class.simpleName}")
             try {
                 it.doEnable()
             } catch (e: Exception) {
@@ -74,7 +88,7 @@ public abstract class AbstractServicesManager : ServicesManager {
         state = ServicesManager.State.DISABLING
 
         // Unload in reverse order, because of dependencies
-        sortModules().reversed().forEach {
+        sortServices().reversed().forEach {
             try {
                 it.doDisable()
             } catch (e: Exception) {
@@ -87,72 +101,98 @@ public abstract class AbstractServicesManager : ServicesManager {
 
 
     public fun reload(service: Service) {
-        service.onDisable()
-        service.onEnable()
+        service.doDisable()
+        service.doEnable()
     }
 
 
-    public fun sortModules(): Collection<Service> {
-        val firstModules = mutableListOf<Service>()
-        val lastModules = mutableListOf<Service>()
-        val middleModules = mutableListOf<Service>()
-        val sortedServices = LinkedHashSet<Service>()
-        val addedModules = HashSet<KClass<out Service>>()
+    public fun sortServices(): Collection<Service> {
+        val visited = mutableSetOf<Service>()
+        val inProcess = mutableSetOf<Service>() // Для отслеживания стека вызовов (для циклов)
+        val sorted = mutableListOf<Service>()
 
-        // Group modules into first, last, and middle categories
-        servicesCollection.forEach { service ->
+        val graph: MutableMap<Service, List<Service>> = LinkedHashMap()
+
+        // Разделим сервисы на категории: first, last и остальные
+        val firstServices = mutableListOf<Service>()
+        val lastServices = mutableListOf<Service>()
+        val regularServices = mutableListOf<Service>()
+
+        // Инициализация графа зависимостей
+        servicesCollection.forEach { ref ->
+            val service = ref.service
+
+            // Проверяем, помечен ли сервис как first или last
             when {
-                service.dependencies.first -> firstModules.add(service)
-                service.dependencies.last -> lastModules.add(service)
-                else -> middleModules.add(service)
+                service.dependencies.first -> firstServices.add(service)
+                service.dependencies.last -> lastServices.add(service)
+                else -> regularServices.add(service)
             }
+
+            val dependencies = service.dependencies.dependsOn.mapTo(ArrayList()) {
+                if (ref.isApplicable(it)) throw CircularDependencyException(service)
+                getServiceInternal(it) ?: throw ServiceNotFoundException(it)
+            }
+
+            graph[ref.service] = dependencies
         }
 
-        // Set for tracking modules currently in the process of loading
-        val currentlyProcessing = HashSet<Service>()
 
-        // Helper function to add a module considering its dependencies
-        fun addModule(service: Service) {
-            if (sortedServices.contains(service)) return
+        // Вспомогательная функция для DFS (поиск в глубину)
+        fun dfs(group: Iterable<Service>) {
+            group.forEach { service ->
+                if (service in visited) return@forEach
 
-            if (currentlyProcessing.contains(service)) {
-                // If the module is already in the process of loading, a cycle is detected
-                throw CircularDependencyException(service)
-            }
+                if (service in inProcess)
+                    throw CircularDependencyException(service) // Обнаружение циклической зависимости
 
-            // Add module to the current process
-            currentlyProcessing.add(service)
+                if (service !in visited) {
+                    inProcess.add(service)
 
-            // Load modules that the current one depends on
-            service.dependencies.after.forEach { afterModule ->
-                val afterService = getServiceInternal(afterModule) ?: throw ServiceNotFoundException(afterModule)
-                addModule(afterService)
-            }
+                    graph[service]?.let(::dfs)
 
-            // Add the current module
-            sortedServices.add(service)
-            addedModules.add(service::class)
-
-            // Load modules that should be loaded before the current one
-            service.dependencies.before.forEach { beforeModule ->
-                val beforeService = getServiceInternal(beforeModule)
-                if (beforeService != null && !sortedServices.contains(beforeService)) {
-                    // Remove the current module so it can be re-added after its dependencies
-                    sortedServices.remove(service)
-                    addModule(beforeService)
-                    sortedServices.add(service)
+                    inProcess.remove(service)
+                    visited.add(service)
+                    sorted.add(service) // Добавляем в список сортировки
                 }
             }
-
-            // Remove the module from the current process after its loading is finished
-            currentlyProcessing.remove(service)
         }
 
-        // Process modules in the correct order
-        firstModules.forEach(::addModule)
-        middleModules.forEach(::addModule)
-        lastModules.forEach(::addModule)
+        dfs(firstServices)
+        dfs(regularServices)
+        dfs(lastServices)
 
-        return sortedServices
+        return sorted
+    }
+
+
+    /**
+     * # Service Reference
+     *
+     * Internal class to store a reference to a service and the classes it should be bound to.
+     *
+     * Used for checking for self-dependencies and comparing services by their bindTo classes.
+     *
+     * @property service Service to store
+     * @property bindTo Classes to bind the service to
+     */
+    public data class ServiceRef(
+        val service: Service,
+        val bindTo: Array<out KClass<out Any>>
+    ) {
+        public fun isApplicable(clazz: KClass<out Any>): Boolean {
+            return bindTo.any { it == clazz }
+        }
+
+
+        override fun equals(other: Any?): Boolean {
+            val other = other as? ServiceRef ?: return false
+
+            return bindTo.contentDeepEquals(other.bindTo)
+        }
+
+        override fun hashCode(): Int {
+            return bindTo.contentDeepHashCode()
+        }
     }
 }

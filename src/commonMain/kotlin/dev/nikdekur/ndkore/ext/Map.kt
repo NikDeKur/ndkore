@@ -372,3 +372,31 @@ public inline fun <K, V> MutableMap<K, V>.clear(block: Map.Entry<K, V>.() -> Uni
     }
     clear()
 }
+
+
+/**
+ * Creates a map from the elements of this iterable using the provided key and value functions.
+ *
+ * @param map the map to populate with the elements of this iterable.
+ * @param key a function that maps an element to a key.
+ * @param value a function that maps an element to a value.
+ * @return the populated map.
+ */
+public inline fun <O, K, V> Iterable<O>.toMapTo(
+    map: MutableMap<K, V>,
+    key: (O) -> K,
+    value: (O) -> V,
+): Map<K, V> {
+    for (element in this) {
+        map[key(element)] = value(element)
+    }
+    return map
+}
+
+
+public inline fun <O, K, V> Iterable<O>.toMap(
+    key: (O) -> K,
+    value: (O) -> V,
+): Map<K, V> {
+    return toMapTo(mutableMapOf(), key, value)
+}

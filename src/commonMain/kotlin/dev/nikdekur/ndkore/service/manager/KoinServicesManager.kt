@@ -12,8 +12,9 @@ package dev.nikdekur.ndkore.service.manager
 
 import dev.nikdekur.ndkore.ext.loadModule
 import dev.nikdekur.ndkore.ext.single
-import dev.nikdekur.ndkore.service.Service
+import dev.nikdekur.ndkore.service.AbstractService
 import dev.nikdekur.ndkore.service.ServiceNotFoundException
+import dev.nikdekur.ndkore.service.ServicesManager
 import org.koin.core.context.KoinContext
 import org.koin.core.error.NoDefinitionFoundException
 import org.koin.core.module.Module
@@ -35,22 +36,19 @@ import kotlin.reflect.KClass
  * }
  *
  * // Implementation of the service
- * class MyServiceImpl(override val servicesManager: ServicesManager<MyApp>) : Service<MyApp>, MyService {
+ * class MyServiceImpl(override val servicesManager: ServicesManager) : AbstractService(), MyService {
  *     override fun doSomething() {
  *         println("Doing something!")
  *     }
  *
- *     override fun onLoad() {
+ *     override fun onEnable() {
  *         println("Service loaded!")
  *     }
  *
- *     override fun onUnload() {
+ *     override fun onDisable() {
  *         println("Service unloaded!")
  *     }
  * }
- *
- * // Define an application context
- * class MyApp(val name: String)
  *
  * fun main() {
  *     // Start Koin for dependency injection
@@ -59,15 +57,14 @@ import kotlin.reflect.KClass
  *     }
  *
  *     // Initialize the ServicesManager with the application context
- *     val myApp = MyApp("My Application")
- *     val serviceManager: ServicesManager<MyApp> = KoinServicesManager(GlobalContext, myApp)
+ *     val serviceManager: ServicesManager = KoinServicesManager(GlobalContext)
  *
  *     // Register the service with the service manager
- *     val myService = MyServiceImpl()
+ *     val myService = MyServiceImpl(serviceManager)
  *     serviceManager.registerService(myService, MyService::class)
  *
- *     // Load all registered services
- *     serviceManager.loadAll()
+ *     // Enable all registered services
+ *     serviceManager.enable()
  *
  *     // Retrieve and use the service
  *     val service: MyService = serviceManager.getService(MyService::class)
@@ -77,8 +74,8 @@ import kotlin.reflect.KClass
  *     val injectedService by serviceManager.inject<MyService>()
  *     injectedService.doSomething()
  *
- *     // Unload all registered services
- *     serviceManager.unloadAll()
+ *     // Disable all registered services
+ *     serviceManager.disable()
  * }
  * ```
  *
@@ -92,13 +89,13 @@ public class KoinServicesManager(
     override fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
         super.registerService(service, *bindTo)
         context.loadModule {
-            reg<Any>(service as Service, *bindTo)
+            reg<Any>(service as AbstractService, *bindTo)
         }
     }
 
 
     @Suppress("UNCHECKED_CAST")
-    public inline fun <I : Any> Module.reg(service: Service, vararg bindTo: KClass<*>) {
+    public inline fun <I : Any> Module.reg(service: AbstractService, vararg bindTo: KClass<*>) {
         val moduleClass = service::class as KClass<I>
         val service = service as I
         val definition = single(clazz = moduleClass) { service }

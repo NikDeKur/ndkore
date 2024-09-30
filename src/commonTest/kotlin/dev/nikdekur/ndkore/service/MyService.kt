@@ -8,7 +8,7 @@
 
 package dev.nikdekur.ndkore.service
 
-abstract class MyService : Service() {
+abstract class MyService : AbstractService() {
 
     abstract val app: App
 

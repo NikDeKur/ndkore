@@ -10,17 +10,21 @@ package dev.nikdekur.ndkore.service
 
 import kotlin.reflect.KClass
 
-public class ClassIsNotServiceException(clazz: KClass<*>) :
-    RuntimeException("Class '${clazz}' is not a service!")
+public class ClassIsNotServiceException(
+    public val clazz: KClass<*>
+) : RuntimeException("Class '${clazz}' is not a service!")
 
 /**
  * Indicates service not found.
  */
-public class ServiceNotFoundException(serviceClass: KClass<*>) :
-    RuntimeException("Service for '${serviceClass}' not found!")
+public class ServiceNotFoundException(
+    public val serviceClass: KClass<*>
+) : RuntimeException("Service for '${serviceClass}' not found!")
 
 
 /**
  * Indicates service circular dependency or self-dependency.
  */
-public class CircularDependencyException(service: Service) : RuntimeException("Circular dependency in '$service'!")
+public class CircularDependencyException(
+    public val service: Service
+) : RuntimeException("Recursive dependency found on processing `$service`")

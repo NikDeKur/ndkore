@@ -12,7 +12,7 @@ package dev.nikdekur.ndkore.service.manager
 
 import dev.nikdekur.ndkore.ext.loadModule
 import dev.nikdekur.ndkore.ext.single
-import dev.nikdekur.ndkore.service.AbstractService
+import dev.nikdekur.ndkore.service.Service
 import dev.nikdekur.ndkore.service.ServiceNotFoundException
 import dev.nikdekur.ndkore.service.ServicesManager
 import org.koin.core.context.KoinContext
@@ -89,13 +89,13 @@ public class KoinServicesManager(
     override fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
         super.registerService(service, *bindTo)
         context.loadModule {
-            reg<Any>(service as AbstractService, *bindTo)
+            reg<Any>(service as Service, *bindTo)
         }
     }
 
 
     @Suppress("UNCHECKED_CAST")
-    public inline fun <I : Any> Module.reg(service: AbstractService, vararg bindTo: KClass<*>) {
+    public inline fun <I : Any> Module.reg(service: Service, vararg bindTo: KClass<*>) {
         val moduleClass = service::class as KClass<I>
         val service = service as I
         val definition = single(clazz = moduleClass) { service }

@@ -8,7 +8,7 @@
 
 package dev.nikdekur.ndkore.service.manager
 
-import dev.nikdekur.ndkore.service.AbstractService
+import dev.nikdekur.ndkore.service.Service
 import dev.nikdekur.ndkore.service.ServiceNotFoundException
 import dev.nikdekur.ndkore.service.ServicesManager
 import kotlin.reflect.KClass
@@ -69,7 +69,7 @@ import kotlin.reflect.KClass
  * @property servicesMap Map of services to store and manage
  */
 public open class RuntimeServicesManager(
-    public val servicesMap: MutableMap<String, AbstractService> = LinkedHashMap()
+    public val servicesMap: MutableMap<String, Service> = LinkedHashMap()
 ) : AbstractServicesManager() {
 
     public open fun classId(clazz: KClass<*>): String = clazz.toString()
@@ -77,8 +77,7 @@ public open class RuntimeServicesManager(
     override fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
         super.registerService(service, *bindTo)
 
-        service as AbstractService
-
+        service as Service
 
         bindTo.forEach { clazz ->
             val id = classId(clazz)

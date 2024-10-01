@@ -69,7 +69,6 @@ public abstract class AbstractServicesManager : ServicesManager {
         val sorted = sortServices()
         logger.info { "Load order: ${sorted.joinToString { it::class.simpleName ?: "UnknownClassName" }}" }
         sorted.forEach {
-            println("Loading module: ${it::class.simpleName}")
             try {
                 it.doEnable()
             } catch (e: Exception) {

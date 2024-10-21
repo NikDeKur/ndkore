@@ -119,11 +119,6 @@ kotlin {
         jvmMain.dependencies {
             compileOnly(libs.slf4j.api)
             compileOnly(libs.google.guava)
-
-            // ndkore has extensions for junit5
-            compileOnly(libs.junit.jupiter.api)
-            compileOnly(libs.junit.jupiter.engine)
-            compileOnly(libs.junit.jupiter.params)
         }
 
         commonTest.dependencies {
@@ -152,8 +147,6 @@ license {
         set("year", "2024-present")
         set("name", authorName)
     }
-
-    ignoreFailures = true
 }
 
 

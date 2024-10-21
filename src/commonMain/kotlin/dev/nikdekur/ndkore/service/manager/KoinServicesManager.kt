@@ -14,7 +14,6 @@ import dev.nikdekur.ndkore.ext.loadModule
 import dev.nikdekur.ndkore.ext.single
 import dev.nikdekur.ndkore.service.Service
 import dev.nikdekur.ndkore.service.ServiceNotFoundException
-import dev.nikdekur.ndkore.service.ServicesManager
 import org.koin.core.context.KoinContext
 import org.koin.core.error.NoDefinitionFoundException
 import org.koin.core.module.Module
@@ -86,7 +85,7 @@ public class KoinServicesManager(
 ) : AbstractServicesManager() {
 
 
-    override fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
+    override suspend fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
         super.registerService(service, *bindTo)
         context.loadModule {
             reg<Any>(service as Service, *bindTo)

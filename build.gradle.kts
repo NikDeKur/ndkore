@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "dev.nikdekur"
-version = "1.4.3"
+version = "1.4.4"
 
 val authorId: String by project
 val authorName: String by project
@@ -199,6 +199,4 @@ publishing {
             from(components["kotlin"])
         }
     }
-
-
 }

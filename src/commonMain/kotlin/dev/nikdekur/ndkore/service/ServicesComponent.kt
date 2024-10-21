@@ -8,14 +8,17 @@
 
 package dev.nikdekur.ndkore.service
 
+import dev.nikdekur.ndkore.service.manager.ServicesManager
+import dev.nikdekur.ndkore.service.manager.getService
+import dev.nikdekur.ndkore.service.manager.getServiceOrNull
 import kotlin.properties.ReadOnlyProperty
 
 /**
  * # Services Component
  *
- * Represents a component that has access to a [ServicesManager].
+ * Represents a component that has access to a [dev.nikdekur.ndkore.service.manager.ServicesManager].
  *
- * This interface is shortcut for accessing components from a [ServicesManager].
+ * This interface is shortcut for accessing components from a [dev.nikdekur.ndkore.service.manager.ServicesManager].
  *
  * ### Example Usage:
  * ```kotlin
@@ -25,7 +28,7 @@ import kotlin.properties.ReadOnlyProperty
  * }
  * ```
  *
- * @see ServicesManager
+ * @see dev.nikdekur.ndkore.service.manager.ServicesManager
  */
 public interface ServicesComponent {
 

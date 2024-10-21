@@ -13,11 +13,11 @@ class SomeService2Impl(
     override val dependencies: Dependencies = Dependencies.none()
 ) : MyService(), SomeService2 {
 
-    override fun onEnable() {
+    override suspend fun onEnable() {
         loaded = true
     }
 
-    override fun onDisable() {
+    override suspend fun onDisable() {
         loaded = false
     }
 

@@ -9,7 +9,7 @@
 package dev.nikdekur.ndkore.spatial
 
 import dev.nikdekur.ndkore.ext.sqrt
-import dev.nikdekur.ndkore.`interface`.Snowflake
+import dev.nikdekur.ndkore.`interface`.Unique
 import dev.nikdekur.ndkore.spatial.octree.OctreeImpl
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -111,7 +111,7 @@ object SphereShape : Shape<SphereBuilding> {
 
 }
 
-interface Building : Snowflake<String> {
+interface Building : Unique<String> {
     val min: Point
     val max: Point
 }

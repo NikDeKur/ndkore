@@ -11,14 +11,15 @@ package dev.nikdekur.ndkore.placeholder
 import dev.nikdekur.ndkore.ext.asCamelCaseGetter
 import dev.nikdekur.ndkore.ext.r_CallMethod
 import dev.nikdekur.ndkore.ext.r_GetField
+import dev.nikdekur.ndkore.reflect.ReflectMethod
 import dev.nikdekur.ndkore.reflect.ReflectResult
 
-public object JVMReflectValuesSource : ValuesSource {
+public object JVMReflectMethod : ReflectMethod {
 
     override fun findValue(obj: Any, name: String): Any? {
         if (obj is Placeholder) {
             val value = obj.getPlaceholder(name)
-            if (value != ValuesSource.NotFound) return value
+            if (value != ReflectMethod.NotFound) return value
         }
         val result1 = obj.r_GetField(name)
         if (result1 != ReflectResult.Missing) return result1.value
@@ -29,6 +30,6 @@ public object JVMReflectValuesSource : ValuesSource {
         val result3 = obj.r_CallMethod(name)
         if (result3 != ReflectResult.Missing) return result3.value
 
-        return ValuesSource.NotFound
+        return ReflectMethod.NotFound
     }
 }

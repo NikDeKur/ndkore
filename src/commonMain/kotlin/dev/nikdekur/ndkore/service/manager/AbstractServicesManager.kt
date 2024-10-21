@@ -8,6 +8,7 @@
 
 package dev.nikdekur.ndkore.service.manager
 
+import dev.nikdekur.ndkore.ext.forEachSafe
 import dev.nikdekur.ndkore.service.*
 import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -36,16 +37,16 @@ public abstract class AbstractServicesManager : ServicesManager {
     override val services: Collection<Service>
         get() = sortServices()
 
-    override fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
+    override suspend fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
         if (service !is Service)
             throw ClassIsNotServiceException(service::class)
 
         // If services manager is enabled and bind override existing services,
         // then disable existing services and enable the new one
         if (state == ServicesManager.State.ENABLED) {
-            getServiceInternal(service::class)?.doDisable()
-            bindTo.forEach { getServiceInternal(it)?.doDisable() }
-            service.doEnable()
+            getServiceInternal(service::class)?.disable()
+            bindTo.forEach { getServiceInternal(it)?.disable() }
+            service.enable()
         }
 
         val reference = ServiceRef(service, bindTo)
@@ -58,50 +59,54 @@ public abstract class AbstractServicesManager : ServicesManager {
     }
 
 
+    public inline fun onEachService(block: (Service) -> Unit, onError: (Throwable, Service) -> Unit) {
+        sortServices().forEachSafe(onError, block)
+    }
 
-    override fun enable() {
+
+    override suspend fun enable() {
         check(state == ServicesManager.State.DISABLED) {
             "Services Manager is not disabled!"
         }
 
         state = ServicesManager.State.ENABLING
 
-        val sorted = sortServices()
-        logger.info { "Load order: ${sorted.joinToString { it::class.simpleName ?: "UnknownClassName" }}" }
-        sorted.forEach {
-            try {
-                it.doEnable()
-            } catch (e: Exception) {
-                logger.error(e) { "Error while loading module '$it'!" }
+        onEachService(
+            block = { it.enable() },
+            onError = { e, s ->
+                logger.error(e) { "Error while enabling service '$s'!" }
             }
-        }
+        )
+
 
         state = ServicesManager.State.ENABLED
     }
 
-    override fun disable() {
+    override suspend fun disable() {
         check(state == ServicesManager.State.ENABLED) {
             "Services Manager is not enabled!"
         }
 
         state = ServicesManager.State.DISABLING
 
-        // Unload in reverse order, because of dependencies
-        sortServices().reversed().forEach {
-            try {
-                it.doDisable()
-            } catch (e: Exception) {
-                logger.error(e) { "Error while unloading module '$it'!" }
+        onEachService(
+            block = { it.disable() },
+            onError = { e, s ->
+                logger.error(e) { "Error while disabling service '$s'!" }
             }
-        }
+        )
 
         state = ServicesManager.State.DISABLED
     }
 
 
-    public fun reload(service: Service) {
-        service.doDisable()
-        service.doEnable()
+    public suspend fun reload(service: Service) {
+        onEachService(
+            block = { it.reload() },
+            onError = { e, s ->
+                logger.error(e) { "Error while reloading service '$s'!" }
+            }
+        )
     }
 
 

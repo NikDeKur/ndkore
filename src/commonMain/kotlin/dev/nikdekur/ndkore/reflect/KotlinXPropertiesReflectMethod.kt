@@ -8,7 +8,7 @@
 
 @file:OptIn(ExperimentalSerializationApi::class)
 
-package dev.nikdekur.ndkore.placeholder
+package dev.nikdekur.ndkore.reflect
 
 import dev.nikdekur.ndkore.annotation.ExperimentalAPI
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -16,9 +16,9 @@ import kotlinx.serialization.properties.Properties
 import kotlinx.serialization.serializer
 
 @ExperimentalAPI
-public class KotlinxValuesSource(
+public class KotlinXPropertiesReflectMethod(
     public val properties: Properties
-) : ValuesSource {
+) : ReflectMethod {
 
     override fun findValue(obj: Any, name: String): Any? {
         println("Looking for `$name` in `$obj`")

@@ -10,6 +10,7 @@
 
 package dev.nikdekur.ndkore.placeholder
 
+import dev.nikdekur.ndkore.reflect.ReflectMethod
 import kotlin.jvm.JvmStatic
 
 /**
@@ -59,7 +60,7 @@ public interface Placeholder {
      * @return The value associated with the key, or [ValuesSource.NotFound] if the key does not exist in the source.
      */
     public fun getPlaceholder(key: String): Any? {
-        return ValuesSource.NotFound
+        return ReflectMethod.NotFound
     }
 
     public companion object {

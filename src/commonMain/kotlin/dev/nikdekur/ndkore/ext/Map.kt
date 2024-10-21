@@ -10,7 +10,7 @@
 
 package dev.nikdekur.ndkore.ext
 
-import dev.nikdekur.ndkore.`interface`.Snowflake
+import dev.nikdekur.ndkore.`interface`.Unique
 
 /**
  * Removes entries from this mutable map if they satisfy the given predicate.
@@ -197,7 +197,7 @@ public fun <K, V> Map<K, V>.removeEmpty(
  * @param obj value to add
  * @return previous value associated with the key, or null if there was no mapping for the key
  */
-public inline fun <IdT, V : Snowflake<IdT>> MutableMap<IdT, V>.addById(obj: V): V? {
+public inline fun <IdT, V : Unique<IdT>> MutableMap<IdT, V>.addById(obj: V): V? {
     return put(obj.id, obj)
 }
 
@@ -207,7 +207,7 @@ public inline fun <IdT, V : Snowflake<IdT>> MutableMap<IdT, V>.addById(obj: V): 
  *
  * @param objs values to add
  */
-public inline fun <IdT, V : Snowflake<IdT>> MutableMap<IdT, V>.addAllById(objs: Iterable<V>) {
+public inline fun <IdT, V : Unique<IdT>> MutableMap<IdT, V>.addAllById(objs: Iterable<V>) {
     objs.forEach {
         addById(it)
     }
@@ -220,7 +220,7 @@ public inline fun <IdT, V : Snowflake<IdT>> MutableMap<IdT, V>.addAllById(objs: 
  * @param obj value to remove
  * @return previous value associated with the key, or null if there was no mapping for the key
  */
-public inline fun <IdT, V : Snowflake<IdT>> MutableMap<IdT, V>.removeById(obj: V): V? {
+public inline fun <IdT, V : Unique<IdT>> MutableMap<IdT, V>.removeById(obj: V): V? {
     return remove(obj.id)
 }
 
@@ -235,7 +235,7 @@ public inline fun <IdT, V : Snowflake<IdT>> MutableMap<IdT, V>.removeById(obj: V
  * @param obj the object whose ID is used to check for presence in the map.
  * @return true if the map contains the key corresponding to the object's ID, false otherwise.
  */
-public inline fun <IdT, V : Snowflake<IdT>> Map<IdT, V>.containsById(obj: V): Boolean {
+public inline fun <IdT, V : Unique<IdT>> Map<IdT, V>.containsById(obj: V): Boolean {
     return containsKey(obj.id)
 }
 

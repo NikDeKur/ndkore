@@ -251,16 +251,11 @@ public enum class RoundingMode {
     HALF_EVEN
 }
 
-public fun Double.round(
-    decimalPlaces: Int,
-    strategy: RoundingMode = RoundingMode.HALF_UP
+private fun roundImpl(
+    factor: Double,
+    scaledNumber: Double,
+    strategy: RoundingMode
 ): Double {
-
-    require(decimalPlaces >= 0) { "Decimal places must be positive." }
-
-    val factor = 10.0.pow(decimalPlaces)
-    val scaledNumber = this * factor
-
     return when (strategy) {
         RoundingMode.UP -> ceil(scaledNumber) / factor
         RoundingMode.DOWN -> floor(scaledNumber) / factor
@@ -285,6 +280,30 @@ public fun Double.round(
     }
 }
 
+public fun Double.round(
+    decimalPlaces: Int,
+    strategy: RoundingMode = RoundingMode.HALF_UP
+): Double {
+    require(decimalPlaces >= 0) { "Decimal places must be positive." }
+
+    val factor = 10.0.pow(decimalPlaces)
+    val scaledNumber = this * factor
+
+    return roundImpl(factor, scaledNumber, strategy)
+}
+
+
+public fun Float.round(
+    decimalPlaces: Int,
+    strategy: RoundingMode = RoundingMode.HALF_UP
+): Float {
+    require(decimalPlaces >= 0) { "Decimal places must be positive." }
+
+    val factor = 10.0.pow(decimalPlaces)
+    val scaledNumber = this * factor
+
+    return roundImpl(factor, scaledNumber, strategy).toFloat()
+}
 
 /**
  * Formats this number to a string with the specified number of decimal places and rounding mode.

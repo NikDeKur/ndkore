@@ -13,7 +13,7 @@ import dev.nikdekur.ndkore.placeholder.PatternPlaceholderParserTest.User
 
 class ReflectPatternPlaceholderParserTest : PatternPlaceholderParserTest() {
 
-    val source = JVMReflectValuesSource
+    val source = JVMReflectMethod
 
     override fun getParser(
         symbolR: String,

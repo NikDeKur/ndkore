@@ -42,7 +42,7 @@ But in some parts, ndkore still supports java, and you can use it in your java p
 
 Replace `{version}` with the latest version number on repository.
 
-[`29.09.2024`] Latest version: `1.4.3`
+[`21.10.2024`] Latest version: `1.4.4`
 
 ### Gradle (Kotlin)
 

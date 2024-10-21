@@ -11,6 +11,9 @@ package dev.nikdekur.ndkore.service
 import dev.nikdekur.ndkore.koin.SimpleKoinContext
 import dev.nikdekur.ndkore.service.manager.KoinServicesManager
 import dev.nikdekur.ndkore.service.manager.RuntimeServicesManager
+import dev.nikdekur.ndkore.service.manager.ServicesManager
+import dev.nikdekur.ndkore.service.manager.getService
+import kotlinx.coroutines.test.runTest
 import kotlin.test.*
 
 interface App {
@@ -40,14 +43,14 @@ abstract class ServicesManagerTest {
     // ----------------------------------
 
     @Test
-    fun serviceAddTest() {
+    fun serviceAddTest() = runTest {
         val service = SomeService1Impl(app)
         manager.registerService(service)
     }
 
 
     @Test
-    fun serviceAddAndGetTest() {
+    fun serviceAddAndGetTest() = runTest {
         val service = SomeService1Impl(app)
         manager.registerService(service)
         assertEquals(service, manager.getService<SomeService1Impl>())
@@ -55,7 +58,7 @@ abstract class ServicesManagerTest {
 
 
     @Test
-    fun serviceAddAndInjectTest() {
+    fun serviceAddAndInjectTest() = runTest {
         val service = SomeService1Impl(app)
         manager.registerService(service)
         val injected by manager.inject<SomeService1Impl>()
@@ -64,7 +67,7 @@ abstract class ServicesManagerTest {
 
 
     @Test
-    fun multiAddTest() {
+    fun multiAddTest() = runTest {
         val service1 = SomeService1Impl(app)
         val service2 = SomeService2Impl(app)
         manager.registerService(service1)
@@ -73,7 +76,7 @@ abstract class ServicesManagerTest {
 
 
     @Test
-    fun multiAddAndGetTest() {
+    fun multiAddAndGetTest() = runTest {
         val service1 = SomeService1Impl(app)
         val service2 = SomeService2Impl(app)
         manager.registerService(service1)
@@ -84,7 +87,7 @@ abstract class ServicesManagerTest {
 
 
     @Test
-    fun multiAddAndInjectTest() {
+    fun multiAddAndInjectTest() = runTest {
         val service1 = SomeService1Impl(app)
         val service2 = SomeService2Impl(app)
         manager.registerService(service1)
@@ -97,14 +100,14 @@ abstract class ServicesManagerTest {
 
 
     @Test
-    fun serviceAddAndBindTest() {
+    fun serviceAddAndBindTest() = runTest {
         val service = SomeService1Impl(app)
         manager.registerService(service, SomeService1::class)
     }
 
 
     @Test
-    fun serviceAddAndBindAndGetTest() {
+    fun serviceAddAndBindAndGetTest() = runTest {
         val service = SomeService1Impl(app)
         manager.registerService(service, SomeService1::class)
         assertEquals(service, manager.getService(SomeService1Impl::class))
@@ -113,7 +116,7 @@ abstract class ServicesManagerTest {
 
 
     @Test
-    fun serviceAddAndBindAndInjectTest() {
+    fun serviceAddAndBindAndInjectTest() = runTest {
         val service = SomeService1Impl(app)
         manager.registerService(service, SomeService1::class)
         val injected by manager.inject<SomeService1>()
@@ -124,7 +127,7 @@ abstract class ServicesManagerTest {
 
 
     @Test
-    fun multiAddAndBindTest() {
+    fun multiAddAndBindTest() = runTest {
         val service1 = SomeService1Impl(app)
         val service2 = SomeService2Impl(app)
         manager.registerService(service1, SomeService1::class)
@@ -133,7 +136,7 @@ abstract class ServicesManagerTest {
 
 
     @Test
-    fun multiAddAndBindAndGetTest() {
+    fun multiAddAndBindAndGetTest() = runTest {
         val service1 = SomeService1Impl(app)
         val service2 = SomeService2Impl(app)
         manager.registerService(service1, SomeService1::class)
@@ -146,7 +149,7 @@ abstract class ServicesManagerTest {
 
 
     @Test
-    fun multiAddAndBindAndInjectTest() {
+    fun multiAddAndBindAndInjectTest() = runTest {
         val service1 = SomeService1Impl(app)
         val service2 = SomeService2Impl(app)
         manager.registerService(service1, SomeService1::class)
@@ -162,7 +165,7 @@ abstract class ServicesManagerTest {
     }
 
     @Test
-    fun serviceReBindTest() {
+    fun serviceReBindTest() = runTest {
         val service1 = object : MyService() {
             override val app = this@ServicesManagerTest.app
             override val manager = this@ServicesManagerTest.manager
@@ -179,7 +182,7 @@ abstract class ServicesManagerTest {
 
 
     @Test
-    fun servicesLoadTest() {
+    fun servicesLoadTest() = runTest {
         val service = SomeService1Impl(app)
         manager.registerService(service, SomeService1::class)
         assertEquals(false, service.loaded)
@@ -191,7 +194,7 @@ abstract class ServicesManagerTest {
 
 
     @Test
-    fun servicesReloadTest() {
+    fun servicesReloadTest() = runTest {
         val service = SomeService1Impl(app)
         manager.registerService(service, SomeService1::class)
         assertEquals(false, service.loaded)
@@ -202,7 +205,7 @@ abstract class ServicesManagerTest {
     }
 
     @Test
-    fun testDisablePreviousServiceAndEnableNewAfterRebind() {
+    fun testDisablePreviousServiceAndEnableNewAfterRebind() = runTest {
         val service1 = SomeService1Impl(app)
         manager.registerService(service1, SomeService1::class)
         manager.enable()
@@ -218,7 +221,7 @@ abstract class ServicesManagerTest {
 
 
     @Test
-    fun disablePreviousServiceAndEnableNewAfterRebindWithMultipleServices() {
+    fun disablePreviousServiceAndEnableNewAfterRebindWithMultipleServices() = runTest {
         val service1 = SomeService1Impl(app)
         val service2 = SomeService2Impl(app)
         manager.registerService(service1, SomeService1::class)
@@ -241,7 +244,7 @@ abstract class ServicesManagerTest {
 
 
     @Test
-    fun defaultOrderTest() {
+    fun defaultOrderTest() = runTest {
         var loadedFirst = false
         var loadedSecond = false
         val service1 = ConfigurableService1Impl(app, onTestLoad = {
@@ -262,7 +265,7 @@ abstract class ServicesManagerTest {
 
 
     @Test
-    fun reverseOrderTest() {
+    fun reverseOrderTest() = runTest {
         var loadedFirst = false
         var loadedSecond = false
         val service1 = ConfigurableService1Impl(app, onTestLoad = {
@@ -283,7 +286,7 @@ abstract class ServicesManagerTest {
 
 
     @Test
-    fun dependencyDependencyLoadTest() {
+    fun dependencyDependencyLoadTest() = runTest {
         var loadedFirst = false
         var loadedSecond = false
         val service1 = ConfigurableService1Impl(app, Dependencies.dependsOn(ConfigurableService::class), onTestLoad = {
@@ -304,7 +307,7 @@ abstract class ServicesManagerTest {
 
 
     @Test
-    fun dependencyLastLoadTest() {
+    fun dependencyLastLoadTest() = runTest {
         var loadedFirst = false
         var loadedSecond = false
         val service1 = ConfigurableService1Impl(app, Dependencies.last(), onTestLoad = {
@@ -324,7 +327,7 @@ abstract class ServicesManagerTest {
     }
 
     @Test
-    fun dependencyFirstLoadTest() {
+    fun dependencyFirstLoadTest() = runTest {
         var loadedFirst = false
         var loadedSecond = false
         val service1 = ConfigurableService1Impl(app, onTestLoad = {
@@ -345,7 +348,7 @@ abstract class ServicesManagerTest {
 
 
     @Test
-    fun testServicesListReturnListInOrderOfDependencies() {
+    fun testServicesListReturnListInOrderOfDependencies() = runTest {
         val service1 = SomeService1Impl(app, Dependencies.dependsOn(SomeService2::class))
         val service2 = SomeService2Impl(app)
 
@@ -369,7 +372,7 @@ abstract class ServicesManagerTest {
     }
 
     @Test
-    fun selfDependencyTest() {
+    fun selfDependencyTest() = runTest {
         val service = ConfigurableService1Impl(app, Dependencies.dependsOn(ConfigurableService1Impl::class))
         manager.registerService(service, ConfigurableService1Impl::class)
         assertFailsWith<CircularDependencyException> {
@@ -378,7 +381,7 @@ abstract class ServicesManagerTest {
     }
 
     @Test
-    fun recursiveDependencyTest() {
+    fun recursiveDependencyTest() = runTest {
         val service1 = ConfigurableService1Impl(app, Dependencies.dependsOn(ConfigurableService2Impl::class))
         val service2 = ConfigurableService2Impl(app, Dependencies.dependsOn(ConfigurableService1Impl::class))
         manager.registerService(service1, ConfigurableService1Impl::class)

@@ -6,13 +6,13 @@ import dev.nikdekur.ndkore.service.Service.State.ErrorDisabling
 import dev.nikdekur.ndkore.service.Service.State.ErrorEnabling
 
 /**
- * A service that can be registered to the [ServicesManager].
+ * A service that can be registered to the [dev.nikdekur.ndkore.service.manager.ServicesManager].
  *
  * Service is a module that can be enabled and disabled.
  *
  * Service have to be able to do a reload infinitely.
  *
- * @see ServicesManager
+ * @see dev.nikdekur.ndkore.service.manager.ServicesManager
  */
 public interface Service : ServicesComponent {
 
@@ -24,7 +24,7 @@ public interface Service : ServicesComponent {
     /**
      * Dependencies that this service has.
      *
-     * [ServicesManager] will enable all dependencies in the order
+     * [dev.nikdekur.ndkore.service.manager.ServicesManager] will enable all dependencies in the order
      * to satisfy all dependencies of all services.
      */
     public val dependencies: Dependencies
@@ -34,26 +34,23 @@ public interface Service : ServicesComponent {
      *
      * Catch all exceptions and change the state.
      */
-    public fun doEnable()
+    public suspend fun enable()
 
     /**
      * Disables the service.
      *
      * Catch all exceptions and change the state.
      */
-    public fun doDisable()
+    public suspend fun disable()
 
     /**
      * Reloads the service.
      *
      * Catch all exceptions and change the state.
      *
-     * By default, equivalent to calling [doDisable] and [doEnable].
+     * By default, equivalent to calling [disable] and [enable].
      */
-    public fun doReload() {
-        doDisable()
-        doEnable()
-    }
+    public suspend fun reload()
 
     /**
      * # State
@@ -64,14 +61,14 @@ public interface Service : ServicesComponent {
         /**
          * Service is enabling.
          *
-         * Usually due to [doEnable] being called.
+         * Usually due to [enable] being called.
          */
         public data object Enabling : State
 
         /**
          * Service failed to enable.
          *
-         * Can be due to an exception thrown in [doEnable].
+         * Can be due to an exception thrown in [enable].
          *
          * @param error the error that occurred
          */
@@ -88,14 +85,14 @@ public interface Service : ServicesComponent {
         /**
          * Service is disabling.
          *
-         * Usually due to [doDisable] being called.
+         * Usually due to [disable] being called.
          */
         public data object Disabling : State
 
         /**
          * Service failed to disable.
          *
-         * Can be due to an exception thrown in [doDisable].
+         * Can be due to an exception thrown in [disable].
          *
          * @param error the error that occurred
          */

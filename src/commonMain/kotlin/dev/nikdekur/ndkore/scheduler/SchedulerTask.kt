@@ -8,17 +8,17 @@
 
 package dev.nikdekur.ndkore.scheduler
 
-import dev.nikdekur.ndkore.`interface`.Snowflake
+import dev.nikdekur.ndkore.`interface`.Unique
 
 /**
  * Represents a task scheduled for execution with unique identification.
  *
- * This interface extends [Snowflake] and provides methods to manage the lifecycle of a scheduled task,
+ * This interface extends [Unique] and provides methods to manage the lifecycle of a scheduled task,
  * including canceling the task and checking its cancellation status.
  *
  * **Overview of `SchedulerTask`:**
  * - **Cancellation:** Provides functionality to cancel the task and check if it has been cancelled.
- * - **Identification:** Inherits from [Snowflake] to include a unique identifier for each task.
+ * - **Identification:** Inherits from [Unique] to include a unique identifier for each task.
  *
  * **Methods:**
  * - `cancel()`: Cancels the task if it has not already been cancelled.
@@ -38,7 +38,7 @@ import dev.nikdekur.ndkore.`interface`.Snowflake
  * task.cancel()
  * ```
  */
-public interface SchedulerTask : Snowflake<Int> {
+public interface SchedulerTask : Unique<Int> {
 
     /**
      * Cancels the task.

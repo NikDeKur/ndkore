@@ -35,27 +35,40 @@ public abstract class AbstractService : Service {
     /**
      * Function that will be called when the service is enabling.
      *
-     * May throw an exception which will be caught in [doEnable]
+     * May throw an exception which will be caught in [enable]
      *
-     * @see doEnable
+     * @see enable
      */
-    public open fun onEnable() {
+    public open suspend fun onEnable() {
         // Do nothing by default
     }
 
     /**
      * Function that will be called when the service is disabling.
      *
-     * May throw an exception which will be caught in [doDisable]
+     * May throw an exception which will be caught in [disable]
      *
-     * @see doDisable
+     * @see disable
      */
-    public open fun onDisable() {
+    public open suspend fun onDisable() {
         // Do nothing by default
     }
 
+    /**
+     * Function that will be called when the service is reloading.
+     *
+     * May throw an exception which will be caught in [reload]
+     *
+     * By default calls [onDisable]
+     *
+     * @see reload
+     */
+    public open suspend fun onReload() {
+        onDisable()
+    }
 
-    public override fun doEnable() {
+
+    public override suspend fun enable() {
         state = State.Enabling
         try {
             onEnable()
@@ -67,7 +80,7 @@ public abstract class AbstractService : Service {
     }
 
 
-    public override fun doDisable() {
+    public override suspend fun disable() {
         state = State.Disabling
         try {
             onDisable()
@@ -78,10 +91,18 @@ public abstract class AbstractService : Service {
         }
     }
 
-    public override fun doReload() {
-        doDisable()
-        doEnable()
-    }
 
+    override suspend fun reload() {
+        state = State.Disabling
+        try {
+            onReload()
+            state = State.Disabled
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to reload service: ${this::class.simpleName}" }
+            state = State.ErrorDisabling(e)
+        }
+
+        enable()
+    }
 }
 

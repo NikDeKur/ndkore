@@ -8,6 +8,8 @@
 
 package dev.nikdekur.ndkore.service
 
+import dev.nikdekur.ndkore.service.manager.ServicesManager
+
 abstract class MyService : AbstractService() {
 
     abstract val app: App

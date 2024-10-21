@@ -2,7 +2,8 @@ package dev.nikdekur.ndkore.ext
 
 import dev.nikdekur.ndkore.service.ServiceNotFoundException
 import dev.nikdekur.ndkore.service.ServicesComponent
-import dev.nikdekur.ndkore.service.ServicesManager
+import dev.nikdekur.ndkore.service.manager.ServicesManager
+import kotlinx.coroutines.runBlocking
 
 /**
  * # Java Services
@@ -28,7 +29,7 @@ public object JavaServices {
         manager: ServicesManager,
         service: S,
         vararg bindTo: Class<out C>
-    ) where S : C {
+    ): Unit where S : C = runBlocking {
         manager.registerService(service, *bindTo.map { it.kotlin }.toTArray())
     }
 

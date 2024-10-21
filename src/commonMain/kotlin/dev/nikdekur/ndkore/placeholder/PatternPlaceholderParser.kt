@@ -10,6 +10,8 @@
 
 package dev.nikdekur.ndkore.placeholder
 
+import dev.nikdekur.ndkore.reflect.ReflectMethod
+
 /**
  * A concrete implementation of `PlaceholderParser` that uses regular expressions to find and replace placeholders
  * within a string.
@@ -66,16 +68,16 @@ package dev.nikdekur.ndkore.placeholder
  */
 public open class PatternPlaceholderParser(
     public val pattern: Regex,
-    public val source: ValuesSource
+    public val source: ReflectMethod
 ) : PlaceholderParser {
 
     public constructor(
         symbolLeft: String,
         symbolRight: String,
-        source: ValuesSource
+        source: ReflectMethod
     ) : this(Regex("$symbolLeft(.*?)$symbolRight"), source)
 
-    public constructor(symbol: String, source: ValuesSource) : this(symbol, symbol, source)
+    public constructor(symbol: String, source: ReflectMethod) : this(symbol, symbol, source)
 
     override fun parseExpression(pathRaw: String, placeholders: Map<String, Any?>): String? {
         val parts = pathRaw.split(".")

@@ -10,7 +10,6 @@ package dev.nikdekur.ndkore.service.manager
 
 import dev.nikdekur.ndkore.service.Service
 import dev.nikdekur.ndkore.service.ServiceNotFoundException
-import dev.nikdekur.ndkore.service.ServicesManager
 import kotlin.reflect.KClass
 
 /**
@@ -74,7 +73,7 @@ public open class RuntimeServicesManager(
 
     public open fun classId(clazz: KClass<*>): String = clazz.toString()
 
-    override fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
+    override suspend fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
         super.registerService(service, *bindTo)
 
         service as Service

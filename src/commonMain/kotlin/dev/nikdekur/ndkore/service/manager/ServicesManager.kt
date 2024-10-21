@@ -6,8 +6,10 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
-package dev.nikdekur.ndkore.service
+package dev.nikdekur.ndkore.service.manager
 
+import dev.nikdekur.ndkore.service.Service
+import dev.nikdekur.ndkore.service.ServicesComponent
 import kotlin.reflect.KClass
 
 /**
@@ -56,7 +58,7 @@ public interface ServicesManager : ServicesComponent {
      * @param service The service to be registered.
      * @param bindTo One or more classes to which the service should be bound.
      */
-    public fun <C : Any, S> registerService(service: S, vararg bindTo: KClass<out C>) where S : C
+    public suspend fun <C : Any, S> registerService(service: S, vararg bindTo: KClass<out C>) where S : C
 
     /**
      * Retrieves a service by its class, or returns null if it is not found.
@@ -91,7 +93,7 @@ public interface ServicesManager : ServicesComponent {
      * This method will enable all registered services ([AbstractService.doEnable])
      * and will enable every service in the correct order to satisfy all dependencies.
      */
-    public fun enable()
+    public suspend fun enable()
 
     /**
      * Disable service manager.
@@ -99,7 +101,7 @@ public interface ServicesManager : ServicesComponent {
      * This method will disable all registered services ([AbstractService.doDisable])
      * and will disable every service in the correct order to satisfy all dependencies.
      */
-    public fun disable()
+    public suspend fun disable()
 
 
     /**
@@ -110,7 +112,7 @@ public interface ServicesManager : ServicesComponent {
      * @see enable
      * @see disable
      */
-    public fun reload() {
+    public suspend fun reload() {
         disable()
         enable()
     }

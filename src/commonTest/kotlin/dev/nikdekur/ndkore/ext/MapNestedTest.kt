@@ -11,7 +11,8 @@ package dev.nikdekur.ndkore.ext
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class MapGetNestedTest {
+
+class MapNestedTest {
 
     @Test
     fun getNestedSingleTest() {
@@ -32,5 +33,20 @@ class MapGetNestedTest {
         val map = mapOf("key1" to mapOf("key2" to "value"))
         val value = map.getNested(listOf("key1", "key3"))
         assertEquals(null, value)
+    }
+
+
+    @Test
+    fun setNestedSingleTest() {
+        val map = mutableMapOf<String, Any?>()
+        map.setNested(listOf("key"), "value")
+        assertEquals<Any>(mapOf("key" to "value"), map)
+    }
+
+    @Test
+    fun setNestedMultiTest() {
+        val map = mutableMapOf<String, Any?>()
+        map.setNested(listOf("key1", "key2"), "value")
+        assertEquals<Any>(mapOf("key1" to mapOf("key2" to "value")), map)
     }
 }

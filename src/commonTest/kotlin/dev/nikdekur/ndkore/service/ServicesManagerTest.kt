@@ -8,9 +8,6 @@
 
 package dev.nikdekur.ndkore.service
 
-import dev.nikdekur.ndkore.koin.SimpleKoinContext
-import dev.nikdekur.ndkore.service.manager.KoinServicesManager
-import dev.nikdekur.ndkore.service.manager.RuntimeServicesManager
 import dev.nikdekur.ndkore.service.manager.ServicesManager
 import dev.nikdekur.ndkore.service.manager.getService
 import kotlinx.coroutines.test.runTest
@@ -29,14 +26,6 @@ abstract class ServicesManagerTest {
     abstract val app: App
     val manager
         get() = app.manager
-
-
-    fun managerProvider(): List<ServicesManager> {
-        return listOf(
-            KoinServicesManager(SimpleKoinContext()),
-            RuntimeServicesManager() // Предполагается, что RuntimeServicesManager можно создать без параметров
-        )
-    }
 
     // ----------------------------------
     //       Normal Behavior Test

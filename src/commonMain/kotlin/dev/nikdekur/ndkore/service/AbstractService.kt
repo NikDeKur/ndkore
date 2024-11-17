@@ -10,6 +10,7 @@
 package dev.nikdekur.ndkore.service
 
 import dev.nikdekur.ndkore.service.Service.State
+import dev.nikdekur.ndkore.service.manager.OnServiceOperation
 import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
 
@@ -39,7 +40,7 @@ public abstract class AbstractService : Service {
      *
      * @see enable
      */
-    public open suspend fun onEnable() {
+    protected open suspend fun onEnable() {
         // Do nothing by default
     }
 
@@ -50,7 +51,7 @@ public abstract class AbstractService : Service {
      *
      * @see disable
      */
-    public open suspend fun onDisable() {
+    protected open suspend fun onDisable() {
         // Do nothing by default
     }
 
@@ -63,10 +64,10 @@ public abstract class AbstractService : Service {
      *
      * @see reload
      */
-    public open suspend fun onReload() {
-        onDisable()
+    protected open suspend fun onReload() {
+        disable()
+        enable()
     }
-
 
     public override suspend fun enable() {
         state = State.Enabling
@@ -74,8 +75,8 @@ public abstract class AbstractService : Service {
             onEnable()
             state = State.Enabled
         } catch (e: Exception) {
-            logger.error(e) { "Failed to enable service: ${this::class.simpleName}" }
             state = State.ErrorEnabling(e)
+            onError(OnServiceOperation.ENABLE, e)
         }
     }
 
@@ -86,23 +87,31 @@ public abstract class AbstractService : Service {
             onDisable()
             state = State.Disabled
         } catch (e: Exception) {
-            logger.error(e) { "Failed to disable service: ${this::class.simpleName}" }
             state = State.ErrorDisabling(e)
+            onError(OnServiceOperation.DISABLE, e)
         }
     }
 
 
     override suspend fun reload() {
-        state = State.Disabling
         try {
             onReload()
-            state = State.Disabled
         } catch (e: Exception) {
-            logger.error(e) { "Failed to reload service: ${this::class.simpleName}" }
-            state = State.ErrorDisabling(e)
+            state = State.ErrorEnabling(e)
+            onError(OnServiceOperation.RELOAD, e)
+        }
+    }
+
+
+    protected open fun onError(operation: OnServiceOperation, exception: Exception) {
+        val text = when (operation) {
+            OnServiceOperation.ENABLE -> "enable"
+            OnServiceOperation.DISABLE -> "disable"
+            OnServiceOperation.RELOAD -> "reload"
         }
 
-        enable()
+        logger.error(exception) { "Failed to $text service: ${this::class.simpleName}" }
     }
+
 }
 

@@ -81,9 +81,9 @@ import kotlin.reflect.KClass
  * @property context The Koin context.
  */
 public class KoinServicesManager(
+    override val builder: ServicesManagerBuilder<*>,
     public val context: KoinContext
 ) : AbstractServicesManager() {
-
 
     override suspend fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
         super.registerService(service, *bindTo)
@@ -114,4 +114,27 @@ public class KoinServicesManager(
             throw ServiceNotFoundException(serviceClass)
         }
     }
+}
+
+
+public open class KoinServicesManagerBuilder : ServicesManagerBuilder<KoinServicesManager>() {
+
+    public var actualContext: KoinContext? = null
+
+    public fun context(context: KoinContext) {
+        this.actualContext = context
+    }
+
+    override fun build(): KoinServicesManager {
+        val context = actualContext
+        requireNotNull(context) { "Koin context must be set!" }
+
+        return KoinServicesManager(this, context)
+    }
+}
+
+
+public inline fun KoinServicesManager(builder: KoinServicesManagerBuilder.() -> Unit): ServicesManager {
+    val b = KoinServicesManagerBuilder().apply(builder)
+    return b.build()
 }

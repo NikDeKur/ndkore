@@ -6,10 +6,15 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
+@file:Suppress("NOTHING_TO_INLINE")
+
 package dev.nikdekur.ndkore.service.manager
 
 import dev.nikdekur.ndkore.ext.forEachSafe
-import dev.nikdekur.ndkore.service.*
+import dev.nikdekur.ndkore.service.CircularDependencyException
+import dev.nikdekur.ndkore.service.ClassIsNotServiceException
+import dev.nikdekur.ndkore.service.Service
+import dev.nikdekur.ndkore.service.ServiceNotFoundException
 import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlin.reflect.KClass
@@ -27,6 +32,8 @@ import kotlin.reflect.KClass
  * @see ServicesManager
  */
 public abstract class AbstractServicesManager : ServicesManager {
+
+    public abstract val builder: ServicesManagerBuilder<*>
 
     public val logger: KLogger = KotlinLogging.logger {}
 
@@ -59,8 +66,11 @@ public abstract class AbstractServicesManager : ServicesManager {
     }
 
 
-    public inline fun onEachService(block: (Service) -> Unit, onError: (Throwable, Service) -> Unit) {
-        sortServices().forEachSafe(onError, block)
+    public inline fun onEachService(operation: OnServiceOperation, block: (Service) -> Unit) {
+        sortServices().forEachSafe({ exception, service ->
+            val context = OnErrorContext(this, service, operation, exception)
+            builder.onErrorFunc(context)
+        }, block)
     }
 
 
@@ -72,11 +82,8 @@ public abstract class AbstractServicesManager : ServicesManager {
         state = ServicesManager.State.ENABLING
 
         onEachService(
-            block = { it.enable() },
-            onError = { e, s ->
-                logger.error(e) { "Error while enabling service '$s'!" }
-            }
-        )
+            OnServiceOperation.ENABLE
+        ) { it.enable() }
 
 
         state = ServicesManager.State.ENABLED
@@ -90,11 +97,8 @@ public abstract class AbstractServicesManager : ServicesManager {
         state = ServicesManager.State.DISABLING
 
         onEachService(
-            block = { it.disable() },
-            onError = { e, s ->
-                logger.error(e) { "Error while disabling service '$s'!" }
-            }
-        )
+            OnServiceOperation.DISABLE
+        ) { it.disable() }
 
         state = ServicesManager.State.DISABLED
     }
@@ -102,11 +106,8 @@ public abstract class AbstractServicesManager : ServicesManager {
 
     public suspend fun reload(service: Service) {
         onEachService(
-            block = { it.reload() },
-            onError = { e, s ->
-                logger.error(e) { "Error while reloading service '$s'!" }
-            }
-        )
+            OnServiceOperation.RELOAD
+        ) { it.reload() }
     }
 
 
@@ -200,3 +201,20 @@ public abstract class AbstractServicesManager : ServicesManager {
         }
     }
 }
+
+
+public abstract class ServicesManagerBuilder<R : ServicesManager> {
+
+    public var onErrorFunc: OnErrorContext.() -> Unit = {
+        manager.logger.error(exception) { "Error while `${operation.name.lowercase()}` service ${service::class.simpleName}" }
+    }
+
+    public fun onError(block: OnErrorContext.() -> Unit) {
+        onErrorFunc = block
+    }
+
+    public abstract fun build(): R
+}
+
+
+public inline fun ServicesManagerBuilder<*>.throwOnError() = onError { throw exception }

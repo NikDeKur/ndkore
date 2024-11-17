@@ -17,7 +17,7 @@ class RuntimeServicesManagerTest : ServicesManagerTest() {
 
     @BeforeTest
     fun setUp() {
-        val manager = RuntimeServicesManager()
+        val manager = RuntimeServicesManager {}
         app = TestApp(manager, true)
     }
 }

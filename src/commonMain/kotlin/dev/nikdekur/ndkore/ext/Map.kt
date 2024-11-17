@@ -352,7 +352,7 @@ public inline fun <K, V> Map<K, V>.any(action: Map.Entry<K, V>.() -> Boolean): B
  * @return value or null if not found
  */
 @Suppress("UNCHECKED_CAST")
-public fun Map<String, Any>.getNested(keys: Iterable<String>): Any? {
+public fun Map<String, Any?>.getNested(keys: Iterable<String>): Any? {
     var current: Any? = this
     for (key in keys) {
         if (current !is Map<*, *>) return null
@@ -360,6 +360,50 @@ public fun Map<String, Any>.getNested(keys: Iterable<String>): Any? {
     }
     return current
 }
+
+
+/**
+ * Set nested value in a map
+ *
+ * Will split key by separator and set value in nested maps step by step
+ *
+ * If any of the keys are not found, will create a new map
+ *
+ * Example:
+ * - map: { "a": { "b": { "c": 1 } } }
+ * - key: listOf("a", "b", "d")
+ * - value: 2
+ * - result: { "a": { "b": { "c": 1, "d": 2 } } }
+ *
+ * @param keys key to set
+ * @param value value to set
+ */
+public fun MutableMap<String, Any?>.setNested(keys: Iterable<String>, value: Any) {
+    var current = this
+    val iterator = keys.iterator()
+
+    // Iterate over the keys
+    while (iterator.hasNext()) {
+        val key = iterator.next()
+
+        // If the key is the last one, set the value
+        if (!iterator.hasNext()) {
+            current[key] = value
+            return
+        }
+
+        // Check if the key is already a map
+        if (current[key] !is MutableMap<*, *>) {
+            current[key] = mutableMapOf<String, Any?>()
+        }
+
+        // Move to the next level
+        @Suppress("UNCHECKED_CAST")
+        current = current[key] as MutableMap<String, Any?>
+    }
+}
+
+
 
 /**
  * Call [block] for each entry in the map and clear the map

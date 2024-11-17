@@ -20,7 +20,9 @@ class KoinServicesManagerTest : ServicesManagerTest() {
     fun setUp() {
         val context = SimpleKoinContext()
         context.startKoin {}
-        val manager = KoinServicesManager(context)
+        val manager = KoinServicesManager {
+            context(context)
+        }
         app = TestApp(manager, true)
     }
 }

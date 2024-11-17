@@ -151,3 +151,15 @@ public inline fun <reified C : Any> ServicesManager.getServiceOrNull() = getServ
  * @throws ServiceNotFoundException If the service is not found.
  */
 public inline fun <reified C : Any> ServicesManager.getService() = getService(C::class)
+
+
+public enum class OnServiceOperation {
+    ENABLE, DISABLE, RELOAD
+}
+
+public data class OnErrorContext(
+    val manager: AbstractServicesManager,
+    val service: Service,
+    val operation: OnServiceOperation,
+    val exception: Throwable
+)

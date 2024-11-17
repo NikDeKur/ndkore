@@ -68,8 +68,10 @@ import kotlin.reflect.KClass
  * @property servicesMap Map of services to store and manage
  */
 public open class RuntimeServicesManager(
-    public val servicesMap: MutableMap<String, Service> = LinkedHashMap()
+    override val builder: ServicesManagerBuilder<*>,
+    public val servicesMap: MutableMap<String, Service>
 ) : AbstractServicesManager() {
+
 
     public open fun classId(clazz: KClass<*>): String = clazz.toString()
 
@@ -98,4 +100,23 @@ public open class RuntimeServicesManager(
     override fun <C : Any> getService(serviceClass: KClass<out C>): C {
         return getServiceOrNull(serviceClass) ?: throw ServiceNotFoundException(serviceClass)
     }
+}
+
+
+public open class RuntimeServicesManagerBuilder : ServicesManagerBuilder<RuntimeServicesManager>() {
+    public var actualServicesMap: MutableMap<String, Service>? = null
+
+    public fun servicesMap(map: MutableMap<String, Service>) {
+        actualServicesMap = map
+    }
+
+    override fun build(): RuntimeServicesManager {
+        val map = actualServicesMap ?: mutableMapOf()
+        return RuntimeServicesManager(this, map)
+    }
+}
+
+public inline fun RuntimeServicesManager(builder: RuntimeServicesManagerBuilder.() -> Unit): ServicesManager {
+    val b = RuntimeServicesManagerBuilder().apply(builder)
+    return b.build()
 }

@@ -29,7 +29,7 @@ public inline fun TimeSource.measureAverageTime(iterations: Int, operation: (Int
         totalTime += startTime.elapsedNow()
         index++
     }
-    return totalTime
+    return totalTime / iterations
 }
 
 /**
@@ -41,8 +41,8 @@ public inline fun TimeSource.measureAverageTime(iterations: Int, operation: (Int
  */
 public inline fun TimeSource.printAverageExecTime(iterations: Int, text: String, operation: (Int) -> Unit) {
     val time = measureAverageTime(iterations, operation)
-    val elapsedTime = time / 1_000_000
-    println("$text: ${elapsedTime.inWholeMilliseconds.format(6)} ms")
+    val nanos = time.inWholeNanoseconds / 1_000_000.0
+    println("$text: ${nanos.format(6)} ms")
 }
 
 /**
@@ -66,7 +66,8 @@ public inline fun <T> TimeSource.printExecTime(text: String, operation: () -> T)
     val startTime = markNow()
     val r = operation()
     val elapsedTime = startTime.elapsedNow()
-    println("$text: ${elapsedTime.inWholeMilliseconds.format(6)} ms")
+    val nanos = elapsedTime.inWholeNanoseconds / 1_000_000.0
+    println("$text: ${nanos.format(6)} ms")
     return r
 }
 

@@ -8,8 +8,7 @@
 
 package dev.nikdekur.ndkore.service.manager
 
-import dev.nikdekur.ndkore.service.Service
-import dev.nikdekur.ndkore.service.ServicesComponent
+import dev.nikdekur.ndkore.service.*
 import kotlin.reflect.KClass
 
 /**
@@ -55,10 +54,9 @@ public interface ServicesManager : ServicesComponent {
      * If some service is already registered with the same class, it will be replaced
      * and the old service will be disabled (if manager is enabled).
      *
-     * @param service The service to be registered.
-     * @param bindTo One or more classes to which the service should be bound.
+     * @param definition The service definition to register.
      */
-    public suspend fun <C : Any, S> registerService(service: S, vararg bindTo: KClass<out C>) where S : C
+    public suspend fun registerService(definition: Definition<*>)
 
     /**
      * Retrieves a service by its class, or returns null if it is not found.
@@ -72,7 +70,10 @@ public interface ServicesManager : ServicesComponent {
      * @param serviceClass The KClass of the service to retrieve.
      * @return The service instance, or null if not found.
      */
-    public fun <C : Any> getServiceOrNull(serviceClass: KClass<out C>): C?
+    public fun <C : Any> getServiceOrNull(
+        serviceClass: KClass<out C>,
+        qualifier: Qualifier = Qualifier.Empty
+    ): C?
 
     /**
      * Retrieves a service by its class.
@@ -85,12 +86,15 @@ public interface ServicesManager : ServicesComponent {
      * @return The service instance.
      * @throws ServiceNotFoundException If the service is not found.
      */
-    public fun <C : Any> getService(serviceClass: KClass<out C>): C
+    public fun <C : Any> getService(
+        serviceClass: KClass<out C>,
+        qualifier: Qualifier = Qualifier.Empty
+    ): C
 
     /**
      * Enable service manager.
      *
-     * This method will enable all registered services ([AbstractService.doEnable])
+     * This method will enable all registered services ([Service.enable])
      * and will enable every service in the correct order to satisfy all dependencies.
      */
     public suspend fun enable()
@@ -98,7 +102,7 @@ public interface ServicesManager : ServicesComponent {
     /**
      * Disable service manager.
      *
-     * This method will disable all registered services ([AbstractService.doDisable])
+     * This method will disable all registered services ([Service.disable])
      * and will disable every service in the correct order to satisfy all dependencies.
      */
     public suspend fun disable()
@@ -129,28 +133,6 @@ public interface ServicesManager : ServicesComponent {
         DISABLED
     }
 }
-
-/**
- * Retrieves a service by its class, or returns null if it is not found.
- *
- * This extension function simplifies the retrieval of services by using reified generics to infer the service class.
- *
- * @param C The type of the service to retrieve.
- * @return The service instance, or null if not found.
- */
-public inline fun <reified C : Any> ServicesManager.getServiceOrNull() = getServiceOrNull(C::class)
-
-/**
- * Retrieves a service by its class.
- *
- * This extension function simplifies the retrieval of services by using reified generics to infer the service class.
- * It will return the service instance if found, or throw a [ServiceNotFoundException] if not found.
- *
- * @param C The type of the service to retrieve.
- * @return The service instance.
- * @throws ServiceNotFoundException If the service is not found.
- */
-public inline fun <reified C : Any> ServicesManager.getService() = getService(C::class)
 
 
 public enum class OnServiceOperation {

@@ -142,5 +142,5 @@ public interface KDTree<T> {
     public fun rangeSearch(min: Point, max: Point): List<T>
 }
 
-public inline fun KDTree<*>.isEmpty() = size == 0
-public inline fun KDTree<*>.isNotEmpty() = !isEmpty()
+public inline fun KDTree<*>.isEmpty(): Boolean = size == 0
+public inline fun KDTree<*>.isNotEmpty(): Boolean = !isEmpty()

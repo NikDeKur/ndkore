@@ -9,16 +9,14 @@
 package dev.nikdekur.ndkore.service
 
 import dev.nikdekur.ndkore.service.manager.ServicesManager
-import dev.nikdekur.ndkore.service.manager.getService
-import dev.nikdekur.ndkore.service.manager.getServiceOrNull
 import kotlin.properties.ReadOnlyProperty
 
 /**
  * # Services Component
  *
- * Represents a component that has access to a [dev.nikdekur.ndkore.service.manager.ServicesManager].
+ * Represents a component that has access to a [ServicesManager].
  *
- * This interface is shortcut for accessing components from a [dev.nikdekur.ndkore.service.manager.ServicesManager].
+ * This interface is shortcut for accessing components from a [ServicesManager].
  *
  * ### Example Usage:
  * ```kotlin
@@ -28,7 +26,7 @@ import kotlin.properties.ReadOnlyProperty
  * }
  * ```
  *
- * @see dev.nikdekur.ndkore.service.manager.ServicesManager
+ * @see ServicesManager
  */
 public interface ServicesComponent {
 
@@ -46,19 +44,23 @@ public interface ServicesComponent {
  * @param C The type of the service to retrieve.
  * @return The service instance, or null if not found.
  */
-public inline fun <reified C : Any> ServicesComponent.getOrNull() = manager.getServiceOrNull<C>()
+public inline fun <reified C : Any> ServicesComponent.getOrNull(
+    qualifier: Qualifier = Qualifier.Empty
+): C? = manager.getServiceOrNull(C::class, qualifier)
 
 /**
  * Retrieves a service by its class.
  *
  * This extension function simplifies the retrieval of services by using reified generics to infer the service class.
- * It will return the service instance if found, or throw a [ServiceNotFoundException] if not found.
+ * It will return the service instance if found, or throw a [DependentServiceNotFoundException] if not found.
  *
  * @param C The type of the service to retrieve.
  * @return The service instance.
- * @throws ServiceNotFoundException If the service is not found.
+ * @throws DependentServiceNotFoundException If the service is not found.
  */
-public inline fun <reified C : Any> ServicesComponent.get() = manager.getService<C>()
+public inline fun <reified C : Any> ServicesComponent.get(
+    qualifier: Qualifier = Qualifier.Empty
+): C = manager.getService(C::class, qualifier)
 
 /**
  * Return a property delegate that provides a service instance.
@@ -68,8 +70,10 @@ public inline fun <reified C : Any> ServicesComponent.get() = manager.getService
  * @param C The type of the service to inject.
  * @return A property delegate that provides the service instance, which might return null if no service found.
  */
-public inline fun <reified C : Any> ServicesComponent.injectOrNull() =
-    ReadOnlyProperty<Any?, C?> { _, _ -> getOrNull() }
+public inline fun <reified C : Any> ServicesComponent.injectOrNull(
+    qualifier: Qualifier = Qualifier.Empty
+): ReadOnlyProperty<Any?, C?> =
+    ReadOnlyProperty { _, _ -> getOrNull(qualifier) }
 
 /**
  * Return a property delegate that provides a service instance.
@@ -78,8 +82,10 @@ public inline fun <reified C : Any> ServicesComponent.injectOrNull() =
  *
  * @param C The type of the service to inject.
  * @return A property delegate that provides the service instance.
- * @throws ServiceNotFoundException If the service is not found.
+ * @throws DependentServiceNotFoundException If the service is not found.
  */
-public inline fun <reified C : Any> ServicesComponent.inject() = ReadOnlyProperty<Any?, C> { _, _ -> get() }
+public inline fun <reified C : Any> ServicesComponent.inject(
+    qualifier: Qualifier = Qualifier.Empty
+): ReadOnlyProperty<Any?, C> = ReadOnlyProperty { _, _ -> get(qualifier) }
 
 

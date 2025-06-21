@@ -281,3 +281,21 @@ public inline fun ByteArray.writeFloat(index: Int, value: Float) {
 public inline fun ByteArray.writeDouble(index: Int, value: Double) {
     writeLong(index, value.toBits())
 }
+
+
+/**
+ * Compares two byte arrays in constant time.
+ *
+ * This function checks if two byte arrays are equal in a way that is resistant to timing attacks.
+ *
+ * @param other The byte array to compare with.
+ * @return `true` if the byte arrays are equal, `false` otherwise.
+ */
+public fun ByteArray.constantTimeEquals(other: ByteArray): Boolean {
+    if (this.size != other.size) return false
+    var result = 0
+    for (i in indices) {
+        result = result or (this[i].toInt() xor other[i].toInt())
+    }
+    return result == 0
+}

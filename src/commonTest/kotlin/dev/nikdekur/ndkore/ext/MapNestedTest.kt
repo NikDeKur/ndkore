@@ -35,6 +35,23 @@ class MapNestedTest {
         assertEquals(null, value)
     }
 
+    @Test
+    fun getNestedIntegerKeyTest() {
+        val map = mapOf(2 to mapOf(1 to "value"))
+        val value = map.getNested(listOf(2, 1))
+        assertEquals("value", value)
+    }
+
+    @Test
+    fun getNestedIntegerKeyStringTest() {
+        val map = mapOf(2 to mapOf("1" to "value"))
+        val value = map.getNested(listOf(2, "1"))
+        assertEquals("value", value)
+    }
+
+
+
+
 
     @Test
     fun setNestedSingleTest() {
@@ -48,5 +65,19 @@ class MapNestedTest {
         val map = mutableMapOf<String, Any?>()
         map.setNested(listOf("key1", "key2"), "value")
         assertEquals<Any>(mapOf("key1" to mapOf("key2" to "value")), map)
+    }
+
+    @Test
+    fun setNestedIntegerKeyTest() {
+        val map = mutableMapOf<String, Any?>()
+        map.setNested(listOf(2, 1), "value")
+        assertEquals<Any>(mapOf(2 to mapOf(1 to "value")), map)
+    }
+
+    @Test
+    fun setNestedIntegerKeyStringTest() {
+        val map = mutableMapOf<String, Any?>()
+        map.setNested(listOf(2, "1"), "value")
+        assertEquals<Any>(mapOf(2 to mapOf("1" to "value")), map)
     }
 }

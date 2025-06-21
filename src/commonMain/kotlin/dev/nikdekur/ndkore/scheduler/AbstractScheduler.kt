@@ -61,7 +61,7 @@ public abstract class AbstractScheduler : Scheduler {
     }
 
     override fun cancelAllTasks() {
-        tasks.values.forEach(SchedulerTask::cancel)
+        tasks.values.toList().forEach(SchedulerTask::cancel)
         tasks.clear()
     }
 }

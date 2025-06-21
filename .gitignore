@@ -12,6 +12,9 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
+### Fleet ###
+.fleet/
+
 ### Eclipse ###
 .apt_generated
 .classpath
@@ -43,3 +46,8 @@ bin/
 build/
 **/build/*
 !**/build/generated/
+
+### KMP ###
+kotlin-js-store/
+node_modules/
+yarn.lock

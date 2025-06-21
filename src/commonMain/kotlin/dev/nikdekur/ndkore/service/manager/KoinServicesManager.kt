@@ -12,12 +12,16 @@ package dev.nikdekur.ndkore.service.manager
 
 import dev.nikdekur.ndkore.ext.loadModule
 import dev.nikdekur.ndkore.ext.single
+import dev.nikdekur.ndkore.service.Definition
+import dev.nikdekur.ndkore.service.Qualifier
 import dev.nikdekur.ndkore.service.Service
 import dev.nikdekur.ndkore.service.ServiceNotFoundException
 import org.koin.core.context.KoinContext
 import org.koin.core.error.NoDefinitionFoundException
 import org.koin.core.module.Module
-import org.koin.dsl.bind
+import org.koin.core.qualifier.StringQualifier
+import org.koin.core.qualifier.qualifier
+import org.koin.dsl.binds
 import kotlin.reflect.KClass
 
 /**
@@ -85,36 +89,38 @@ public class KoinServicesManager(
     public val context: KoinContext
 ) : AbstractServicesManager() {
 
-    override suspend fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
-        super.registerService(service, *bindTo)
+    override suspend fun registerService(definition: Definition<*>) {
+        super.registerService(definition)
         context.loadModule {
-            reg<Any>(service as Service, *bindTo)
+            reg<Any>(definition.service as Service, definition.qualifier, definition.bindTo)
         }
     }
-
 
     @Suppress("UNCHECKED_CAST")
-    public inline fun <I : Any> Module.reg(service: Service, vararg bindTo: KClass<*>) {
+    public inline fun <I : Any> Module.reg(service: Service, qualifier: Qualifier, bindTo: Iterable<KClass<*>>) {
         val moduleClass = service::class as KClass<I>
         val service = service as I
-        val definition = single(clazz = moduleClass) { service }
-        bindTo.forEach {
-            definition bind it as KClass<I>
-        }
+
+        val qualifier = qualifier.toKoinQualifier()
+        val definition = single(clazz = moduleClass, qualifier = qualifier) { service }
+        definition binds bindTo.toList().toTypedArray()
     }
 
-    override fun <C : Any> getServiceOrNull(serviceClass: KClass<out C>): C? {
-        return context.get().getOrNull(serviceClass)
+    override fun <C : Any> getServiceOrNull(serviceClass: KClass<out C>, qualifier: Qualifier): C? {
+        return context.get().getOrNull(serviceClass, qualifier = qualifier.toKoinQualifier())
     }
 
-    override fun <C : Any> getService(serviceClass: KClass<out C>): C {
+
+    override fun <C : Any> getService(serviceClass: KClass<out C>, qualifier: Qualifier): C {
         return try {
-            context.get().get(serviceClass)
+            context.get().get(serviceClass, qualifier = qualifier.toKoinQualifier())
         } catch (e: NoDefinitionFoundException) {
-            throw ServiceNotFoundException(serviceClass)
+            throw ServiceNotFoundException(serviceClass, qualifier)
         }
     }
 }
+
+public inline fun Qualifier.toKoinQualifier(): StringQualifier? = if (value.isEmpty()) null else qualifier(value)
 
 
 public open class KoinServicesManagerBuilder : ServicesManagerBuilder<KoinServicesManager>() {

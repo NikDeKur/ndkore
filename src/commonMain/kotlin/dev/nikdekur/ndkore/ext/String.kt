@@ -27,7 +27,7 @@ public inline fun String.match(condition: MatchCondition, otherString: String): 
     return condition.match(this, otherString)
 }
 
-public inline fun String.asCamelCaseGetter() =
+public inline fun String.asCamelCaseGetter(): String =
     if (this.isEmpty()) {
         "get"
     } else {
@@ -77,4 +77,15 @@ public inline fun String.capitalizeFirstLetter(): String {
     } else {
         this[0].uppercase() + this.substring(1)
     }
+}
+
+
+@OptIn(ExperimentalStdlibApi::class)
+public inline fun ByteArray.toHEX(): String {
+    return toHexString(HexFormat.Default)
+}
+
+@OptIn(ExperimentalStdlibApi::class)
+public inline fun String.fromHEX(): ByteArray {
+    return hexToByteArray(HexFormat.Default)
 }

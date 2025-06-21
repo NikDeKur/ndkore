@@ -1,17 +1,18 @@
 [versions]
-kotlin = "2.1.0-RC"
-kotlinx-coroutines = "1.9.0"
-kotlinx-serialization = "1.7.3"
-kotlinx-datetime = "0.6.1"
-kotlinx-io = "0.5.4"
-kotlin-logging = "7.0.0"
+kotlin = "2.2.0-RC3"
+kotlinx-coroutines = "1.10.2"
+kotlinx-serialization = "1.8.1"
+kotlinx-datetime = "0.6.2"
+kotlinx-io = "0.7.0"
+kotlin-logging = "7.0.7"
 stately = "2.1.0"
 bignum = "0.3.10"
-google-guava = "33.3.1-jre"
-slf4j = "2.0.16"
+google-guava = "33.4.8-jre"
+slf4j = "2.0.17"
 licenser = "0.6.1"
-kaml = "0.61.0"
-koin = "4.0.0"
+kaml = "0.65.0"
+koin = "4.1.0"
+lz4 = "1.8.0"
 
 [libraries]
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
@@ -23,12 +24,14 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io" }
 kotlin-logging = { module = "io.github.oshai:kotlin-logging", version.ref = "kotlin-logging" }
 stately-concurrency = { module = "co.touchlab:stately-concurrency", version.ref = "stately" }
+stately-concurrent-collections = { module = "co.touchlab:stately-concurrent-collections", version.ref = "stately" }
 bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
 google-guava = { module = "com.google.guava:guava", version.ref = "google-guava" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
 koin = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+lz4 = { module = "org.lz4:lz4-java", version.ref = "lz4" }
 
 [plugins]
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

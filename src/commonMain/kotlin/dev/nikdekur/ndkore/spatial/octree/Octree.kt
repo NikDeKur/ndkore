@@ -9,6 +9,7 @@
 package dev.nikdekur.ndkore.spatial.octree
 
 import dev.nikdekur.ndkore.spatial.Point
+import dev.nikdekur.ndkore.spatial.Shape
 
 /**
  * # Octree Interface
@@ -33,7 +34,7 @@ import dev.nikdekur.ndkore.spatial.Point
  * val foundObjects = octree.find(point)
  * ```
  */
-public interface Octree<T> : Iterable<T> {
+public interface Octree<T : Shape> : Iterable<T> {
 
     /**
      * The minimum point (corner) of the Octree.
@@ -70,7 +71,7 @@ public interface Octree<T> : Iterable<T> {
      * @param point The point to search for.
      * @return A collection of node data objects that contain the given point.
      */
-    public fun findNodes(point: Point): Collection<NodeData<T>>
+    public fun findNodes(point: Point): Collection<T>
 
     /**
      * Finds all elements within the specified radius from the given point.
@@ -94,7 +95,7 @@ public interface Octree<T> : Iterable<T> {
      * @param radius The radius within which to search for node data objects.
      * @return A collection of node data objects within the specified radius from the given point.
      */
-    public fun findNodesNearby(point: Point, radius: Double): Collection<NodeData<T>>
+    public fun findNodesNearby(point: Point, radius: Double): Collection<T>
 
     /**
      * Finds all elements within the specified region defined by the min and max points.
@@ -118,5 +119,5 @@ public interface Octree<T> : Iterable<T> {
      * @param max The maximum point defining the region.
      * @return A collection of node data objects within the specified region.
      */
-    public fun findNodesInRegion(min: Point, max: Point): Collection<NodeData<T>>
+    public fun findNodesInRegion(min: Point, max: Point): Collection<T>
 }

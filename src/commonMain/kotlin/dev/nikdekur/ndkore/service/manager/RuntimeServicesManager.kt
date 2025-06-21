@@ -6,10 +6,15 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
+@file:Suppress("NOTHING_TO_INLINE")
+
 package dev.nikdekur.ndkore.service.manager
 
+import dev.nikdekur.ndkore.service.Definition
+import dev.nikdekur.ndkore.service.Qualifier
 import dev.nikdekur.ndkore.service.Service
 import dev.nikdekur.ndkore.service.ServiceNotFoundException
+import org.koin.ext.getFullName
 import kotlin.reflect.KClass
 
 /**
@@ -73,32 +78,48 @@ public open class RuntimeServicesManager(
 ) : AbstractServicesManager() {
 
 
-    public open fun classId(clazz: KClass<*>): String = clazz.toString()
+    public open fun classId(clazz: KClass<*>): String {
+        // Not great, that we have to use Koin's internal function to get the full name
+        return clazz.getFullName()
+    }
 
-    override suspend fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
-        super.registerService(service, *bindTo)
 
-        service as Service
+    public open fun definitionId(serviceClass: KClass<*>, qualifier: Qualifier): String {
+        val classId = classId(serviceClass)
+        val qualifierId = qualifier.value
+        return "$classId:$qualifierId"
+    }
+
+    public inline fun definitionId(definition: Definition<*>): String =
+        definitionId(definition.service::class, definition.qualifier)
+
+
+    override suspend fun registerService(definition: Definition<*>) {
+        super.registerService(definition)
+
+        val service = definition.service as Service
+        val qualifier = definition.qualifier
+        val bindTo = definition.bindTo
 
         bindTo.forEach { clazz ->
-            val id = classId(clazz)
-            servicesMap[id] = service
+            val id = definitionId(clazz, qualifier)
+            servicesMap.put(id, service)
         }
 
-        val id = classId(service::class)
+        val id = definitionId(definition)
         servicesMap[id] = service
     }
 
-    override fun <C : Any> getServiceOrNull(serviceClass: KClass<out C>): C? {
-        val id = classId(serviceClass)
+    override fun <C : Any> getServiceOrNull(serviceClass: KClass<out C>, qualifier: Qualifier): C? {
+        val id = definitionId(serviceClass, qualifier)
         val service = servicesMap[id] ?: return null
 
         @Suppress("UNCHECKED_CAST", "kotlin:S6531")
         return service as C
     }
 
-    override fun <C : Any> getService(serviceClass: KClass<out C>): C {
-        return getServiceOrNull(serviceClass) ?: throw ServiceNotFoundException(serviceClass)
+    override fun <C : Any> getService(serviceClass: KClass<out C>, qualifier: Qualifier): C {
+        return getServiceOrNull(serviceClass, qualifier) ?: throw ServiceNotFoundException(serviceClass, qualifier)
     }
 }
 

@@ -12,6 +12,7 @@ package dev.nikdekur.ndkore.spatial.octree
 
 import dev.nikdekur.ndkore.spatial.Shape
 
+
 /**
  * # MutableOctree Interface
  *
@@ -28,7 +29,7 @@ import dev.nikdekur.ndkore.spatial.Shape
  * mutableOctree.insert(data)
  * ```
  */
-public interface MutableOctree<T> : Octree<T> {
+public interface MutableOctree<T : Shape> : Octree<T> {
 
     /**
      * Inserts a new node data object into the Octree.
@@ -37,19 +38,23 @@ public interface MutableOctree<T> : Octree<T> {
      *
      * @param data The node data object to insert.
      */
-    public fun insert(data: NodeData<T>)
+    public fun insert(data: T)
+
 
     /**
-     * Inserts a new value with its corresponding shape into the Octree.
+     * Removes a node data object from the Octree.
      *
-     * This method creates a new node data object with the specified value and shape,
-     * and then inserts it into the Octree.
+     * This method removes the specified node data object from the Octree.
      *
-     * @param value The value to insert.
-     * @param shape The shape corresponding to the value.
+     * @param data The node data object to remove.
      */
-    public fun insert(value: T, shape: Shape<T>) {
-        val nodeData = NodeData(value, shape)
-        insert(nodeData)
-    }
+    public fun remove(data: T)
+
+
+    /**
+     * Clears the Octree.
+     *
+     * This method removes all data from the Octree.
+     */
+    public fun clear()
 }

@@ -18,35 +18,35 @@ import kotlin.reflect.KClass
  *
  * @return the result of squaring this number.
  */
-public inline fun Double.pow() = pow(2.0)
+public inline fun Double.pow(): Double = pow(2.0)
 
 /**
  * Computes the square root of this number.
  *
  * @return the square root of this number.
  */
-public inline fun Number.sqrt() = sqrt(this.toDouble())
+public inline fun Number.sqrt(): Double = sqrt(this.toDouble())
 
 /**
  * Computes the cube root of this number.
  *
  * @return the cube root of this number.
  */
-public inline fun Number.cbrt() = cbrt(this.toDouble())
+public inline fun Number.cbrt(): Double = cbrt(this.toDouble())
 
 /**
  * Computes the absolute value of this number.
  *
  * @return the absolute value of this number.
  */
-public inline fun Number.abs() = abs(this.toDouble())
+public inline fun Number.abs(): Double = abs(this.toDouble())
 
 /**
  * Rounds this number up to the nearest integer.
  *
  * @return the smallest integer greater than or equal to this number.
  */
-public inline fun Number.ceil() = ceil(this.toDouble())
+public inline fun Number.ceil(): Double = ceil(this.toDouble())
 
 /**
  * Rounds this number down to the nearest integer.
@@ -54,7 +54,7 @@ public inline fun Number.ceil() = ceil(this.toDouble())
  * @return the largest integer less than or equal to this number.
  */
 
-public inline fun Number.floor() = floor(this.toDouble())
+public inline fun Number.floor(): Double = floor(this.toDouble())
 
 //
 // TRIGONOMETRY
@@ -65,63 +65,63 @@ public inline fun Number.floor() = floor(this.toDouble())
  *
  * @return the sine of this number.
  */
-public inline fun Number.sin() = sin(this.toDouble())
+public inline fun Number.sin(): Double = sin(this.toDouble())
 
 /**
  * Computes the cosine of this number (in radians).
  *
  * @return the cosine of this number.
  */
-public inline fun Number.cos() = cos(this.toDouble())
+public inline fun Number.cos(): Double = cos(this.toDouble())
 
 /**
  * Computes the tangent of this number (in radians).
  *
  * @return the tangent of this number.
  */
-public inline fun Number.tan() = tan(this.toDouble())
+public inline fun Number.tan(): Double = tan(this.toDouble())
 
 /**
  * Computes the arc sine of this number.
  *
  * @return the arc sine of this number.
  */
-public inline fun Number.asin() = asin(this.toDouble())
+public inline fun Number.asin(): Double = asin(this.toDouble())
 
 /**
  * Computes the arc cosine of this number.
  *
  * @return the arc cosine of this number.
  */
-public inline fun Number.acos() = acos(this.toDouble())
+public inline fun Number.acos(): Double = acos(this.toDouble())
 
 /**
  * Computes the arc tangent of this number.
  *
  * @return the arc tangent of this number.
  */
-public inline fun Number.atan() = atan(this.toDouble())
+public inline fun Number.atan(): Double = atan(this.toDouble())
 
 /**
  * Computes the hyperbolic sine of this number.
  *
  * @return the hyperbolic sine of this number.
  */
-public inline fun Number.sinh() = sinh(this.toDouble())
+public inline fun Number.sinh(): Double = sinh(this.toDouble())
 
 /**
  * Computes the hyperbolic cosine of this number.
  *
  * @return the hyperbolic cosine of this number.
  */
-public inline fun Number.cosh() = cosh(this.toDouble())
+public inline fun Number.cosh(): Double = cosh(this.toDouble())
 
 /**
  * Computes the hyperbolic tangent of this number.
  *
  * @return the hyperbolic tangent of this number.
  */
-public inline fun Number.tanh() = tanh(this.toDouble())
+public inline fun Number.tanh(): Double = tanh(this.toDouble())
 
 
 public const val DEGREES_TO_RADIANS: Double = 0.017453292519943295
@@ -132,14 +132,14 @@ public const val RADIANS_TO_DEGREES: Double = 57.29577951308232
  *
  * @return the equivalent value of this number in degrees.
  */
-public inline fun Number.toDegrees() = this.toDouble() * RADIANS_TO_DEGREES
+public inline fun Number.toDegrees(): Double = this.toDouble() * RADIANS_TO_DEGREES
 
 /**
  * Converts this number from degrees to radians.
  *
  * @return the equivalent value of this number in radians.
  */
-public inline fun Number.toRadians() = this.toDouble() * DEGREES_TO_RADIANS
+public inline fun Number.toRadians(): Double = this.toDouble() * DEGREES_TO_RADIANS
 
 //
 // Mathematical Operators
@@ -151,7 +151,7 @@ public inline fun Number.toRadians() = this.toDouble() * DEGREES_TO_RADIANS
  * @param value the value to subtract from this number.
  * @return the result of subtracting the specified value from this number.
  */
-public inline operator fun Number.minus(value: Number) = this.toDouble() - value.toDouble()
+public inline operator fun Number.minus(value: Number): Double = this.toDouble() - value.toDouble()
 
 /**
  * Multiplies this number by the specified value.
@@ -159,7 +159,7 @@ public inline operator fun Number.minus(value: Number) = this.toDouble() - value
  * @param value the value to multiply this number by.
  * @return the result of multiplying this number by the specified value.
  */
-public inline operator fun Number.times(value: Number) = this.toDouble() * value.toDouble()
+public inline operator fun Number.times(value: Number): Double = this.toDouble() * value.toDouble()
 
 /**
  * Divides this number by the specified value.
@@ -167,7 +167,7 @@ public inline operator fun Number.times(value: Number) = this.toDouble() * value
  * @param value the value to divide this number by.
  * @return the result of dividing this number by the specified value.
  */
-public inline operator fun Number.div(value: Number) = this.toDouble() / value.toDouble()
+public inline operator fun Number.div(value: Number): Double = this.toDouble() / value.toDouble()
 
 /**
  * Computes the remainder of dividing this number by the specified value.
@@ -175,7 +175,7 @@ public inline operator fun Number.div(value: Number) = this.toDouble() / value.t
  * @param value the divisor.
  * @return the remainder of dividing this number by the specified value.
  */
-public inline operator fun Number.rem(value: Number) = this.toDouble() % value.toDouble()
+public inline operator fun Number.rem(value: Number): Double = this.toDouble() % value.toDouble()
 
 
 
@@ -185,7 +185,7 @@ public inline operator fun Number.rem(value: Number) = this.toDouble() % value.t
  * @param value the value to compare this number with.
  * @return a negative integer, zero, or a positive integer as this number is less than, equal to, or greater than the specified value.
  */
-public inline operator fun Number.compareTo(value: Number) = toDouble().compareTo(value.toDouble())
+public inline operator fun Number.compareTo(value: Number): Int = toDouble().compareTo(value.toDouble())
 
 /**
  * Casts this number to the specified type.
@@ -451,8 +451,7 @@ public val NUMBER_UNITS: Array<String> = arrayOf(
  * Converts this number to a human-readable string with units.
  *
  * @param rounding the number of decimal places.
- * @param roundingMode the rounding mode to apply.
- * @param formatSymbols the decimal format symbols to use.
+ * @param roundingMode the rounding mode to apply..
  * @param units the array of units to use.
  * @return the human-readable string representation of this number with units.
  */
@@ -496,42 +495,42 @@ public fun fromBeautifulString(string: String, units: Array<String> = NUMBER_UNI
  *
  * @return a list of Bytes.
  */
-public inline fun Iterable<Number>.toByte() = map { it.toByte() }
+public inline fun Iterable<Number>.toByte(): List<Byte> = map { it.toByte() }
 
 /**
  * Converts this Iterable of Numbers to a list of Shorts.
  *
  * @return a list of Shorts.
  */
-public inline fun Iterable<Number>.toShort() = map { it.toShort() }
+public inline fun Iterable<Number>.toShort(): List<Short> = map { it.toShort() }
 
 /**
  * Converts this Iterable of Numbers to a list of Ints.
  *
  * @return a list of Ints.
  */
-public inline fun Iterable<Number>.toInt() = map { it.toInt() }
+public inline fun Iterable<Number>.toInt(): List<Int> = map { it.toInt() }
 
 /**
  * Converts this Iterable of Numbers to a list of Longs.
  *
  * @return a list of Longs.
  */
-public inline fun Iterable<Number>.toLong() = map { it.toLong() }
+public inline fun Iterable<Number>.toLong(): List<Long> = map { it.toLong() }
 
 /**
  * Converts this Iterable of Numbers to a list of Floats.
  *
  * @return a list of Floats.
  */
-public inline fun Iterable<Number>.toFloat() = map { it.toFloat() }
+public inline fun Iterable<Number>.toFloat(): List<Float> = map { it.toFloat() }
 
 /**
  * Converts this Iterable of Numbers to a list of Doubles.
  *
  * @return a list of Doubles.
  */
-public inline fun Iterable<Number>.toDouble() = map { it.toDouble() }
+public inline fun Iterable<Number>.toDouble(): List<Double> = map { it.toDouble() }
 
 /**
  * Checks if this number is odd.
@@ -553,27 +552,50 @@ public inline fun Boolean.toByte(): Byte = if (this) 1 else 0
  *
  * @return true if this number is not zero, false otherwise.
  */
-public inline fun Number.toBoolean() = this != 0
+public inline fun Number.toBoolean(): Boolean = this != 0
+
+
 
 /**
- * Computes the squared distance between two points in 3D space.
+ * Calculates the squared distance between two points given by their individual coordinates in 3D space.
  *
- * @param fromX the x-coordinate of the first point.
- * @param fromY the y-coordinate of the first point.
- * @param fromZ the z-coordinate of the first point.
- * @param toX the x-coordinate of the second point.
- * @param toY the y-coordinate of the second point.
- * @param toZ the z-coordinate of the second point.
- * @return the squared distance between the two points.
+ * @param x1 The x-coordinate of the first point.
+ * @param y1 The y-coordinate of the first point.
+ * @param z1 The z-coordinate of the first point.
+ * @param x2 The x-coordinate of the second point.
+ * @param y2 The y-coordinate of the second point.
+ * @param z2 The z-coordinate of the second point.
+ * @return The squared distance between the two points.
  */
 public inline fun distanceSquared(
-    fromX: Double,
-    fromY: Double,
-    fromZ: Double,
-    toX: Double,
-    toY: Double,
-    toZ: Double
+    x1: Double, y1: Double, z1: Double,
+    x2: Double, y2: Double, z2: Double,
 ): Double {
-    return (toX - fromX).pow(2) + (toY - fromY).pow(2) + (toZ - fromZ).pow(2)
+    val a = x1 - x2
+    val b = y1 - y2
+    val c = z1 - z2
+    return a * a + b * b + c * c
 }
 
+
+/**
+ * Calculates the mean of the specified numbers.
+ *
+ * Mean is the average of a set of numbers.
+ *
+ * It is calculated by adding up all the numbers and then dividing the sum by the count of numbers.
+ *
+ * @param numbers the numbers to calculate the mean of.
+ * @return the mean of the specified numbers.
+ * @throws ArithmeticException if the count of numbers is zero.
+ * @see sum
+ */
+public inline fun mean(
+    vararg numbers: Number
+): Double {
+    var sum = 0.0
+    for (number in numbers) {
+        sum += number.toDouble()
+    }
+    return sum / numbers.size
+}

@@ -11,6 +11,7 @@
 package dev.nikdekur.ndkore.placeholder
 
 import dev.nikdekur.ndkore.reflect.ReflectMethod
+import dev.nikdekur.ndkore.reflect.ReflectMethod.NotFound
 
 /**
  * A concrete implementation of `PlaceholderParser` that uses regular expressions to find and replace placeholders
@@ -79,8 +80,8 @@ public open class PatternPlaceholderParser(
 
     public constructor(symbol: String, source: ReflectMethod) : this(symbol, symbol, source)
 
-    override fun parseExpression(pathRaw: String, placeholders: Map<String, Any?>): String? {
-        val parts = pathRaw.split(".")
+    override fun parseExpression(path: String, placeholders: Map<String, Any?>): String? {
+        val parts = path.split(".")
         var currentObject: Any? = placeholders[parts[0]] ?: return null
 
         if (parts.size == 1)
@@ -92,17 +93,8 @@ public open class PatternPlaceholderParser(
 
         for (partI in 1 until parts.size) {
             val part = parts[partI]
-            currentObject = if (currentObject is Iterable<*>) {
-                var found: Any? = null
-                for (item in currentObject) {
-                    found = source.findValue(item!!, part)
-                    if (found != null) break
-                }
-                found
-            } else {
-                source.findValue(currentObject!!, part)
-            }
-            if (currentObject == null) return null
+            currentObject = source.findValue(currentObject!!, part)
+            if (currentObject == NotFound) return path
         }
 
         return currentObject.toString()
@@ -128,5 +120,4 @@ public open class PatternPlaceholderParser(
 
         return sb.toString()
     }
-
 }

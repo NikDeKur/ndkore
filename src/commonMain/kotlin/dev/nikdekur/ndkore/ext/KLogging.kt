@@ -6,6 +6,7 @@ package dev.nikdekur.ndkore.ext
 import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.Level
 import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.time.TimeSource
 import kotlin.time.TimedValue
@@ -18,7 +19,7 @@ public inline fun <T> TimeSource.recordTimingImpl(
 ): TimedValue<T> {
 
     contract {
-        callsInPlace(block, kotlin.contracts.InvocationKind.EXACTLY_ONCE)
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
 
 
@@ -33,21 +34,21 @@ public inline fun <T> TimeSource.recordTimingImpl(
 }
 
 
-public inline fun KLogger.log(level: Level, msg: String) = at(level) {
+public inline fun KLogger.log(level: Level, msg: String): Unit = at(level) {
     message = msg
 }
 
-public inline fun KLogger.log(level: Level, msg: () -> String) = log(level, msg())
+public inline fun KLogger.log(level: Level, msg: () -> String): Unit = log(level, msg())
 
 
-public inline fun KLogger.log(level: Level, throwable: Throwable, msg: String) =
+public inline fun KLogger.log(level: Level, throwable: Throwable, msg: String): Unit =
     at(level) {
         message = msg
         cause = throwable
     }
 
 
-public inline fun KLogger.log(level: Level, throwable: Throwable, crossinline msg: () -> String) =
+public inline fun KLogger.log(level: Level, throwable: Throwable, crossinline msg: () -> String): Unit =
     log(level, throwable, msg())
 
 

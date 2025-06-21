@@ -125,6 +125,7 @@ public open class CoroutineScheduler(
 
 
     override fun shutdown() {
+
         cancelAllTasks()
         scope.cancel()
     }
@@ -139,7 +140,7 @@ public open class CoroutineScheduler(
          */
         @JvmStatic
         public inline fun fromSupervisor(context: CoroutineContext): CoroutineScheduler =
-            CoroutineScheduler(CoroutineScope(context + SupervisorJob()))
+            CoroutineScheduler(CoroutineScope(context + SupervisorJob() + CoroutineName("CoroutineScheduler")))
 
         /**
          * A globally available [CoroutineScheduler] using the [GlobalScope].

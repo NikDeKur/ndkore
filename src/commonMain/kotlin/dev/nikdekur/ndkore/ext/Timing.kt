@@ -51,7 +51,7 @@ public inline fun TimeSource.printAverageExecTime(iterations: Int, text: String,
  * @param iterations The number of times the operation should be executed.
  * @param operation The operation to measure, accepting the current iteration index as a parameter.
  */
-public inline fun TimeSource.printAverageExecTime(iterations: Int, operation: (Int) -> Unit) =
+public inline fun TimeSource.printAverageExecTime(iterations: Int, operation: (Int) -> Unit): Unit =
     printAverageExecTime(iterations, "Execution time", operation)
 
 /**
@@ -78,4 +78,4 @@ public inline fun <T> TimeSource.printExecTime(text: String, operation: () -> T)
  * @param operation The operation to measure the execution time for.
  * @return The result of the operation.
  */
-public inline fun <T> TimeSource.printExecTime(operation: () -> T) = printExecTime("Execution time", operation)
+public inline fun <T> TimeSource.printExecTime(operation: () -> T): T = printExecTime("Execution time", operation)

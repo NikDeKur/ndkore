@@ -11,30 +11,35 @@
 package dev.nikdekur.ndkore.memory
 
 import com.ionspin.kotlin.bignum.integer.BigInteger
+import com.ionspin.kotlin.bignum.integer.toBigInteger
+import dev.nikdekur.ndkore.ext.BigIntegerSerializer
+import kotlinx.serialization.Serializable
+import kotlin.jvm.JvmInline
 
 
 /**
- * Represents an amount of memory in a specific unit.
+ * # MemoryAmount
  *
- * The `MemoryAmount` class allows for various memory-related operations such as addition, subtraction, multiplication,
- * division, and comparison. It also supports conversion between different memory units.
+ * Represents an amount of memory.
+ * Each memory amount is defined by the number of bytes it contains.
  *
- * ### Example usage
+ * The `MemoryAmount` class provides a unified way to handle different amounts of memory
+ * and offers a set of arithmetic operations for memory-related calculations.
  *
+ * This class is particularly useful when working with memory-related calculations, conversions, and comparisons.
+ *
+ * ### Example usage with `MemoryUnit`
  * ```kotlin
- * val memoryInBytes = MemoryAmount(MemoryUnit.Byte, BigInteger.valueOf(1024))
- * val memoryInKB = memoryInBytes.convertTo(MemoryUnit.KB)
- * println(memoryInKB) // Output: MemoryAmount(unit=KB, amount=1)
+ * val memory = MemoryAmount(BigInteger.valueOf(1024))
+ * val memoryInKiB = memory.toBigInteger(MemoryUnit.KiB)
+ * println("Memory in KiB: $memoryInKiB") // 1 KiB
  * ```
- *
- * ### Properties
- *
- * @property unit The unit of memory (e.g., bytes, kilobytes).
- * @property amount The amount of memory in the specified unit.
  */
-public data class MemoryAmount(
-    val unit: MemoryUnit,
-    val amount: BigInteger,
+@JvmInline
+@Serializable
+public value class MemoryAmount(
+    @Serializable(with = BigIntegerSerializer::class)
+    public val bytes: BigInteger,
 ) : Comparable<MemoryAmount> {
 
     /**
@@ -44,17 +49,17 @@ public data class MemoryAmount(
      * @return A new `MemoryAmount` representing the sum.
      */
     public operator fun plus(memory: MemoryAmount): MemoryAmount {
-        return MemoryAmount(unit, amount + memory.amount)
+        return MemoryAmount(bytes + memory.bytes)
     }
 
     /**
      * Subtracts the specified memory amount from this memory amount.
      *
-     * @param memory The memory amount to subtract.
+     * @param memory The memory amounts to subtract.
      * @return A new `MemoryAmount` representing the difference.
      */
     public operator fun minus(memory: MemoryAmount): MemoryAmount {
-        return MemoryAmount(unit, amount - memory.amount)
+        return MemoryAmount(bytes - memory.bytes)
     }
 
     /**
@@ -64,7 +69,7 @@ public data class MemoryAmount(
      * @return A new `MemoryAmount` representing the product.
      */
     public operator fun times(memory: MemoryAmount): MemoryAmount {
-        return MemoryAmount(unit, amount * memory.amount)
+        return MemoryAmount(bytes * memory.bytes)
     }
 
     /**
@@ -74,17 +79,17 @@ public data class MemoryAmount(
      * @return A new `MemoryAmount` representing the quotient.
      */
     public operator fun div(memory: MemoryAmount): MemoryAmount {
-        return MemoryAmount(unit, amount / memory.amount)
+        return MemoryAmount(bytes / memory.bytes)
     }
 
     /**
-     * Calculates the remainder of the division of this memory amount by the specified memory amount.
+     * Calculates the remainder after the division of this memory amount by the specified memory amount.
      *
      * @param memory The memory amount to divide by.
      * @return A new `MemoryAmount` representing the remainder.
      */
     public operator fun rem(memory: MemoryAmount): MemoryAmount {
-        return MemoryAmount(unit, amount % memory.amount)
+        return MemoryAmount(bytes % memory.bytes)
     }
 
     /**
@@ -94,43 +99,144 @@ public data class MemoryAmount(
      * @return A negative integer, zero, or a positive integer as this memory amount is less than, equal to, or greater than the specified memory amount.
      */
     override operator fun compareTo(other: MemoryAmount): Int {
-        return amount.compareTo(other.amount)
-    }
-
-    /**
-     * Converts this memory amount to the specified memory unit.
-     *
-     * @param unit The memory unit to convert to.
-     * @return A new `MemoryAmount` representing the converted amount.
-     */
-    public fun convertTo(unit: MemoryUnit): MemoryAmount {
-        if (this.unit == unit) return this
-        return MemoryAmount(unit, amount * this.unit.bytes / unit.bytes)
-    }
-
-    public companion object {
-        /**
-         * Creates a `MemoryAmount` by converting from one unit to another.
-         *
-         * @param input The input memory unit.
-         * @param output The output memory unit.
-         * @param value The amount of memory in the input unit.
-         * @return A new `MemoryAmount` converted to the output unit.
-         */
-        public inline fun of(input: MemoryUnit, output: MemoryUnit, value: BigInteger): MemoryAmount {
-            val memoryAmount = MemoryAmount(input, value)
-            return memoryAmount.convertTo(output)
-        }
-
-        /**
-         * Creates a `MemoryAmount` in the specified memory unit.
-         *
-         * @param input The memory unit.
-         * @param value The amount of memory in the specified unit.
-         * @return A new `MemoryAmount`.
-         */
-        public inline fun of(input: MemoryUnit, value: BigInteger): MemoryAmount {
-            return of(input, input, value)
-        }
+        return bytes.compareTo(other.bytes)
     }
 }
+
+public inline val BigInteger.bytes: MemoryAmount
+    get() = MemoryAmount(this, MemoryUnit.Byte)
+
+public inline val BigInteger.kibiBytes: MemoryAmount
+    get() = MemoryAmount(this, MemoryUnit.KiB)
+
+public inline val BigInteger.mebiBytes: MemoryAmount
+    get() = MemoryAmount(this, MemoryUnit.MiB)
+
+public inline val BigInteger.gibiBytes: MemoryAmount
+    get() = MemoryAmount(this, MemoryUnit.GiB)
+
+public inline val BigInteger.tebiBytes: MemoryAmount
+    get() = MemoryAmount(this, MemoryUnit.TiB)
+
+public inline val BigInteger.pebiBytes: MemoryAmount
+    get() = MemoryAmount(this, MemoryUnit.PiB)
+
+public inline val BigInteger.exbiBytes: MemoryAmount
+    get() = MemoryAmount(this, MemoryUnit.EiB)
+
+public inline val BigInteger.zebiBytes: MemoryAmount
+    get() = MemoryAmount(this, MemoryUnit.ZiB)
+
+public inline val BigInteger.yobiBytes: MemoryAmount
+    get() = MemoryAmount(this, MemoryUnit.YiB)
+
+
+public inline val Number.bytes: MemoryAmount
+    get() = MemoryAmount(this.toLong().toBigInteger(), MemoryUnit.Byte)
+
+public inline val Number.kibiBytes: MemoryAmount
+    get() = MemoryAmount(this.toLong().toBigInteger(), MemoryUnit.KiB)
+
+public inline val Number.mebiBytes: MemoryAmount
+    get() = MemoryAmount(this.toLong().toBigInteger(), MemoryUnit.MiB)
+
+public inline val Number.gibiBytes: MemoryAmount
+    get() = MemoryAmount(this.toLong().toBigInteger(), MemoryUnit.GiB)
+
+public inline val Number.tebiBytes: MemoryAmount
+    get() = MemoryAmount(this.toLong().toBigInteger(), MemoryUnit.TiB)
+
+public inline val Number.pebiBytes: MemoryAmount
+    get() = MemoryAmount(this.toLong().toBigInteger(), MemoryUnit.PiB)
+
+public inline val Number.exbiBytes: MemoryAmount
+    get() = MemoryAmount(this.toLong().toBigInteger(), MemoryUnit.EiB)
+
+public inline val Number.zebiBytes: MemoryAmount
+    get() = MemoryAmount(this.toLong().toBigInteger(), MemoryUnit.ZiB)
+
+public inline val Number.yobiBytes: MemoryAmount
+    get() = MemoryAmount(this.toLong().toBigInteger(), MemoryUnit.YiB)
+
+/**
+ * Creates a `MemoryAmount` by converting from one unit to another.
+ *
+ * @param unit The unit of memory to convert from.
+ * @param value The amount of memory to convert.
+ * @return A new `MemoryAmount` representing the converted amount.
+ */
+public fun MemoryAmount(value: BigInteger, unit: MemoryUnit = MemoryUnit.Byte): MemoryAmount {
+    return MemoryAmount(value * unit.bytes)
+}
+
+
+/**
+ * Converts this memory amount to the specified memory unit and returns the result as a `BigInteger`.
+ *
+ * @param unit The memory unit to convert to.
+ * @return BigInteger The memory amount in the specified memory unit.
+ */
+public fun MemoryAmount.toBigInteger(unit: MemoryUnit = MemoryUnit.Byte): BigInteger {
+    return bytes / unit.bytes
+}
+
+/**
+ * Converts this memory amount to the specified memory unit and returns the result as a `Long`.
+ *
+ * @param unit The memory unit to convert to.
+ * @return Long The memory amount in the specified memory unit.
+ */
+public fun MemoryAmount.toLong(unit: MemoryUnit = MemoryUnit.Byte): Long {
+    return toBigInteger(unit).longValue(true)
+}
+
+
+/**
+ * Converts this memory amount to the specified memory unit and returns the result as a `ULong`.
+ *
+ * @param unit The memory unit to convert to.
+ * @return ULong The memory amount in the specified memory unit.
+ */
+
+public fun MemoryAmount.toULong(unit: MemoryUnit = MemoryUnit.Byte): ULong {
+    return toBigInteger(unit).ulongValue(true)
+}
+
+
+/**
+ * Converts this memory amount to the specified memory unit and returns the result as an `Int`.
+ *
+ * @param unit The memory unit to convert to.
+ * @return Int The memory amount in the specified memory unit.
+ */
+public fun MemoryAmount.toInt(unit: MemoryUnit = MemoryUnit.Byte): Int {
+    return toBigInteger(unit).intValue(true)
+}
+
+
+/**
+ * Converts this memory amount to the specified memory unit and returns the result as a `UInt`.
+ *
+ * @param unit The memory unit to convert to.
+ * @return UInt The memory amount in the specified memory unit.
+ */
+public fun MemoryAmount.toUInt(unit: MemoryUnit = MemoryUnit.Byte): UInt {
+    return toBigInteger(unit).uintValue(true)
+}
+
+
+public val MemoryAmount.bitsLong: Long
+    get() = bytes.longValue(true) * 8L
+
+
+public val MemoryAmount.bitsULong: ULong
+    get() = bytes.ulongValue(true) * 8UL
+
+
+public val MemoryAmount.bitsInt: Int
+    get() = bytes.intValue(true) * 8
+
+
+public val MemoryAmount.bitsUInt: UInt
+    get() = bytes.uintValue(true) * 8U
+

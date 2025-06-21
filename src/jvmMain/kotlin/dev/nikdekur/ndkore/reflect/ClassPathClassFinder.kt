@@ -38,7 +38,7 @@ import com.google.common.reflect.ClassPath
  * @see ClassLoader
  * @see com.google.common.reflect.ClassPath
  */
-public object ClassPathClassFinder : ClassFinder {
+public open class ClassPathClassFinder : ClassFinder {
 
     override fun find(classLoader: ClassLoader, packageName: String, consumer: (Class<*>) -> Unit) {
         ClassPath.from(classLoader)
@@ -47,4 +47,6 @@ public object ClassPathClassFinder : ClassFinder {
                 consumer(it.load())
             }
     }
+
+    public companion object Default : ClassPathClassFinder()
 }

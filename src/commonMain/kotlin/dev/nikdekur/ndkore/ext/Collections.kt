@@ -78,7 +78,7 @@ public inline fun <T> MutableCollection<T>.addIfNotContains(item: T): Boolean {
 }
 
 
-@Suppress("UNCHECKED_CAST")
+
 /**
  * Cast a collection to a collection of different types.
  *
@@ -86,6 +86,7 @@ public inline fun <T> MutableCollection<T>.addIfNotContains(item: T): Boolean {
  *
  * @return the collection casted to a different type
  */
+@Suppress("UNCHECKED_CAST")
 public inline fun <T, R> Collection<T>.cast(): Collection<R> = this as Collection<R>
 
 
@@ -94,7 +95,7 @@ public inline fun <T, R> Collection<T>.cast(): Collection<R> = this as Collectio
  *
  * If the list is empty, the method will return an [emptyList]
  *
- * If the list has only one element, the method will return a [Collections.SingletonList]
+ * If the list has only one element, the method will return a SingletonList.
  *
  * If the list has more than one element, the method will return the list itself without any changes.
  *
@@ -153,14 +154,14 @@ public inline fun <T : Any> MutableCollection<T>.removeIfNotAssignable(fromClass
  *
  * @return a set containing only this element.
  */
-public inline fun <T> T.toSingletonSet() = setOf(this)
+public inline fun <T> T.toSingletonSet(): Set<T> = setOf(this)
 
 /**
  * Returns a singleton list containing only this element.
  *
  * @return a list containing only this element.
  */
-public inline fun <T> T.toSingletonList() = listOf(this)
+public inline fun <T> T.toSingletonList(): List<T> = listOf(this)
 
 
 
@@ -301,7 +302,7 @@ public inline fun <T : MutableCollection<String>> T.filterPartialMatches(token: 
  * @param elements the elements to add to this collection.
  * @return `true` if the collection was modified as a result of the operation, `false` otherwise.
  */
-public inline fun <T> MutableCollection<T>.addAll(vararg elements: T) = addAll(elements)
+public inline fun <T> MutableCollection<T>.addAll(vararg elements: T): Boolean = addAll(elements)
 
 /**
  * Returns a list containing a specified number of random elements from this list.
@@ -358,7 +359,7 @@ public inline fun <T> MutableList<T>.addAllNotNull(vararg elements: T?) {
  * @return the first element that is an instance of the specified class
  * @throws NoSuchElementException if no such element is found
  */
-public inline fun <reified T> Iterable<*>.firstInstance() = first { it is T } as T
+public inline fun <reified T> Iterable<*>.firstInstance(): T = first { it is T } as T
 
 /**
  * Find the first element in iterable that is an instance of the specified class or null if no such element is found.
@@ -367,4 +368,4 @@ public inline fun <reified T> Iterable<*>.firstInstance() = first { it is T } as
  * @return the first element that is an instance of the specified class or null if no such element is found
  * @throws NoSuchElementException if no such element is found
  */
-public inline fun <reified T> Iterable<*>.firstInstanceOrNull() = firstOrNull { it is T } as? T
+public inline fun <reified T> Iterable<*>.firstInstanceOrNull(): T? = firstOrNull { it is T } as? T

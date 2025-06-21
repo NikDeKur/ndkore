@@ -45,9 +45,9 @@ abstract class PatternPlaceholderParserTest {
         val parser = getParser("\\{", "\\}")
         val result = parser.parse(
             "{user.name} is {user.age} years old", mapOf(
-                "user" to setOf(
-                    Placeholder.of("name" to "Alice"),
-                    Placeholder.of("age" to 30)
+                "user" to mapOf(
+                    "name" to "Alice",
+                    "age" to 30
                 )
             )
         )
@@ -64,7 +64,7 @@ abstract class PatternPlaceholderParserTest {
     @Test
     fun placeholderWithMapResolvedCorrectly() {
         val parser = getParser("%")
-        val result = parser.parse("%user.name%", mapOf("user" to Placeholder.of("name" to "Diana")))
+        val result = parser.parse("%user.name%", mapOf("user" to mapOf("name" to "Diana")))
         assertEquals("Diana", result)
     }
 
@@ -127,7 +127,7 @@ abstract class PatternPlaceholderParserTest {
         val member = getMember(getUser("John", 20))
 
         val memberPlaceholders = listOf(
-            Placeholder.ofSingle("icon", "https://example.com/icon.png"),
+            mapOf("icon" to "https://example.com/icon.png"),
             member
         )
 
@@ -140,5 +140,21 @@ abstract class PatternPlaceholderParserTest {
         )
 
         assertEquals("value https://example.com/icon.png John - 20", result)
+    }
+
+
+    @Test
+    fun parseFromNonExistingPlaceholder() {
+        val parser = getParser("#")
+        val result = parser.parse("Her name is #name#", mapOf("age" to 30))
+        assertEquals("Her name is #name#", result)
+    }
+
+
+    @Test
+    fun parseFromList() {
+        val parser = getParser("#")
+        val result = parser.parse("#names.1#", mapOf("names" to listOf("Bob", "Charlie")))
+        assertEquals("Charlie", result)
     }
 }

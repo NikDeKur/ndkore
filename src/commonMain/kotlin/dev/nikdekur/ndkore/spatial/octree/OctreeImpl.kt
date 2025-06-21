@@ -11,7 +11,9 @@
 package dev.nikdekur.ndkore.spatial.octree
 
 import dev.nikdekur.ndkore.spatial.Point
-import dev.nikdekur.ndkore.spatial.Point.Companion.middlePoint
+import dev.nikdekur.ndkore.spatial.Shape
+import dev.nikdekur.ndkore.spatial.middlePoint
+
 /**
  * # OctreeImpl Class
  *
@@ -82,20 +84,20 @@ import dev.nikdekur.ndkore.spatial.Point.Companion.middlePoint
  * and management, such as 3D graphics, simulations, and spatial databases.
  */
 
-public open class OctreeImpl<T>(
+public open class OctreeImpl<T : Shape>(
     public val capacity: Int = DEFAULT_CAPACITY,
 ) : MutableOctree<T> {
 
-    public var minX: Int? = null
-    public var minY: Int? = null
-    public var minZ: Int? = null
-    public var maxX: Int? = null
-    public var maxY: Int? = null
-    public var maxZ: Int? = null
+    public var minX: Double? = null
+    public var minY: Double? = null
+    public var minZ: Double? = null
+    public var maxX: Double? = null
+    public var maxY: Double? = null
+    public var maxZ: Double? = null
 
-    public var centerX: Int? = null
-    public var centerY: Int? = null
-    public var centerZ: Int? = null
+    public var centerX: Double? = null
+    public var centerY: Double? = null
+    public var centerZ: Double? = null
 
     override val min: Point
         get() = Point(minX!!, minY!!, minZ!!)
@@ -132,14 +134,14 @@ public open class OctreeImpl<T>(
         get() = minX != null && minY != null && minZ != null && maxX != null && maxY != null && maxZ != null
 
 
-    public var data: MutableList<NodeData<T>> = ArrayList<NodeData<T>>(capacity)
-    public var children: Array<OctreeImpl<T>?> = arrayOfNulls<OctreeImpl<T>>(8)
+    public var data: MutableList<T> = ArrayList(capacity)
+    public var children: Array<OctreeImpl<T>?> = arrayOfNulls(8)
 
     public fun isChildrenEmpty(): Boolean = children.all { it == null }
     public inline fun isChildrenNotEmpty(): Boolean = !isChildrenEmpty()
 
 
-    override fun insert(data: NodeData<T>) {
+    override fun insert(data: T) {
         val nodeDataMin = data.min
         val minX = minOf(minX ?: nodeDataMin.x, nodeDataMin.x)
         val minY = minOf(minY ?: nodeDataMin.y, nodeDataMin.y)
@@ -192,9 +194,9 @@ public open class OctreeImpl<T>(
             extractChildrenNodes(current, stack)
 
             if (current.data.isNotEmpty()) {
-                for (nodeData in current.data) {
-                    if (nodeData.contains(point))
-                        result.add(nodeData.data)
+                for (data in current.data) {
+                    if (data.contains(point))
+                        result.add(data)
                 }
             }
         }
@@ -202,8 +204,8 @@ public open class OctreeImpl<T>(
         return result
     }
 
-    override fun findNodes(point: Point): Collection<NodeData<T>> {
-        val result = HashSet<NodeData<T>>()
+    override fun findNodes(point: Point): Collection<T> {
+        val result = HashSet<T>()
         val stack = ArrayDeque<OctreeImpl<T>>()
         stack.add(this)
 
@@ -243,18 +245,18 @@ public open class OctreeImpl<T>(
             extractChildrenNodes(current, stack)
 
             if (current.data.isNotEmpty()) {
-                for (nodeData in current.data) {
-                    if (nodeData.distanceSquared(point) <= radiusSquared)
-                        result.add(nodeData.data)
+                for (data in current.data) {
+                    if (data.distanceSquared(point) <= radiusSquared)
+                        result.add(data)
                 }
             }
         }
         return result
     }
 
-    override fun findNodesNearby(point: Point, radius: Double): Collection<NodeData<T>> {
+    override fun findNodesNearby(point: Point, radius: Double): Collection<T> {
         val stack = ArrayDeque<OctreeImpl<T>>()
-        val result = HashSet<NodeData<T>>()
+        val result = HashSet<T>()
         val radiusSquared = radius * radius
         stack.add(this)
 
@@ -299,9 +301,9 @@ public open class OctreeImpl<T>(
             extractChildrenNodes(current, stack)
 
             if (current.data.isNotEmpty()) {
-                for (nodeData in current.data) {
-                    if (nodeData.intersects(min, max)) {
-                        result.add(nodeData.data)
+                for (data in current.data) {
+                    if (data.intersects(min, max)) {
+                        result.add(data)
                     }
                 }
             }
@@ -310,8 +312,8 @@ public open class OctreeImpl<T>(
         return result
     }
 
-    override fun findNodesInRegion(min: Point, max: Point): HashSet<NodeData<T>> {
-        val result = HashSet<NodeData<T>>()
+    override fun findNodesInRegion(min: Point, max: Point): HashSet<T> {
+        val result = HashSet<T>()
         val stack = ArrayDeque<OctreeImpl<T>>()
         stack.add(this)
 
@@ -346,12 +348,12 @@ public open class OctreeImpl<T>(
     }
 
     public inline fun getIndex(min: Point, max: Point): Int {
-        val point = middlePoint(min, max)
+        val point = min.middlePoint(max)
         return getIndex(point)
     }
 
-    public inline fun getIndex(nodeData: NodeData<T>): Int {
-        return getIndex(nodeData.center)
+    public inline fun getIndex(data: T): Int {
+        return getIndex(data.center)
     }
 
     public inline fun split() {
@@ -370,16 +372,17 @@ public open class OctreeImpl<T>(
         children[7] = newChild(Point(minX!!, midY, midZ), Point(midX, maxY!!, maxZ!!))
     }
 
-
-    public open fun remove(value: T) {
+    override fun remove(data: T) {
+        val value = data
+        
         if (children.isNotEmpty()) {
             children.forEach { it?.remove(value) }
         }
 
-        val iterator = data.iterator()
+        val iterator = this.data.iterator()
         while (iterator.hasNext()) {
-            val currentNodeData = iterator.next()
-            if (currentNodeData.data == value) {
+            val currentData = iterator.next()
+            if (currentData == value) {
                 iterator.remove()
                 return
             }
@@ -393,14 +396,14 @@ public open class OctreeImpl<T>(
 
         val iterator = data.iterator()
         while (iterator.hasNext()) {
-            val currentNodeData = iterator.next()
-            if (predicate(currentNodeData.data)) {
+            val currentData = iterator.next()
+            if (predicate(currentData)) {
                 iterator.remove()
             }
         }
     }
 
-    public open fun clear() {
+    public override fun clear() {
         data.clear()
         for (index in children.indices) {
             children[index]?.clear()
@@ -412,11 +415,11 @@ public open class OctreeImpl<T>(
         return OctreeIterator(this)
     }
 
-    public fun iteratorNode(): Iterator<NodeData<T>> {
+    public fun iteratorNode(): Iterator<T> {
         return OctreeIteratorNode(this)
     }
 
-    public fun forEachNode(action: (NodeData<T>) -> Unit) {
+    public fun forEachNode(action: (T) -> Unit) {
         return iteratorNode().forEach(action)
     }
 
@@ -435,9 +438,9 @@ public open class OctreeImpl<T>(
         public const val DEFAULT_CAPACITY: Int = 10
 
 
-        public abstract class AbstractIterator<T, I>(octree: OctreeImpl<T>) : Iterator<I> {
+        public abstract class AbstractIterator<T : Shape, I>(octree: OctreeImpl<T>) : Iterator<I> {
             private val stack = ArrayDeque<OctreeImpl<T>>()
-            private var dataIterator: Iterator<NodeData<T>>? = null
+            private var dataIterator: Iterator<T>? = null
             private var current: I? = null
 
             init {
@@ -459,7 +462,7 @@ public open class OctreeImpl<T>(
                 return false
             }
 
-            public abstract fun result(data: NodeData<T>): I
+            public abstract fun result(data: T): I
 
             override fun next(): I {
                 if (!hasNext()) throw NoSuchElementException()
@@ -469,14 +472,14 @@ public open class OctreeImpl<T>(
             }
         }
 
-        public open class OctreeIterator<T>(octree: OctreeImpl<T>) : AbstractIterator<T, T>(octree) {
-            override fun result(data: NodeData<T>): T {
-                return data.data
+        public open class OctreeIterator<T : Shape>(octree: OctreeImpl<T>) : AbstractIterator<T, T>(octree) {
+            override fun result(data: T): T {
+                return data
             }
         }
 
-        public class OctreeIteratorNode<T>(octree: OctreeImpl<T>) : AbstractIterator<T, NodeData<T>>(octree) {
-            override fun result(data: NodeData<T>): NodeData<T> {
+        public class OctreeIteratorNode<T : Shape>(octree: OctreeImpl<T>) : AbstractIterator<T, T>(octree) {
+            override fun result(data: T): T {
                 return data
             }
         }

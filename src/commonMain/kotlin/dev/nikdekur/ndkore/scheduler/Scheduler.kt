@@ -72,4 +72,4 @@ public interface Scheduler {
 public inline fun Scheduler.runTaskTimer(
     interval: Duration,
     noinline task: suspend () -> Unit
-) = runTaskTimer(interval, interval, task)
+): SchedulerTask = runTaskTimer(interval, interval, task)

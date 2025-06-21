@@ -37,7 +37,7 @@ import java.io.File
  * @see ClassFinder
  * @see ClassLoader
  */
-public object SimpleClassFinder : ClassFinder {
+public open class JVMReflectClassFinder : ClassFinder {
 
     public fun findClass(name: String): Class<*>? {
         return try {
@@ -67,4 +67,7 @@ public object SimpleClassFinder : ClassFinder {
             }
         }
     }
+
+
+    public companion object Default : JVMReflectClassFinder()
 }

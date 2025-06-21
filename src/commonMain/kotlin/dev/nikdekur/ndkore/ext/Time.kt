@@ -11,6 +11,8 @@
 package dev.nikdekur.ndkore.ext
 
 import dev.nikdekur.ndkore.duration.DurationFormatter
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
@@ -36,4 +38,9 @@ public inline fun Duration.toNanosPart(): Int {
 
 public inline fun Duration.toReadableString(language: String): String {
     return DurationFormatter.format(this, language)
+}
+
+
+public inline fun Clock.isBefore(instant: Instant): Boolean {
+    return now() <= instant
 }

@@ -2,6 +2,7 @@
 
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -11,58 +12,17 @@ plugins {
 }
 
 group = "dev.nikdekur"
-version = "1.4.5"
+version = "1.6.0"
 
 val authorId: String by project
 val authorName: String by project
 
-repositories {
-    mavenCentral().apply {
-        content {
-            excludeGroup("Kotlin/Native")
-        }
-    }
-    mavenLocal().apply {
-        content {
-            excludeGroup("Kotlin/Native")
-        }
-    }
-    google().apply {
-        content {
-            excludeGroup("Kotlin/Native")
-        }
-    }
-
-    maven {
-        name = "Sonatype Snapshots (Legacy)"
-        url = uri("https://oss.sonatype.org/content/repositories/snapshots")
-    }.apply {
-        content {
-            excludeGroup("Kotlin/Native")
-        }
-    }
-
-    maven {
-        name = "Sonatype Snapshots"
-        url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots")
-    }.apply {
-        content {
-            excludeGroup("Kotlin/Native")
-        }
-    }
-}
-
 kotlin {
     explicitApi()
-
-    val javaVersion = JavaVersion.VERSION_1_8
     jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = javaVersion.toString()
-        }
-
         compilerOptions {
             freeCompilerArgs.addAll("-Xno-param-assertions", "-Xno-call-assertions")
+            jvmTarget = JvmTarget.JVM_1_8
         }
     }
 
@@ -80,13 +40,13 @@ kotlin {
 
     // Web
     js {
-        moduleName = project.name
+        outputModuleName = project.name
         browser()
         nodejs()
     }
 
     wasmJs {
-        moduleName = project.name + "Wasm"
+        outputModuleName = project.name + "Wasm"
         browser()
         nodejs()
     }
@@ -96,7 +56,6 @@ kotlin {
         commonMain.dependencies {
 
             // Kotlin require both api and compileOnly for some targets
-
             val dependencies = listOf(
                 libs.kotlinx.coroutines.core,
                 libs.kotlinx.serialization.core,
@@ -119,12 +78,11 @@ kotlin {
         jvmMain.dependencies {
             compileOnly(libs.slf4j.api)
             compileOnly(libs.google.guava)
+            compileOnly(libs.lz4)
         }
 
         commonTest.dependencies {
             implementation(libs.slf4j.api)
-            implementation(libs.kotlin.logging)
-            implementation(libs.bignum)
 
             implementation(libs.kotlinx.coroutines.test)
             implementation(kotlin("test"))
@@ -135,6 +93,7 @@ kotlin {
             implementation(libs.google.guava)
             implementation(libs.kotlinx.serialization.core)
             implementation(libs.kotlinx.serialization.properties)
+            implementation(libs.stately.concurrent.collections)
         }
     }
 }

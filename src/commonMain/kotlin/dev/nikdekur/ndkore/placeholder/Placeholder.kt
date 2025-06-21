@@ -10,99 +10,57 @@
 
 package dev.nikdekur.ndkore.placeholder
 
-import dev.nikdekur.ndkore.reflect.ReflectMethod
-import kotlin.jvm.JvmStatic
-
 /**
- * A functional interface for retrieving values based on a given key from a source.
+ * A functional interface for dynamically retrieving values based on a given key.
  *
  * ## Overview
- * The `Placeholder` interface is designed to provide a way to access values using keys, which is useful in
- * scenarios where you need to dynamically retrieve values based on variable input.
- * This can be particularly
- * beneficial in template engines, configuration management, and other contexts where key-value lookups are common.
+ * The `Placeholder` interface is designed to handle scenarios where the list of placeholders is not known
+ * in advance, and their values need to be determined dynamically at runtime based on the provided key.
  *
- * ## Key Concepts
- * - **Dynamic Value Retrieval**: Allows retrieving values from a source like a map using a key.
- * - **Flexibility**: Can be implemented in various ways to source values from different data structures.
+ * This interface is ideal for cases where placeholder values cannot be predefined and must be resolved
+ * on-the-fly during execution.
+ *
+ * ## Key Features
+ * - **Dynamic Value Resolution**: Retrieves values dynamically for keys,
+ * enabling flexible and runtime-dependent behavior.
+ * - **On-Demand Evaluation**: Decisions about values are made only when the key is requested, making it suitable
+ *   for systems with unpredictable or variable input.
  *
  * ## Practical Use Cases
- * - **Template Engines**: Replacing placeholders in templates with dynamic values.
- * - **Configuration Management**: Accessing configuration values based on keys.
- *
- * ## Companion Object
- * The companion object provides factory methods to create instances of `Placeholder`:
- * - `of(map: Map<String, Any>)`: Creates a `Placeholder` implementation that retrieves values from a given map.
- * - `of(vararg pair: Pair<String, Any>)`: Allows creating a `Placeholder` from a list of key-value pairs,
- * making it convenient to initialize with multiple entries.
- * - `ofSingle(key: String, value: Any)`: Quickly creates a `Placeholder` for a single key-value pair.
+ * - **Dynamic Template Rendering**: Resolving placeholders in templates where values depend on runtime logic.
+ * - **Event-Driven Systems**: Handling dynamic events or inputs that determine placeholder values.
+ * - **Extensible Frameworks**: Supporting pluggable modules or dynamic configurations where values cannot
+ *   be statically defined.
  *
  * ## Examples
  *
- * ### Example 1: Creating a Placeholder from a Map
+ * ### Example 1: Using a Lambda for Dynamic Resolution
  * ```kotlin
- * val placeholder = Placeholder.of(mapOf("name" to "John Doe"))
- * println(placeholder.getPlaceholder("name")) // Output: John Doe
+ * val dynamicPlaceholder = Placeholder { key ->
+ *     when (key) {
+ *         "currentTime" -> System.currentTimeMillis()
+ *         "randomNumber" -> (1..100).random()
+ *         else -> null
+ *     }
+ * }
+ * println(dynamicPlaceholder.getPlaceholder("currentTime")) // Output: 1691234567890 (current timestamp)
  * ```
  *
- * ### Example 2: Creating a Placeholder from Key-Value Pairs
+ * ### Example 2: Integrating with Dynamic Systems
  * ```kotlin
- * val placeholder = Placeholder.of("greeting" to "Hello")
- * println(placeholder.getPlaceholder("greeting")) // Output: Hello
+ * val placeholder = Placeholder { key ->
+ *     fetchValueFromDatabaseOrApi(key) // Custom logic to dynamically resolve values
+ * }
+ * println(placeholder.getPlaceholder("userName")) // Output depends on the external source
  * ```
  */
-public interface Placeholder {
+public fun interface Placeholder {
 
     /**
-     * Retrieves the value associated with the specified key from the source.
+     * Dynamically retrieves the value associated with the specified key.
      *
-     * @param key The key whose associated value is to be retrieved.
-     * @return The value associated with the key, or [ValuesSource.NotFound] if the key does not exist in the source.
+     * @param key The key for which the value should be resolved dynamically.
+     * @return The dynamically resolved value associated with the key, or `null` if no value can be determined.
      */
-    public fun getPlaceholder(key: String): Any? {
-        return ReflectMethod.NotFound
-    }
-
-    public companion object {
-        /**
-         * Creates a `Placeholder` implementation that uses the provided map for value retrieval.
-         *
-         * @param map A map where keys are placeholder names and values are the corresponding values.
-         * @return A `Placeholder` instance backed by the map.
-         */
-        @JvmStatic
-        public fun of(map: Map<String, Any>): Placeholder {
-            return object : Placeholder {
-                override fun getPlaceholder(key: String): Any? {
-                    return map[key]
-                }
-                override fun toString(): String {
-                    return "Placeholder(map=$map)"
-                }
-            }
-        }
-
-        /**
-         * Creates a `Placeholder` implementation from a variable number of key-value pairs.
-         *
-         * @param pair A list of key-value pairs to be used for value retrieval.
-         * @return A `Placeholder` instance initialized with the provided pairs.
-         */
-        @JvmStatic
-        public inline fun of(vararg pair: Pair<String, Any>): Placeholder {
-            return of(mapOf(*pair))
-        }
-
-        /**
-         * Creates a `Placeholder` implementation for a single key-value pair.
-         *
-         * @param key The key for which the value is provided.
-         * @param value The value associated with the key.
-         * @return A `Placeholder` instance for the single key-value pair.
-         */
-        @JvmStatic
-        public inline fun ofSingle(key: String, value: Any): Placeholder {
-            return of(key to value)
-        }
-    }
+    public fun getPlaceholder(key: String): Any?
 }

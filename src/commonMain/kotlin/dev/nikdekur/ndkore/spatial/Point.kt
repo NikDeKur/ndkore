@@ -10,6 +10,14 @@
 
 package dev.nikdekur.ndkore.spatial
 
+import dev.nikdekur.ndkore.ext.distanceSquared
+import dev.nikdekur.ndkore.ext.mean
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.descriptors.element
+import kotlinx.serialization.encoding.*
 import kotlin.jvm.JvmField
 
 /**
@@ -19,14 +27,11 @@ import kotlin.jvm.JvmField
  * @property y The y-coordinate of the point.
  * @property z The z-coordinate of the point.
  */
-public data class Point(var x: Int, var y: Int, var z: Int) : Comparable<Point> {
+public interface Point : Comparable<Point> {
 
-    /**
-     * Creates and returns a copy of this point.
-     *
-     * @return A clone of this point.
-     */
-    public fun clone(): Point = Point(x, y, z)
+    public val x: Double
+    public val y: Double
+    public val z: Double
 
     /**
      * Adds the coordinates of another point to this point.
@@ -34,7 +39,7 @@ public data class Point(var x: Int, var y: Int, var z: Int) : Comparable<Point> 
      * @param other The point to add.
      * @return A new point representing the result of the addition.
      */
-    public operator fun plus(other: Point): Point = Point(x + other.x, y + other.y, z + other.z)
+    public operator fun plus(other: Point): Point = SimplePoint(x + other.x, y + other.y, z + other.z)
 
     /**
      * Subtracts the coordinates of another point from this point.
@@ -42,7 +47,7 @@ public data class Point(var x: Int, var y: Int, var z: Int) : Comparable<Point> 
      * @param other The point to subtract.
      * @return A new point representing the result of the subtraction.
      */
-    public operator fun minus(other: Point): Point = Point(x - other.x, y - other.y, z - other.z)
+    public operator fun minus(other: Point): Point = SimplePoint(x - other.x, y - other.y, z - other.z)
 
     /**
      * Multiplies the coordinates of this point by a scalar value.
@@ -50,7 +55,7 @@ public data class Point(var x: Int, var y: Int, var z: Int) : Comparable<Point> 
      * @param other The scalar value to multiply by.
      * @return A new point representing the result of the multiplication.
      */
-    public operator fun times(other: Int): Point = Point(x * other, y * other, z * other)
+    public operator fun times(other: Double): Point = SimplePoint(x * other, y * other, z * other)
 
     /**
      * Divides the coordinates of this point by a scalar value.
@@ -58,80 +63,135 @@ public data class Point(var x: Int, var y: Int, var z: Int) : Comparable<Point> 
      * @param other The scalar value to divide by.
      * @return A new point representing the result of the division.
      */
-    public operator fun div(other: Int): Point = Point(x / other, y / other, z / other)
+    public operator fun div(other: Double): Point = SimplePoint(x / other, y / other, z / other)
 
     /**
      * Calculates the squared length (magnitude) of this point from the origin in 3D space.
      *
      * @return The squared length of this point.
      */
-    public fun lengthSquared(): Int {
+    public fun lengthSquared(): Double {
         return (x * x + y * y + z * z)
     }
 
-    /**
-     * Calculates the squared length (magnitude) of this point from the origin in 2D space (ignoring the y-coordinate).
-     *
-     * @return The squared length of this point in 2D.
-     */
-    public fun lengthSquared2D(): Int {
-        return (x * x + z * z)
-    }
-
-    /**
-     * Calculates the squared distance between this point and another point in 3D space.
-     *
-     * @param point The other point.
-     * @return The squared distance between the two points.
-     */
-    public inline fun distanceSquared(point: Point): Double {
-        return distanceSquared(x, y, z, point.x, point.y, point.z)
-    }
 
     public override fun compareTo(other: Point): Int {
         return when {
-            x != other.x -> x - other.x
-            y != other.y -> y - other.y
-            else -> z - other.z
+            x != other.x -> x.compareTo(other.x)
+            y != other.y -> y.compareTo(other.y)
+            else -> z.compareTo(other.z)
         }
     }
+
 
     public companion object {
 
         @JvmField
-        public val ZERO: Point = Point(0, 0, 0)
+        public val ZERO: Point = SimplePoint(0.0, 0.0, 0.0)
+    }
+}
 
+public fun Point(
+    x: Double,
+    y: Double,
+    z: Double
+): Point = SimplePoint(x, y, z)
 
-        /**
-         * Calculates the middle point between two given points.
-         *
-         * @param point1 The first point.
-         * @param point2 The second point.
-         * @return A new point representing the middle point between the two given points.
-         */
-        public inline fun middlePoint(point1: Point, point2: Point): Point {
-            return Point((point1.x + point2.x) / 2, (point1.y + point2.y) / 2, (point1.z + point2.z) / 2)
+@Serializable(with = SimplePoint.Serializer::class)
+public data class SimplePoint(
+    override val x: Double,
+    override val y: Double,
+    override val z: Double,
+) : Point {
+
+    public object Serializer : KSerializer<SimplePoint> {
+        override val descriptor: SerialDescriptor = buildClassSerialDescriptor("SimplePoint") {
+            element<Double>("x")
+            element<Double>("y")
+            element<Double>("z")
+        }
+
+        override fun serialize(encoder: Encoder, value: SimplePoint) {
+            encoder.encodeStructure(descriptor) {
+                encodeDoubleElement(descriptor, 0, value.x)
+                encodeDoubleElement(descriptor, 1, value.y)
+                encodeDoubleElement(descriptor, 2, value.z)
+            }
+        }
+
+        override fun deserialize(decoder: Decoder): SimplePoint {
+            return try {
+                val stringValue = decoder.decodeString()
+                parseFromString(stringValue)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                decoder.decodeStructure(descriptor) {
+                    var x = 0.0
+                    var y = 0.0
+                    var z = 0.0
+
+                    while (true) {
+                        when (val index = decodeElementIndex(descriptor)) {
+                            0 -> x = decodeDoubleElement(descriptor, 0)
+                            1 -> y = decodeDoubleElement(descriptor, 1)
+                            2 -> z = decodeDoubleElement(descriptor, 2)
+                            CompositeDecoder.DECODE_DONE -> break
+                            else -> error("Unexpected index: $index")
+                        }
+                    }
+
+                    SimplePoint(x, y, z)
+                }
+            }
+        }
+
+        private fun parseFromString(value: String): SimplePoint {
+            val parts = value.split(", ", ",", " ", ";", "|", ":", "\t")
+            require(parts.size == 3) { "Invalid format for Point string. But was ${parts.size}. String: $value" }
+            val x = parts[0].toDouble()
+            val y = parts[1].toDouble()
+            val z = parts[2].toDouble()
+            return SimplePoint(x, y, z)
         }
     }
 }
 
+
 /**
- * Calculates the squared distance between two points given by their individual coordinates in 3D space.
+ * Calculates the squared distance between this point and another point in 3D space.
  *
- * @param x1 The x-coordinate of the first point.
- * @param y1 The y-coordinate of the first point.
- * @param z1 The z-coordinate of the first point.
- * @param x2 The x-coordinate of the second point.
- * @param y2 The y-coordinate of the second point.
- * @param z2 The z-coordinate of the second point.
+ * @param point The other point.
  * @return The squared distance between the two points.
  */
-public inline fun distanceSquared(
-    x1: Int, y1: Int, z1: Int,
-    x2: Int, y2: Int, z2: Int,
-): Double {
-    val a = x1 - x2
-    val b = y1 - y2
-    val c = z1 - z2
-    return (a * a + b * b + c * c).toDouble()
+public inline fun Point.distanceSquared(point: Point): Double {
+    return distanceSquared(x, y, z, point.x, point.y, point.z)
+}
+
+
+/**
+ * Calculates the middle point between two given points.
+ *
+ * @receiver The point to calculate the middle point from.
+ * @param point The second point.
+ * @return A new point representing the middle point between the two given points.
+ */
+public inline fun Point.middlePoint(point: Point): Point {
+    return Point(mean(x, point.x), mean(y, point.y), mean(z, point.z))
+}
+
+
+public inline fun Point.add(x: Double, y: Double, z: Double): Point {
+    return Point(this.x + x, this.y + y, this.z + z)
+}
+
+public inline fun Point.subtract(x: Double, y: Double, z: Double): Point {
+    return Point(this.x - x, this.y - y, this.z - z)
+}
+
+public inline fun Point.multiply(x: Double, y: Double, z: Double): Point {
+    return Point(this.x * x, this.y * y, this.z * z)
+}
+
+public inline fun Point.divide(x: Double, y: Double, z: Double): Point {
+    return Point(this.x / x, this.y / y, this.z / z)
 }

@@ -42,6 +42,13 @@ public inline fun <K1, K2, V> MutableMultiMap<K1, K2, V>.put(
 
 @Suppress("kotlin:S6524")
 public inline fun <K1, K2, V> MutableMultiMap<K1, K2, V>.remove(k1: K1, k2: K2): V? {
-    return get(k1)?.remove(k2)
+    val map = get(k1)
+    val removed = map?.remove(k2)
+
+    if (map != null && map.isEmpty()) {
+        remove(k1)
+    }
+
+    return removed
 }
 

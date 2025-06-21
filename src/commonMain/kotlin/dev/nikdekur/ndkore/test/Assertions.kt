@@ -19,7 +19,6 @@ public inline fun assertEmpty(map: Map<*, *>) {
 
 
 public inline fun assertNotEmpty(iterable: Iterable<*>) {
-    @Suppress("ReplaceSizeCheckWithIsNotEmpty")
     if (iterable is Collection<*>)
         assertNotEquals(0, iterable.size)
     val hasNext = iterable.iterator().hasNext()

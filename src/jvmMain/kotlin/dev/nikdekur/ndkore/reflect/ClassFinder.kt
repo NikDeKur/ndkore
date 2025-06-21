@@ -20,9 +20,9 @@ package dev.nikdekur.ndkore.reflect
  *
  * There are two basic implementations of this interface:
  * - [ClassPathClassFinder] uses the Google Guava library to find classes with ClassPath.
- * - [SimpleClassFinder] uses getResource to find classes in a package.
+ * - [JVMReflectClassFinder] uses getResource to find classes in a package.
  *
- * As default implementation [SimpleClassFinder] is recommended,
+ * As default implementation [JVMReflectClassFinder] is recommended,
  * because it does not require any additional dependencies,
  * but in cases where multiple class loaders are used, [ClassPathClassFinder] is recommended.
  *

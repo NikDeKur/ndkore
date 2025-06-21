@@ -10,10 +10,11 @@
 
 package dev.nikdekur.ndkore.reflect
 
-import dev.nikdekur.ndkore.ext.*
+import dev.nikdekur.ndkore.ext.withUnlock
 import sun.misc.Unsafe
 import java.lang.reflect.Field
 import java.lang.reflect.Method
+import kotlin.annotation.AnnotationTarget.*
 
 /**
  * A utility object for performing reflection-based operations on classes and objects.
@@ -280,6 +281,7 @@ public object Reflect {
      * @return The `Unsafe` instance.
      * @throws IllegalAccessException If the `Unsafe` instance could not be accessed.
      */
+    @UnsafeReflectAPI
     public fun getUnsafe(): Unsafe {
         val result = getFieldValue(Unsafe::class.java, null, "theUnsafe")
         if (result is ReflectResult.Missing) {
@@ -288,4 +290,54 @@ public object Reflect {
 
         return result.value as Unsafe
     }
+
+    /**
+     * Sets the value of a field in the given object using the `Unsafe` instance.
+     *
+     * This method uses the `Unsafe` instance to set the value of a field directly in the object,
+     * without facing any access restrictions.
+     * It allows setting the value of a field that is even declared as `final`.
+     *
+     * @param clazz The class in which to start the search for the field.
+     * @param obj The object in which to set the field value.
+     * @param name The name of the field whose value is to be set.
+     * @param value The value to be set in the field.
+     * @throws IllegalAccessException If the `Unsafe` instance could not be accessed.
+     * @throws NoSuchFieldException If the field does not exist in the object.
+     */
+    @UnsafeReflectAPI
+    public fun setFieldValueUnsafe(clazz: Class<*>, obj: Any?, name: String, value: Any?) {
+        val field = searchFieldRecursive(clazz, name)
+        val unsafe = getUnsafe()
+        if (obj == null) {
+            val base = unsafe.staticFieldBase(field)
+            val offset = unsafe.staticFieldOffset(field)
+            unsafe.putObject(base, offset, value)
+
+        } else {
+            val offset = unsafe.objectFieldOffset(field)
+            unsafe.putObject(obj, offset, value)
+        }
+    }
 }
+
+@MustBeDocumented
+@Retention(AnnotationRetention.BINARY)
+@Target(
+    CLASS,
+    ANNOTATION_CLASS,
+    PROPERTY,
+    FIELD,
+    LOCAL_VARIABLE,
+    VALUE_PARAMETER,
+    CONSTRUCTOR,
+    FUNCTION,
+    PROPERTY_GETTER,
+    PROPERTY_SETTER,
+    TYPEALIAS
+)
+@RequiresOptIn(
+    message = "This API involves direct access to fields and methods using reflection, which can be unsafe.",
+    level = RequiresOptIn.Level.ERROR
+)
+public annotation class UnsafeReflectAPI

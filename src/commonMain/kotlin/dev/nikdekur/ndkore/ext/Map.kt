@@ -249,7 +249,8 @@ public inline fun <IdT, V : Unique<IdT>> Map<IdT, V>.containsById(obj: V): Boole
  * @return the first map entry that matches the predicate.
  * @throws NoSuchElementException if no entry matches the predicate.
  */
-public inline fun <K, V> Map<K, V>.firstEntry(predicate: Map.Entry<K, V>.() -> Boolean) = entries.first(predicate)
+public inline fun <K, V> Map<K, V>.firstEntry(predicate: Map.Entry<K, V>.() -> Boolean): Map.Entry<K, V> =
+    entries.first(predicate)
 
 /**
  * Finds the first map entry that matches the given predicate or returns null if none match.
@@ -260,7 +261,7 @@ public inline fun <K, V> Map<K, V>.firstEntry(predicate: Map.Entry<K, V>.() -> B
  * @param predicate a function that evaluates each entry and returns true for the desired entry.
  * @return the first map entry that matches the predicate, or null if no entry matches.
  */
-public inline fun <K, V> Map<K, V>.firstEntryOrNull(predicate: Map.Entry<K, V>.() -> Boolean) =
+public inline fun <K, V> Map<K, V>.firstEntryOrNull(predicate: Map.Entry<K, V>.() -> Boolean): Map.Entry<K, V>? =
     entries.firstOrNull(predicate)
 
 /**
@@ -273,7 +274,7 @@ public inline fun <K, V> Map<K, V>.firstEntryOrNull(predicate: Map.Entry<K, V>.(
  * @return the first key that matches the predicate.
  * @throws NoSuchElementException if no key matches the predicate.
  */
-public inline fun <K, V> Map<K, V>.firstKey(predicate: (K) -> Boolean) = keys.first(predicate)
+public inline fun <K, V> Map<K, V>.firstKey(predicate: (K) -> Boolean): K = keys.first(predicate)
 
 /**
  * Finds the first key that matches the given predicate or returns null if none match.
@@ -284,7 +285,7 @@ public inline fun <K, V> Map<K, V>.firstKey(predicate: (K) -> Boolean) = keys.fi
  * @param predicate a function that evaluates each key and returns true for the desired key.
  * @return the first key that matches the predicate, or null if no key matches.
  */
-public inline fun <K, V> Map<K, V>.firstKeyOrNull(predicate: (K) -> Boolean) = keys.firstOrNull(predicate)
+public inline fun <K, V> Map<K, V>.firstKeyOrNull(predicate: (K) -> Boolean): K? = keys.firstOrNull(predicate)
 
 /**
  * Finds the first value that matches the given predicate.
@@ -296,7 +297,7 @@ public inline fun <K, V> Map<K, V>.firstKeyOrNull(predicate: (K) -> Boolean) = k
  * @return the first value that matches the predicate.
  * @throws NoSuchElementException if no value matches the predicate.
  */
-public inline fun <K, V> Map<K, V>.firstValue(predicate: (V) -> Boolean) = values.first(predicate)
+public inline fun <K, V> Map<K, V>.firstValue(predicate: (V) -> Boolean): V = values.first(predicate)
 
 /**
  * Finds the first value that matches the given predicate or returns null if none match.
@@ -307,7 +308,7 @@ public inline fun <K, V> Map<K, V>.firstValue(predicate: (V) -> Boolean) = value
  * @param predicate a function that evaluates each value and returns true for the desired value.
  * @return the first value that matches the predicate, or null if no value matches.
  */
-public inline fun <K, V> Map<K, V>.firstValueOrNull(predicate: (V) -> Boolean) = values.firstOrNull(predicate)
+public inline fun <K, V> Map<K, V>.firstValueOrNull(predicate: (V) -> Boolean): V? = values.firstOrNull(predicate)
 
 
 /**
@@ -352,7 +353,7 @@ public inline fun <K, V> Map<K, V>.any(action: Map.Entry<K, V>.() -> Boolean): B
  * @return value or null if not found
  */
 @Suppress("UNCHECKED_CAST")
-public fun Map<String, Any?>.getNested(keys: Iterable<String>): Any? {
+public fun Map<out Any?, Any?>.getNested(keys: Iterable<Any>): Any? {
     var current: Any? = this
     for (key in keys) {
         if (current !is Map<*, *>) return null
@@ -378,8 +379,9 @@ public fun Map<String, Any?>.getNested(keys: Iterable<String>): Any? {
  * @param keys key to set
  * @param value value to set
  */
-public fun MutableMap<String, Any?>.setNested(keys: Iterable<String>, value: Any) {
-    var current = this
+public fun MutableMap<out Any?, out Any?>.setNested(keys: Iterable<Any>, value: Any) {
+    @Suppress("UNCHECKED_CAST")
+    var current = this as MutableMap<Any?, Any?>
     val iterator = keys.iterator()
 
     // Iterate over the keys
@@ -393,13 +395,13 @@ public fun MutableMap<String, Any?>.setNested(keys: Iterable<String>, value: Any
         }
 
         // Check if the key is already a map
-        if (current[key] !is MutableMap<*, *>) {
-            current[key] = mutableMapOf<String, Any?>()
+        if (current[key] !is MutableMap<out Any?, out Any?>) {
+            current[key] = mutableMapOf<Any?, Any?>()
         }
 
         // Move to the next level
         @Suppress("UNCHECKED_CAST")
-        current = current[key] as MutableMap<String, Any?>
+        current = current[key] as MutableMap<Any?, Any?>
     }
 }
 

@@ -11,6 +11,7 @@
 package dev.nikdekur.ndkore.spatial.kdtree
 
 import dev.nikdekur.ndkore.spatial.Point
+import dev.nikdekur.ndkore.spatial.distanceSquared
 import kotlin.math.pow
 
 /**
@@ -260,9 +261,9 @@ public open class KDTreeImpl<T> : MutableKDTree<T> {
 
     private inline fun distanceToSquared(p: Point, n: Point, cd: Int): Double {
         return when (cd) {
-            0 -> (p.x - n.x).toDouble().pow(2)
-            1 -> (p.y - n.y).toDouble().pow(2)
-            else -> (p.z - n.z).toDouble().pow(2)
+            0 -> (p.x - n.x).pow(2)
+            1 -> (p.y - n.y).pow(2)
+            else -> (p.z - n.z).pow(2)
         }
     }
 

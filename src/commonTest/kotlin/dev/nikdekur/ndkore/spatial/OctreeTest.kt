@@ -8,128 +8,28 @@
 
 package dev.nikdekur.ndkore.spatial
 
-import dev.nikdekur.ndkore.ext.sqrt
 import dev.nikdekur.ndkore.`interface`.Unique
 import dev.nikdekur.ndkore.spatial.octree.OctreeImpl
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-object CuboidShape : Shape<CuboidBuilding> {
-    override fun getMinPoint(o: CuboidBuilding): Point {
-        return o.min
-    }
 
-    override fun getMaxPoint(o: CuboidBuilding): Point {
-        return o.max
-    }
-
-    override fun contains(
-        obj: CuboidBuilding,
-        point: Point,
-    ): Boolean {
-        val min = obj.min
-        val max = obj.max
-        return point.x >= min.x && point.x <= max.x &&
-                point.y >= min.y && point.y <= max.y &&
-                point.z >= min.z && point.z <= max.z
-    }
-
-    override fun distanceSquared(
-        from: CuboidBuilding,
-        to: Point,
-    ): Double {
-        val dx = maxOf(0, from.min.x - to.x, to.x - from.max.x)
-        val dy = maxOf(0, from.min.y - to.y, to.y - from.max.y)
-        val dz = maxOf(0, from.min.z - to.z, to.z - from.max.z)
-        return (dx * dx + dy * dy + dz * dz).toDouble()
-    }
-
-    override fun intersects(
-        obj: CuboidBuilding,
-        min: Point,
-        max: Point,
-    ): Boolean {
-        val min2 = obj.min
-        val max2 = obj.max
-        return min.x <= max2.x && max.x >= min2.x &&
-                min.y <= max2.y && max.y >= min2.y &&
-                min.z <= max2.z && max.z >= min2.z
-    }
-}
-
-object SphereShape : Shape<SphereBuilding> {
-    override fun getMinPoint(o: SphereBuilding): Point {
-        return o.min
-    }
-
-    override fun getMaxPoint(o: SphereBuilding): Point {
-        return o.max
-    }
-
-    override fun contains(
-        obj: SphereBuilding,
-        point: Point,
-    ): Boolean {
-        val center = obj.center
-        val dx = point.x - center.x
-        val dy = point.y - center.y
-        val dz = point.z - center.z
-        return dx * dx + dy * dy + dz * dz <= obj.radiusSquared
-    }
-
-    override fun distanceSquared(
-        from: SphereBuilding,
-        to: Point,
-    ): Double {
-
-        val center = from.center
-        val dx = to.x - center.x
-        val dy = to.y - center.y
-        val dz = to.z - center.z
-        val distanceSquaredToCenter = dx * dx + dy * dy + dz * dz
-        return if (distanceSquaredToCenter <= from.radiusSquared) {
-            0.0
-        } else {
-            val distanceToSurface = distanceSquaredToCenter.sqrt() - from.radius
-            distanceToSurface * distanceToSurface
-        }
-    }
-
-    override fun intersects(
-        obj: SphereBuilding,
-        min: Point,
-        max: Point,
-    ): Boolean {
-        val center = obj.center
-        val dx = maxOf(min.x - center.x, center.x - max.x)
-        val dy = maxOf(min.y - center.y, center.y - max.y)
-        val dz = maxOf(min.z - center.z, center.z - max.z)
-        val distanceSquaredToSurface = dx * dx + dy * dy + dz * dz
-        return distanceSquaredToSurface <= obj.radiusSquared
-    }
-
-}
-
-interface Building : Unique<String> {
-    val min: Point
-    val max: Point
-}
+interface Building : Shape, Unique<String>
 
 data class CuboidBuilding(
     override val min: Point,
     override val max: Point,
     override val id: String,
-) : Building
+) : Building, CuboidShape
 
 data class SphereBuilding(
-    val center: Point,
-    val radius: Int,
+    override val center: Point,
+    override val radius: Double,
     override val id: String,
-) : Building {
-    override val min = Point(center.x - radius, center.y - radius, center.z - radius)
-    override val max = Point(center.x + radius, center.y + radius, center.z + radius)
-
+) : Building, SphereShape {
     val radiusSquared = radius * radius
 }
 
@@ -137,25 +37,50 @@ data class SphereBuilding(
 @Suppress("UNCHECKED_CAST")
 class OctreeTest {
 
+    fun calculateFinalDamage(initialDamage: Int, defensePoints: Int, toughness: Int): Double {
+        return initialDamage * (1 - (min(
+            20.0,
+            max((defensePoints / 5.0), defensePoints - (initialDamage / (2.0 + (toughness / 4.0))))
+        ) / 25.0))
+    }
+
+
+    enum class ArmorType {
+        HELMET,
+        CHESTPLATE,
+        LEGGINGS,
+        BOOTS
+    }
+
+    @Test
+    fun testDamage() {
+        val initialDamage = 7
+        val defensePoints = 9
+        val toughness = 4
+        val finalDamage = calculateFinalDamage(initialDamage, defensePoints, toughness)
+        assertEquals(5.13, finalDamage, 0.01)
+    }
+
+
 
     @Test
     fun testCube() {
         val octree = OctreeImpl<Building>()
 
-        val building = CuboidBuilding(Point(0, 0, 0), Point(10, 10, 10), "10x10x10 Cube")
-        octree.insert(building, CuboidShape as Shape<Building>)
+        val building = CuboidBuilding(Point.ZERO, Point(10.0, 10.0, 10.0), "10x10x10 Cube")
+        octree.insert(building)
 
-        val point = Point(5, 5, 5)
+        val point = Point(5.0, 5.0, 5.0)
         val found = octree.find(point)
         assertEquals(1, found.size)
         assertEquals(building, found.first())
 
-        val point2 = Point(10, 10, 10)
+        val point2 = Point(10.0, 10.0, 10.0)
         val found2 = octree.find(point2)
         assertEquals(1, found2.size)
         assertEquals(building, found2.first())
 
-        val point3 = Point(15, 15, 15)
+        val point3 = Point(15.0, 15.0, 15.0)
         val found3 = octree.find(point3)
         assertEquals(0, found3.size)
 
@@ -163,20 +88,20 @@ class OctreeTest {
         assertEquals(1, nearby1.size)
         assertEquals(building, nearby1.first())
 
-        val region1Min = Point(0, 0, 0)
-        val region1Max = Point(1, 1, 1)
+        val region1Min = Point.ZERO
+        val region1Max = Point(1.0, 1.0, .01)
         val inRegion1 = octree.findInRegion(region1Min, region1Max)
         assertEquals(1, inRegion1.size)
         assertEquals(building, inRegion1.first())
 
-        val region2Min = Point(10, 10, 10)
-        val region2Max = Point(11, 11, 11)
+        val region2Min = Point(10.0, 10.0, 10.0)
+        val region2Max = Point(11.0, 11.0, 11.0)
         val inRegion2 = octree.findInRegion(region2Min, region2Max)
         assertEquals(1, inRegion2.size)
         assertEquals(building, inRegion2.first())
 
-        val region3Min = Point(11, 11, 11)
-        val region3Max = Point(12, 12, 12)
+        val region3Min = Point(11.0, 11.0, 11.0)
+        val region3Max = Point(12.0, 12.0, 12.0)
         val inRegion3 = octree.findInRegion(region3Min, region3Max)
         assertEquals(0, inRegion3.size)
     }
@@ -185,20 +110,20 @@ class OctreeTest {
     fun testSphere() {
         val octree = OctreeImpl<Building>()
 
-        val building = SphereBuilding(Point(10, 10, 10), 5, "Sphere")
-        octree.insert(building, SphereShape as Shape<Building>)
+        val building = SphereBuilding(Point(10.0, 10.0, 10.0), 5.0, "Sphere")
+        octree.insert(building)
 
-        val point = Point(10, 10, 10)
+        val point = Point(10.0, 10.0, 10.0)
         val found = octree.find(point)
         assertEquals(1, found.size)
         assertEquals(building, found.first())
 
-        val point2 = Point(12, 12, 12)
+        val point2 = Point(12.0, 12.0, 12.0)
         val found2 = octree.find(point2)
         assertEquals(1, found2.size)
         assertEquals(building, found2.first())
 
-        val point3 = Point(15, 15, 15)
+        val point3 = Point(15.0, 15.0, 15.0)
         val found3 = octree.find(point3)
         assertEquals(0, found3.size)
 
@@ -206,20 +131,20 @@ class OctreeTest {
         assertEquals(1, nearby1.size)
         assertEquals(building, nearby1.first())
 
-        val region1Min = Point(10, 10, 10)
-        val region1Max = Point(11, 11, 11)
+        val region1Min = Point(10.0, 10.0, 10.0)
+        val region1Max = Point(11.0, 11.0, 11.0)
         val inRegion1 = octree.findInRegion(region1Min, region1Max)
         assertEquals(1, inRegion1.size)
         assertEquals(building, inRegion1.first())
 
-        val region2Min = Point(10, 10, 10)
-        val region2Max = Point(11, 11, 11)
+        val region2Min = Point(10.0, 10.0, 10.0)
+        val region2Max = Point(11.0, 11.0, 11.0)
         val inRegion2 = octree.findInRegion(region2Min, region2Max)
         assertEquals(1, inRegion2.size)
         assertEquals(building, inRegion2.first())
 
-        val region3Min = Point(13, 13, 13)
-        val region3Max = Point(14, 14, 14)
+        val region3Min = Point(13.0, 13.0, 13.0)
+        val region3Max = Point(14.0, 14.0, 14.0)
         val inRegion3 = octree.findInRegion(region3Min, region3Max)
         assertEquals(0, inRegion3.size)
     }
@@ -228,19 +153,19 @@ class OctreeTest {
     fun testMultipleCuboidElements() {
         val octree = OctreeImpl<Building>()
 
-        val building1 = CuboidBuilding(Point(0, 0, 0), Point(10, 10, 10), "Building 1")
-        val building2 = CuboidBuilding(Point(5, 5, 5), Point(15, 15, 15), "Building 2")
-        octree.insert(building1, CuboidShape as Shape<Building>)
-        octree.insert(building2, CuboidShape as Shape<Building>)
+        val building1 = CuboidBuilding(Point.ZERO, Point(10.0, 10.0, 10.0), "Building 1")
+        val building2 = CuboidBuilding(Point(5.0, 5.0, 5.0), Point(15.0, 15.0, 15.0), "Building 2")
+        octree.insert(building1)
+        octree.insert(building2)
 
-        val point1 = Point(5, 5, 5)
+        val point1 = Point(5.0, 5.0, 5.0)
         val found1 = octree.find(point1)
         assertEquals(2, found1.size)
         assertTrue(found1.contains(building1))
         assertTrue(found1.contains(building2))
 
-        val regionMin = Point(0, 0, 0)
-        val regionMax = Point(20, 20, 20)
+        val regionMin = Point.ZERO
+        val regionMax = Point(20.0, 20.0, 20.0)
         val inRegion = octree.findInRegion(regionMin, regionMax)
         assertEquals(2, inRegion.size)
         assertTrue(inRegion.contains(building1))
@@ -251,22 +176,22 @@ class OctreeTest {
     fun testMultipleSphereElements() {
         val octree = OctreeImpl<Building>()
 
-        val sphere1 = SphereBuilding(Point(10, 10, 10), 5, "Sphere 1")
-        val sphere2 = SphereBuilding(Point(15, 15, 15), 5, "Sphere 2")
-        octree.insert(sphere1, SphereShape as Shape<Building>)
-        octree.insert(sphere2, SphereShape as Shape<Building>)
+        val sphere1 = SphereBuilding(Point(10.0, 10.0, 10.0), 5.0, "Sphere 1")
+        val sphere2 = SphereBuilding(Point(15.0, 15.0, 15.0), 5.0, "Sphere 2")
+        octree.insert(sphere1)
+        octree.insert(sphere2)
 
-        val point1 = Point(12, 12, 12)
+        val point1 = Point(12.0, 12.0, 12.0)
         val found1 = octree.find(point1)
         assertEquals(1, found1.size)
         assertEquals(sphere1, found1.first())
 
-        val point2 = Point(15, 15, 15)
+        val point2 = Point(15.0, 15.0, 15.0)
         val found2 = octree.find(point2)
         assertEquals(1, found2.size)
         assertEquals(sphere2, found2.first())
 
-        val nearby = octree.findNearby(Point(20, 20, 20), 17.4)
+        val nearby = octree.findNearby(Point(20.0, 20.0, 20.0), 17.4)
         assertEquals(2, nearby.size)
         assertTrue(nearby.contains(sphere1))
         assertTrue(nearby.contains(sphere2))
@@ -276,15 +201,15 @@ class OctreeTest {
     fun testIteration() {
         val octree = OctreeImpl<Building>()
 
-        val building1 = CuboidBuilding(Point(0, 0, 0), Point(10, 10, 10), "Building 1")
-        val building2 = CuboidBuilding(Point(20, 20, 20), Point(30, 30, 30), "Building 2")
-        val sphere1 = SphereBuilding(Point(5, 5, 5), 5, "Sphere 1")
-        val sphere2 = SphereBuilding(Point(25, 25, 25), 5, "Sphere 2")
+        val building1 = CuboidBuilding(Point.ZERO, Point(10.0, 10.0, 10.0), "Building 1")
+        val building2 = CuboidBuilding(Point(20.0, 20.0, 20.0), Point(30.0, 30.0, 30.0), "Building 2")
+        val sphere1 = SphereBuilding(Point(5.0, 5.0, 5.0), 5.0, "Sphere 1")
+        val sphere2 = SphereBuilding(Point(25.0, 25.0, 25.0), 5.0, "Sphere 2")
 
-        octree.insert(building1, CuboidShape as Shape<Building>)
-        octree.insert(building2, CuboidShape as Shape<Building>)
-        octree.insert(sphere1, SphereShape as Shape<Building>)
-        octree.insert(sphere2, SphereShape as Shape<Building>)
+        octree.insert(building1)
+        octree.insert(building2)
+        octree.insert(sphere1)
+        octree.insert(sphere2)
 
         val elements = octree.toList()
         assertEquals(4, elements.size)
@@ -298,24 +223,25 @@ class OctreeTest {
     fun testCuboidAndSphereMixed() {
         val octree = OctreeImpl<Building>()
 
-        val building = CuboidBuilding(Point(0, 0, 0), Point(10, 10, 10), "Building")
-        val sphere = SphereBuilding(Point(5, 5, 5), 5, "Sphere")
-        octree.insert(building, CuboidShape as Shape<Building>)
-        octree.insert(sphere, SphereShape as Shape<Building>)
+        val building = CuboidBuilding(Point.ZERO, Point(10.0, 10.0, 10.0), "Building")
+        val sphere = SphereBuilding(Point(5.0, 5.0, 5.0), 5.0, "Sphere")
+        octree.insert(building)
+        octree.insert(sphere)
 
-        val point1 = Point(5, 5, 5)
+        val point1 = Point(5.0, 5.0, 5.0)
         val found1 = octree.find(point1)
         assertEquals(2, found1.size)
         assertTrue(found1.contains(building))
         assertTrue(found1.contains(sphere))
 
-        val nearby = octree.findNearby(Point(4, 4, 4), 5.0)
+        val nearby = octree.findNearby(Point(4.0, 4.0, 4.0), 5.0)
+        println(nearby)
         assertEquals(2, nearby.size)
         assertTrue(nearby.contains(building))
         assertTrue(nearby.contains(sphere))
 
-        val regionMin = Point(0, 0, 0)
-        val regionMax = Point(5, 5, 5)
+        val regionMin = Point.ZERO
+        val regionMax = Point(5.0, 5.0, 5.0)
         val inRegion = octree.findInRegion(regionMin, regionMax)
         assertEquals(2, inRegion.size)
         assertTrue(inRegion.contains(building))
@@ -326,21 +252,21 @@ class OctreeTest {
     fun testNodesIteration() {
         val octree = OctreeImpl<Building>()
 
-        val building1 = CuboidBuilding(Point(0, 0, 0), Point(10, 10, 10), "Building 1")
-        val building2 = CuboidBuilding(Point(20, 20, 20), Point(30, 30, 30), "Building 2")
-        val sphere1 = SphereBuilding(Point(5, 5, 5), 5, "Sphere 1")
-        val sphere2 = SphereBuilding(Point(25, 25, 25), 5, "Sphere 2")
+        val building1 = CuboidBuilding(Point.ZERO, Point(10.0, 10.0, 10.0), "Building 1")
+        val building2 = CuboidBuilding(Point(20.0, 20.0, 20.0), Point(30.0, 30.0, 30.0), "Building 2")
+        val sphere1 = SphereBuilding(Point(5.0, 5.0, 5.0), 5.0, "Sphere 1")
+        val sphere2 = SphereBuilding(Point(25.0, 25.0, 25.0), 5.0, "Sphere 2")
 
-        octree.insert(building1, CuboidShape as Shape<Building>)
-        octree.insert(building2, CuboidShape as Shape<Building>)
-        octree.insert(sphere1, SphereShape as Shape<Building>)
-        octree.insert(sphere2, SphereShape as Shape<Building>)
+        octree.insert(building1)
+        octree.insert(building2)
+        octree.insert(sphere1)
+        octree.insert(sphere2)
 
         val nodes = octree.iteratorNode().asSequence().toList()
         assertEquals(4, nodes.size)
-        assertTrue(nodes.any { it.data == building1 })
-        assertTrue(nodes.any { it.data == building2 })
-        assertTrue(nodes.any { it.data == sphere1 })
-        assertTrue(nodes.any { it.data == sphere2 })
+        assertTrue(nodes.any { it == building1 })
+        assertTrue(nodes.any { it == building2 })
+        assertTrue(nodes.any { it == sphere1 })
+        assertTrue(nodes.any { it == sphere2 })
     }
 }

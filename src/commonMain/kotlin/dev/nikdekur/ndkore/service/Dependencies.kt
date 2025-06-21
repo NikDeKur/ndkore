@@ -28,7 +28,7 @@ import kotlin.reflect.KClass
  * @see AbstractService
  */
 public data class Dependencies(
-    val dependsOn: Array<out KClass<out Any>>,
+    val dependsOn: Array<out Dependency>,
     val first: Boolean = false,
     val last: Boolean = false,
 ) {
@@ -54,18 +54,7 @@ public data class Dependencies(
 
 
     public companion object {
-        /**
-         * Creates a new instance of [Dependencies] with the given modules that should be loaded before this module.
-         *
-         * @param modules List of modules that should be loaded before this module
-         * @return New instance of [Dependencies]
-         */
-        @JvmStatic
-        public fun dependsOn(vararg modules: KClass<out Any>): Dependencies =
-            Dependencies(modules, first = false, last = false)
-
-
-        private val EMPTY by lazy {
+        private val NONE by lazy {
             Dependencies(emptyArray(), first = false, last = false)
         }
         private val FIRST by lazy {
@@ -81,7 +70,7 @@ public data class Dependencies(
          * @return Empty instance of [Dependencies]
          */
         @JvmStatic
-        public fun none(): Dependencies = EMPTY
+        public fun none(): Dependencies = NONE
 
         /**
          * Returns an instance of [Dependencies] that should be loaded as first as possible by other dependencies.
@@ -101,12 +90,18 @@ public data class Dependencies(
     }
 }
 
+public data class Dependency(
+    val service: KClass<out Any>,
+    val qualifier: Qualifier,
+    val optional: Boolean
+)
+
 
 /**
  * Builder for [Dependencies].
  */
 public class DependenciesBuilder {
-    private val dependsOn = mutableListOf<KClass<out Any>>()
+    private val dependsOn = mutableListOf<Dependency>()
     private var first = false
     private var last = false
 
@@ -126,12 +121,18 @@ public class DependenciesBuilder {
 
 
     /**
-     * Adds the given modules that should be loaded before this module.
+     * Adds a dependency to the dependency list.
      *
-     * @param services List of modules
+     * @param service Service's KClass to depend
+     * @param qualifier Qualifier to use for the dependency
+     * @param optional True if the dependency is optional, false otherwise
      */
-    public fun dependsOn(vararg services: KClass<out Any>) {
-        dependsOn.addAll(services)
+    public fun dependsOn(
+        service: KClass<out Any>,
+        qualifier: Qualifier = Qualifier.Empty,
+        optional: Boolean = false
+    ) {
+        dependsOn.add(Dependency(service, qualifier, optional))
     }
 
 
@@ -146,15 +147,27 @@ public class DependenciesBuilder {
 
 
     /**
-     * Adds the given module that should be loaded before this module.
+     * Adds the given service that should be loaded before this service.
      *
-     * Just a shorthand for [dependsOn], for DSL purposes.
+     * Just shorthand for [dependsOn], for DSL purposes.
      *
-     * @param service Module
+     * @receiver Service's KClass to depend. optional parameter is set to false.
      */
     @NdkoreDSL
     public inline operator fun KClass<out Any>.unaryPlus() {
-        dependsOn(this)
+        dependsOn(this, optional = false)
+    }
+
+    /**
+     * Adds the given service that should be loaded before this service.
+     *
+     * Just shorthand for [dependsOn], for DSL purposes.
+     *
+     * @receiver Service's KClass to depend. optional parameter is set to true.
+     */
+    @NdkoreDSL
+    public inline operator fun KClass<out Any>.unaryMinus() {
+        dependsOn(this, optional = true)
     }
 }
 

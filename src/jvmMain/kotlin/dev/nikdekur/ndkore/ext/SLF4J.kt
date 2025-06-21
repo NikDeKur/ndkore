@@ -15,24 +15,24 @@ import org.slf4j.event.Level
 import kotlin.time.TimeSource
 import kotlin.time.TimedValue
 
-public inline fun Logger.log(level: Level, msg: String) = atLevel(level).log(msg)
+public inline fun Logger.log(level: Level, msg: String): Unit = atLevel(level).log(msg)
 
-public inline fun Logger.log(level: Level, msg: () -> String) = log(level, msg())
-public inline fun Logger.trace(msg: () -> String) = trace(msg())
-public inline fun Logger.debug(msg: () -> String) = debug(msg())
-public inline fun Logger.info(msg: () -> String) = info(msg())
-public inline fun Logger.warn(msg: () -> String) = warn(msg())
-public inline fun Logger.error(msg: () -> String) = error(msg())
+public inline fun Logger.log(level: Level, msg: () -> String): Unit = log(level, msg())
+public inline fun Logger.trace(msg: () -> String): Unit = trace(msg())
+public inline fun Logger.debug(msg: () -> String): Unit = debug(msg())
+public inline fun Logger.info(msg: () -> String): Unit = info(msg())
+public inline fun Logger.warn(msg: () -> String): Unit = warn(msg())
+public inline fun Logger.error(msg: () -> String): Unit = error(msg())
 
 
-public inline fun Logger.log(level: Level, throwable: Throwable, msg: () -> String) =
+public inline fun Logger.log(level: Level, throwable: Throwable, msg: () -> String): Unit =
     atLevel(level).setCause(throwable).log(msg())
 
-public inline fun Logger.trace(throwable: Throwable, msg: () -> String) = trace(msg(), throwable)
-public inline fun Logger.debug(throwable: Throwable, msg: () -> String) = debug(msg(), throwable)
-public inline fun Logger.info(throwable: Throwable, msg: () -> String) = info(msg(), throwable)
-public inline fun Logger.warn(throwable: Throwable, msg: () -> String) = warn(msg(), throwable)
-public inline fun Logger.error(throwable: Throwable, msg: () -> String) = error(msg(), throwable)
+public inline fun Logger.trace(throwable: Throwable, msg: () -> String): Unit = trace(msg(), throwable)
+public inline fun Logger.debug(throwable: Throwable, msg: () -> String): Unit = debug(msg(), throwable)
+public inline fun Logger.info(throwable: Throwable, msg: () -> String): Unit = info(msg(), throwable)
+public inline fun Logger.warn(throwable: Throwable, msg: () -> String): Unit = warn(msg(), throwable)
+public inline fun Logger.error(throwable: Throwable, msg: () -> String): Unit = error(msg(), throwable)
 
 public inline fun <T> Logger.recordTiming(
     source: TimeSource,

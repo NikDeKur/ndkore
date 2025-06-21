@@ -35,5 +35,5 @@ public inline operator fun BigInteger.div(value: BigInteger): BigInteger = this.
  *
  * @return true if this BigInteger is zero, false otherwise.
  */
-public inline val BigInteger.isZero
+public inline val BigInteger.isZero: Boolean
     get() = this == BigInteger.ZERO

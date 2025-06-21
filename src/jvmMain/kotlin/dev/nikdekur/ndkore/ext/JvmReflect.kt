@@ -4,6 +4,7 @@ package dev.nikdekur.ndkore.ext
 
 import dev.nikdekur.ndkore.reflect.Reflect
 import dev.nikdekur.ndkore.reflect.ReflectResult
+import dev.nikdekur.ndkore.reflect.UnsafeReflectAPI
 import java.io.File
 import java.lang.reflect.AccessibleObject
 import java.lang.reflect.Constructor
@@ -108,7 +109,7 @@ public inline val Any.r_ClassMethods: HashMap<String, Method>
  * or `ReflectResult.Missing` if the field does not exist.
  */
 @Suppress("FunctionName", "kotlin:S100")
-public inline fun Any.r_GetField(name: String) = Reflect.getFieldValue(javaClass, this, name)
+public inline fun Any.r_GetField(name: String): ReflectResult = Reflect.getFieldValue(javaClass, this, name)
 
 /**
  * Extension function to set the value of a field in the object.
@@ -118,7 +119,7 @@ public inline fun Any.r_GetField(name: String) = Reflect.getFieldValue(javaClass
  * @param value The value to be set in the field.
  */
 @Suppress("FunctionName", "kotlin:S100")
-public inline fun Any.r_SetField(name: String, value: Any?) = Reflect.setFieldValue(javaClass, this, name, value)
+public inline fun Any.r_SetField(name: String, value: Any?): Unit = Reflect.setFieldValue(javaClass, this, name, value)
 
 /**
  * Extension function to invoke a method with specified arguments and return the result.
@@ -161,6 +162,23 @@ public inline fun Any.r_CallMethod(name: String, vararg args: Any?): ReflectResu
     return Reflect.callMethodTyped(javaClass, this, name, classes, *args)
 }
 
+/**
+ * Sets the value of a field in the given object using the `Unsafe` instance.
+ *
+ * This method uses the `Unsafe` instance to set the value of a field directly in the object,
+ * without facing any access restrictions.
+ * It allows setting the value of a field that is even declared as `final`.
+ *
+ * @param name The name of the field whose value is to be set.
+ * @param value The value to be set in the field.
+ * @throws IllegalAccessException If the `Unsafe` instance could not be accessed.
+ * @throws NoSuchFieldException If the field does not exist in the object.
+ */
+@UnsafeReflectAPI
+@Suppress("FunctionName", "kotlin:S100")
+public inline fun Any.r_SetFieldUnsafe(name: String, value: Any?) {
+    Reflect.setFieldValueUnsafe(javaClass, this, name, value)
+}
 
 /**
  * Retrieves methods in the class that are annotated with a specific annotation.
@@ -282,7 +300,7 @@ public inline fun <T> Class<T>.getInstanceField(): T {
  * @throws ClassNotFoundException If the nested class does not exist.
  */
 public inline fun <reified T> getNestedClass(name: String): Class<*> {
-    return Class.forName("${T::class.java.name}\$${name}")
+    return Class.forName("${T::class.java.name}$${name}")
 }
 
 
@@ -334,3 +352,4 @@ public inline fun KType(
     override val classifier: KClassifier = classifier
     override val arguments: List<KTypeProjection> = arguments
 }
+

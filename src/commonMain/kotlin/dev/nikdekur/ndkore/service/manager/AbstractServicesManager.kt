@@ -11,10 +11,7 @@
 package dev.nikdekur.ndkore.service.manager
 
 import dev.nikdekur.ndkore.ext.forEachSafe
-import dev.nikdekur.ndkore.service.CircularDependencyException
-import dev.nikdekur.ndkore.service.ClassIsNotServiceException
-import dev.nikdekur.ndkore.service.Service
-import dev.nikdekur.ndkore.service.ServiceNotFoundException
+import dev.nikdekur.ndkore.service.*
 import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlin.reflect.KClass
@@ -39,29 +36,40 @@ public abstract class AbstractServicesManager : ServicesManager {
 
     override var state: ServicesManager.State = ServicesManager.State.DISABLED
 
-    public val servicesCollection: MutableSet<ServiceRef> = LinkedHashSet()
+    public val servicesCollection: MutableSet<ServiceDefinition<*>> = LinkedHashSet()
 
     override val services: Collection<Service>
         get() = sortServices()
 
-    override suspend fun <C : Any, S : C> registerService(service: S, vararg bindTo: KClass<out C>) {
-        if (service !is Service)
+    override suspend fun registerService(definition: Definition<*>) {
+
+        val service = definition.service
+        if (service !is Service) {
             throw ClassIsNotServiceException(service::class)
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        val definition = definition as Definition<Service>
+
+        val qualifier = definition.qualifier
+        val bindTo = definition.bindTo
 
         // If services manager is enabled and bind override existing services,
         // then disable existing services and enable the new one
         if (state == ServicesManager.State.ENABLED) {
-            getServiceInternal(service::class)?.disable()
-            bindTo.forEach { getServiceInternal(it)?.disable() }
+            getServiceInternal(service::class, qualifier)?.disable()
+            bindTo.forEach { getServiceInternal(it, qualifier)?.disable() }
             service.enable()
         }
 
-        val reference = ServiceRef(service, bindTo)
-        servicesCollection.add(reference)
+        servicesCollection.add(
+            ServiceDefinition(definition)
+        )
     }
 
-    public fun getServiceInternal(serviceClass: KClass<*>): Service? {
-        val service = getServiceOrNull(serviceClass) ?: return null
+
+    public fun getServiceInternal(serviceClass: KClass<*>, qualifier: Qualifier): Service? {
+        val service = getServiceOrNull(serviceClass, qualifier) ?: return null
         return service as? Service ?: throw ClassIsNotServiceException(serviceClass)
     }
 
@@ -111,6 +119,7 @@ public abstract class AbstractServicesManager : ServicesManager {
     }
 
 
+    // TODO: Reduce complexity of this function
     public fun sortServices(): Collection<Service> {
         val visited = mutableSetOf<Service>()
         val inProcess = mutableSetOf<Service>() // Для отслеживания стека вызовов (для циклов)
@@ -134,9 +143,18 @@ public abstract class AbstractServicesManager : ServicesManager {
                 else -> regularServices.add(service)
             }
 
-            val dependencies = service.dependencies.dependsOn.mapTo(ArrayList()) {
-                if (ref.isApplicable(it)) throw CircularDependencyException(service)
-                getServiceInternal(it) ?: throw ServiceNotFoundException(it)
+            val dependencies = service.dependencies.dependsOn.mapNotNull {
+                if (it.optional) return@mapNotNull null
+
+                val qualifier = it.qualifier
+                val clazz = it.service
+
+                if (ref.isApplicable(clazz, qualifier)) throw CircularDependencyException(service)
+                getServiceInternal(clazz, qualifier) ?: throw DependentServiceNotFoundException(
+                    service,
+                    clazz,
+                    qualifier
+                )
             }
 
             graph[ref.service] = dependencies
@@ -171,36 +189,23 @@ public abstract class AbstractServicesManager : ServicesManager {
     }
 
 
-    /**
-     * # Service Reference
-     *
-     * Internal class to store a reference to a service and the classes it should be bound to.
-     *
-     * Used for checking for self-dependencies and comparing services by their bindTo classes.
-     *
-     * @property service Service to store
-     * @property bindTo Classes to bind the service to
-     */
-    public data class ServiceRef(
-        val service: Service,
-        val bindTo: Array<out KClass<out Any>>
-    ) {
-        public fun isApplicable(clazz: KClass<out Any>): Boolean {
-            return bindTo.any { it == clazz }
+    public class ServiceDefinition<S : Service>(
+        public val delegate: Definition<S>,
+    ) : Definition<S> {
+
+        public inline fun isApplicable(clazz: KClass<out Any>, qualifier: Qualifier): Boolean {
+            return bindTo.contains(clazz) && this.qualifier == qualifier
         }
 
-
-        override fun equals(other: Any?): Boolean {
-            val other = other as? ServiceRef ?: return false
-
-            return bindTo.contentDeepEquals(other.bindTo)
-        }
-
-        override fun hashCode(): Int {
-            return bindTo.contentDeepHashCode()
-        }
+        override val service: S
+            get() = delegate.service
+        override val qualifier: Qualifier
+            get() = delegate.qualifier
+        override val bindTo: Iterable<KClass<*>>
+            get() = delegate.bindTo
     }
 }
+
 
 
 public abstract class ServicesManagerBuilder<R : ServicesManager> {
@@ -217,4 +222,4 @@ public abstract class ServicesManagerBuilder<R : ServicesManager> {
 }
 
 
-public inline fun ServicesManagerBuilder<*>.throwOnError() = onError { throw exception }
+public inline fun ServicesManagerBuilder<*>.throwOnError(): Unit = onError { throw exception }

@@ -15,11 +15,22 @@ public class ClassIsNotServiceException(
 ) : RuntimeException("Class '${clazz}' is not a service!")
 
 /**
- * Indicates service not found.
+ * Indicates service not found in the services manager.
+ *
+ * Can be thrown when a service dependency is not found.
  */
+public class DependentServiceNotFoundException(
+    public val source: Service,
+    public val serviceClass: KClass<*>,
+    public val qualifier: Qualifier
+) : RuntimeException("$source need service '${serviceClass}' with qualifier '$qualifier', which is not found!")
+
+
 public class ServiceNotFoundException(
-    public val serviceClass: KClass<*>
-) : RuntimeException("Service for '${serviceClass}' not found!")
+    public val serviceClass: KClass<*>,
+    public val qualifier: Qualifier
+) : RuntimeException("Service '${serviceClass}' with qualifier '$qualifier' not found!")
+
 
 
 /**

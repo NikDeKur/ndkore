@@ -8,7 +8,7 @@ import java.util.concurrent.CompletableFuture
 /**
  * Completes this [CompletableFuture] with the Unit value.
  */
-public inline fun CompletableFuture<Unit>.complete() = complete(Unit)
+public inline fun CompletableFuture<Unit>.complete(): Boolean = complete(Unit)
 
 /**
  * Returns a new CompletableFuture that is already completed with the given value.

@@ -1,6 +1,9 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package dev.nikdekur.ndkore.time.clock
 
 import dev.nikdekur.ndkore.time.mark.AcceleratedTimeMark
+import dev.nikdekur.ndkore.time.mark.FixedTimeMark
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.time.TimeMark
@@ -41,5 +44,13 @@ public class FixedStartClock(
 
     override fun now(): Instant {
         return start + timeMark.elapsedNow()
+    }
+
+    public companion object {
+        public inline fun Zero(timeMark: TimeMark = TimeSource.Monotonic.markNow()): FixedStartClock {
+            return FixedStartClock(Instant.fromEpochSeconds(0), timeMark)
+        }
+
+        public val AlwaysZero: FixedStartClock = FixedStartClock(Instant.fromEpochSeconds(0), FixedTimeMark.Zero)
     }
 }

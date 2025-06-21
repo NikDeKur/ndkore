@@ -8,8 +8,8 @@
 
 package dev.nikdekur.ndkore.reflect.classfinder
 
-import dev.nikdekur.ndkore.reflect.SimpleClassFinder
+import dev.nikdekur.ndkore.reflect.JVMReflectClassFinder
 
 class SimpleClassFinderTest : ClassFinderTest() {
-    override val finder = SimpleClassFinder
+    override val finder = JVMReflectClassFinder
 }

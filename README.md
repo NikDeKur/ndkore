@@ -40,10 +40,6 @@ But in some parts, ndkore still supports java, and you can use it in your java p
 
 ## Installation
 
-Replace `{version}` with the latest version number on repository.
-
-[`21.10.2024`] Latest version: `1.4.4`
-
 ### Gradle (Kotlin)
 
 ```kotlin
@@ -52,7 +48,7 @@ repositories {
 }
 
 dependencies {
-    implementation("dev.nikdekur:ndkore:{version}")
+    implementation("dev.nikdekur:ndkore:1.6.0")
 }
 ```
 
@@ -64,7 +60,7 @@ repositories {
 }
 
 dependencies {
-    implementation "dev.nikdekur:ndkore:{version}"
+    implementation "dev.nikdekur:ndkore:1.6.0"
 }
 ```
 
@@ -85,6 +81,6 @@ dependencies {
 <dependency>
     <groupId>dev.nikdekur</groupId>
     <artifactId>ndkore</artifactId>
-    <version>{version}</version>
+    <version>1.6.0</version>
 </dependency>
 ```

@@ -57,24 +57,20 @@ public class KotlinXEncoderReflectMethod(
         }
 
         override fun encodeElement(descriptor: SerialDescriptor, index: Int): Boolean {
-            println("encodeElement: $field -> ${descriptor.getElementName(index)}")
             return descriptor.getElementName(index) == field
         }
 
 
         override fun encodeValue(value: Any) {
-            println("encodeValue: $field -> $value")
             result = value
         }
 
 
         override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
-            println("encodeSerializableValue: $field -> $value")
             result = value
         }
 
         override fun <T : Any> encodeNullableSerializableValue(serializer: SerializationStrategy<T>, value: T?) {
-            println("encodeNullableSerializableValue: $field -> $value")
             result = value
         }
     }

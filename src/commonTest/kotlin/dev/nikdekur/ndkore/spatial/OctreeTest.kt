@@ -235,7 +235,6 @@ class OctreeTest {
         assertTrue(found1.contains(sphere))
 
         val nearby = octree.findNearby(Point(4.0, 4.0, 4.0), 5.0)
-        println(nearby)
         assertEquals(2, nearby.size)
         assertTrue(nearby.contains(building))
         assertTrue(nearby.contains(sphere))

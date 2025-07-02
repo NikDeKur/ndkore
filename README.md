@@ -48,7 +48,7 @@ repositories {
 }
 
 dependencies {
-    implementation("dev.nikdekur:ndkore:1.6.0")
+    implementation("dev.nikdekur:ndkore:1.6.1")
 }
 ```
 
@@ -60,7 +60,7 @@ repositories {
 }
 
 dependencies {
-    implementation "dev.nikdekur:ndkore:1.6.0"
+    implementation "dev.nikdekur:ndkore:1.6.1"
 }
 ```
 
@@ -81,6 +81,6 @@ dependencies {
 <dependency>
     <groupId>dev.nikdekur</groupId>
     <artifactId>ndkore</artifactId>
-    <version>1.6.0</version>
+    <version>1.6.1</version>
 </dependency>
 ```

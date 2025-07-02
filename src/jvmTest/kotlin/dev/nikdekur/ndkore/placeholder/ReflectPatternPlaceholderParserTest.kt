@@ -8,8 +8,7 @@
 
 package dev.nikdekur.ndkore.placeholder
 
-import dev.nikdekur.ndkore.placeholder.PatternPlaceholderParserTest.Member
-import dev.nikdekur.ndkore.placeholder.PatternPlaceholderParserTest.User
+import dev.nikdekur.ndkore.reflect.JVMReflectMethod
 
 class ReflectPatternPlaceholderParserTest : PatternPlaceholderParserTest() {
 

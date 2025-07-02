@@ -100,12 +100,12 @@ public open class PatternPlaceholderParser(
         return currentObject.toString()
     }
 
-    override fun parse(string: String, placeholders: Map<String, Any?>): String {
+    override fun parse(pattern: String, placeholders: Map<String, Any?>): String {
         val sb = StringBuilder()
         var lastIndex = 0
 
-        pattern.findAll(string).forEach { match ->
-            sb.append(string.substring(lastIndex, match.range.first))
+        this@PatternPlaceholderParser.pattern.findAll(pattern).forEach { match ->
+            sb.append(pattern.substring(lastIndex, match.range.first))
 
             val pathRaw = match.groupValues[1]
             val value = parseExpression(pathRaw, placeholders)
@@ -115,8 +115,8 @@ public open class PatternPlaceholderParser(
         }
 
         // Append the remaining part of the string
-        if (lastIndex < string.length)
-            sb.append(string.substring(lastIndex))
+        if (lastIndex < pattern.length)
+            sb.append(pattern.substring(lastIndex))
 
         return sb.toString()
     }

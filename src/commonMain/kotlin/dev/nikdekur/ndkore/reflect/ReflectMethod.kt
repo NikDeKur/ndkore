@@ -1,6 +1,8 @@
 package dev.nikdekur.ndkore.reflect
 
-public fun interface ReflectMethod {
+public interface ReflectMethod {
+
+    public val supportMethodCalling: Boolean
 
     /**
      * Finds a value at a path in an object.
@@ -19,3 +21,5 @@ public fun interface ReflectMethod {
      */
     public data object NotFound
 }
+
+

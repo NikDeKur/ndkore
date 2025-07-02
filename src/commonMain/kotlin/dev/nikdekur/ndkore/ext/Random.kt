@@ -28,8 +28,8 @@ public inline fun Random.randomBigPercent(): Double {
 }
 
 
-public inline fun requireGreater(num1: Number, num2: Number) {
-    require(num1 <= num2) { "max must be greater than min" }
+public inline fun requireGreater(number: Number, greaterThan: Number) {
+    require(number > greaterThan) { "Value $number must be greater than $greaterThan" }
 }
 
 /**
@@ -77,7 +77,7 @@ public inline fun Random.randFloat(min: Float, max: Float): Float {
  * @return true with a chance of [chance]
  */
 public inline fun Random.chance(chance: Double): Boolean {
-    require(chance in 0.0..1.0) { "chance must be between 0.0 and 100.0" }
+    require(chance in 0.0..1.0) { "chance must be between 0.0 and 1.0" }
     return when (chance) {
         0.0 -> return false
         1.0 -> return true

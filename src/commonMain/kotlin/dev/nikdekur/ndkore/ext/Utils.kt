@@ -17,3 +17,4 @@ public inline fun input(text: String): String {
 
 
 public typealias CompAny = Comparable<Any>
+public typealias CompOutAny = Comparable<*>

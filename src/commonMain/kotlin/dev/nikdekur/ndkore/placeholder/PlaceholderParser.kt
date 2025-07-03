@@ -57,22 +57,22 @@ public interface PlaceholderParser {
     /**
      * Parses the entire string with placeholders, replacing them with their corresponding values from the map.
      *
-     * @param string The string to parse, which contains placeholders to be replaced.
+     * @param pattern The string to parse, which contains placeholders to be replaced.
      * @param placeholders A map of key-value pairs where keys are placeholder names and values are their replacements.
      * @return The string with all placeholders replaced with their values.
      */
-    public fun parse(string: String, placeholders: Map<String, Any?>): String
+    public fun parse(pattern: String, placeholders: Map<String, Any?>): String
 }
 
 /**
  * Extension function for `PlaceholderParser` that converts variable arguments of key-value pairs into a map
  * and then parses the string with those placeholders.
  *
- * @param string The string with placeholders to be replaced.
+ * @param pattern The string with placeholders to be replaced.
  * @param placeholders A variable number of key-value pairs where keys are placeholder names and values are
  *                      their replacements.
  * @return The string with placeholders replaced based on the provided pairs.
  */
-public inline fun PlaceholderParser.parse(string: String, vararg placeholders: Pair<String, Any?>): String {
-    return parse(string, placeholders.toMap())
+public inline fun PlaceholderParser.parse(pattern: String, vararg placeholders: Pair<String, Any?>): String {
+    return parse(pattern, placeholders.toMap())
 }

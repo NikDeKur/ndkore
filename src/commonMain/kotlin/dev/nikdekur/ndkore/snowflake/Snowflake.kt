@@ -20,9 +20,9 @@ import kotlinx.serialization.Serializable
  * The bits are split across two ULong values:
  * - data1:
  *   - 4 bits: Version
- *   - 60 bits: Timestamp (most significant bits)
+ *   - 60 bits: Timestamp (least significant bits)
  * - data2:
- *   - 4 bits: Timestamp (least significant bits)
+ *   - 4 bits: Timestamp (most significant bits)
  *   - 10 bits: Datacenter ID
  *   - 10 bits: Worker ID
  *   - 10 bits: Process ID

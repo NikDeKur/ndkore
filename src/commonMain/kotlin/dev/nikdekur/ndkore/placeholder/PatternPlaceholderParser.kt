@@ -81,6 +81,8 @@ public open class PatternPlaceholderParser(
     public constructor(symbol: String, source: ReflectMethod) : this(symbol, symbol, source)
 
     override fun parseExpression(path: String, placeholders: Map<String, Any?>): String? {
+        if (placeholders.isEmpty()) return null
+
         val parts = path.split(".")
         var currentObject: Any? = placeholders[parts[0]] ?: return null
 
@@ -101,6 +103,8 @@ public open class PatternPlaceholderParser(
     }
 
     override fun parse(pattern: String, placeholders: Map<String, Any?>): String {
+        if (placeholders.isEmpty()) return pattern
+
         val sb = StringBuilder()
         var lastIndex = 0
 

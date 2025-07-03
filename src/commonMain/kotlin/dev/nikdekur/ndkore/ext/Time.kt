@@ -10,7 +10,6 @@
 
 package dev.nikdekur.ndkore.ext
 
-import dev.nikdekur.ndkore.duration.DurationFormatter
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
@@ -34,10 +33,6 @@ public inline fun Duration.toMillisPart(): Int {
 
 public inline fun Duration.toNanosPart(): Int {
     return (toLong(DurationUnit.NANOSECONDS) % 1_000_000_000).toInt()
-}
-
-public inline fun Duration.toReadableString(language: String): String {
-    return DurationFormatter.format(this, language)
 }
 
 

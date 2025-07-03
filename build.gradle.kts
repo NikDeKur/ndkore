@@ -98,6 +98,9 @@ kotlin {
     }
 }
 
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
 
 
 license {

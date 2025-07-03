@@ -16,8 +16,8 @@ public class LibsVersionsTomlParser(
     public val text: String
 ) {
 
-    public val versions: MutableMap<String, String> = mutableMapOf<String, String>()
-    public val libraries: MutableList<Library> = mutableListOf<Library>()
+    public val versions: MutableMap<String, String> = HashMap()
+    public val libraries: MutableList<Library> = ArrayList()
 
     public fun parse() {
         var part = Part.NONE

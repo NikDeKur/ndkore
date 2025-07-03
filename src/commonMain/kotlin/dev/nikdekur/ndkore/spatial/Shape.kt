@@ -160,15 +160,15 @@ public interface SphereShape : Shape {
 @Serializable
 @SerialName("cuboid")
 public data class CuboidShapeData(
-    public override val min: SimplePoint,
-    public override val max: SimplePoint,
+    public override val min: Point,
+    public override val max: Point,
 ) : CuboidShape
 
 
 @Serializable
 @SerialName("circle")
 public data class CircleShapeData(
-    public override val center: SimplePoint,
+    public override val center: Point,
     public override val radius: Double,
     public override val height: Double,
 ) : CircleShape
@@ -177,6 +177,6 @@ public data class CircleShapeData(
 @Serializable
 @SerialName("sphere")
 public data class SphereShapeData(
-    public override val center: SimplePoint,
+    public override val center: Point,
     public override val radius: Double,
 ) : SphereShape

@@ -27,11 +27,12 @@ import kotlin.jvm.JvmField
  * @property y The y-coordinate of the point.
  * @property z The z-coordinate of the point.
  */
-public interface Point : Comparable<Point> {
-
-    public val x: Double
-    public val y: Double
-    public val z: Double
+@Serializable(with = Point.Serializer::class)
+public data class Point(
+    val x: Double,
+    val y: Double,
+    val z: Double,
+) : Comparable<Point> {
 
     /**
      * Adds the coordinates of another point to this point.
@@ -39,7 +40,7 @@ public interface Point : Comparable<Point> {
      * @param other The point to add.
      * @return A new point representing the result of the addition.
      */
-    public operator fun plus(other: Point): Point = SimplePoint(x + other.x, y + other.y, z + other.z)
+    public operator fun plus(other: Point): Point = Point(x + other.x, y + other.y, z + other.z)
 
     /**
      * Subtracts the coordinates of another point from this point.
@@ -47,7 +48,7 @@ public interface Point : Comparable<Point> {
      * @param other The point to subtract.
      * @return A new point representing the result of the subtraction.
      */
-    public operator fun minus(other: Point): Point = SimplePoint(x - other.x, y - other.y, z - other.z)
+    public operator fun minus(other: Point): Point = Point(x - other.x, y - other.y, z - other.z)
 
     /**
      * Multiplies the coordinates of this point by a scalar value.
@@ -55,7 +56,7 @@ public interface Point : Comparable<Point> {
      * @param other The scalar value to multiply by.
      * @return A new point representing the result of the multiplication.
      */
-    public operator fun times(other: Double): Point = SimplePoint(x * other, y * other, z * other)
+    public operator fun times(other: Double): Point = Point(x * other, y * other, z * other)
 
     /**
      * Divides the coordinates of this point by a scalar value.
@@ -63,7 +64,7 @@ public interface Point : Comparable<Point> {
      * @param other The scalar value to divide by.
      * @return A new point representing the result of the division.
      */
-    public operator fun div(other: Double): Point = SimplePoint(x / other, y / other, z / other)
+    public operator fun div(other: Double): Point = Point(x / other, y / other, z / other)
 
     /**
      * Calculates the squared length (magnitude) of this point from the origin in 3D space.
@@ -85,33 +86,18 @@ public interface Point : Comparable<Point> {
 
 
     public companion object {
-
         @JvmField
-        public val ZERO: Point = SimplePoint(0.0, 0.0, 0.0)
+        public val ZERO: Point = Point(0.0, 0.0, 0.0)
     }
-}
 
-public fun Point(
-    x: Double,
-    y: Double,
-    z: Double
-): Point = SimplePoint(x, y, z)
-
-@Serializable(with = SimplePoint.Serializer::class)
-public data class SimplePoint(
-    override val x: Double,
-    override val y: Double,
-    override val z: Double,
-) : Point {
-
-    public object Serializer : KSerializer<SimplePoint> {
-        override val descriptor: SerialDescriptor = buildClassSerialDescriptor("SimplePoint") {
+    public object Serializer : KSerializer<Point> {
+        override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Point") {
             element<Double>("x")
             element<Double>("y")
             element<Double>("z")
         }
 
-        override fun serialize(encoder: Encoder, value: SimplePoint) {
+        override fun serialize(encoder: Encoder, value: Point) {
             encoder.encodeStructure(descriptor) {
                 encodeDoubleElement(descriptor, 0, value.x)
                 encodeDoubleElement(descriptor, 1, value.y)
@@ -119,7 +105,7 @@ public data class SimplePoint(
             }
         }
 
-        override fun deserialize(decoder: Decoder): SimplePoint {
+        override fun deserialize(decoder: Decoder): Point {
             return try {
                 val stringValue = decoder.decodeString()
                 parseFromString(stringValue)
@@ -140,18 +126,18 @@ public data class SimplePoint(
                         }
                     }
 
-                    SimplePoint(x, y, z)
+                    Point(x, y, z)
                 }
             }
         }
 
-        private fun parseFromString(value: String): SimplePoint {
+        private fun parseFromString(value: String): Point {
             val parts = value.split(", ", ",", " ", ";", "|", ":", "\t")
             require(parts.size == 3) { "Invalid format for Point string. But was ${parts.size}. String: $value" }
             val x = parts[0].toDouble()
             val y = parts[1].toDouble()
             val z = parts[2].toDouble()
-            return SimplePoint(x, y, z)
+            return Point(x, y, z)
         }
     }
 }

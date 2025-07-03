@@ -8,6 +8,9 @@
 
 package dev.nikdekur.ndkore.map.spread
 
+import dev.nikdekur.ndkore.ext.CompAny
+import dev.nikdekur.ndkore.ext.CompOutAny
+
 /**
  * SpreadMap is a map that stores values up to a certain sum of values.
  *
@@ -21,9 +24,9 @@ package dev.nikdekur.ndkore.map.spread
  * }
  *
  * map.register(player1, BigInteger("500")) // First player attacked the boss with 500 damage
- * map.register(player2, BigInteger("250")) // Second player attacked the boss with 300 damage
- * map.register(player2, BigInteger("50"))  // Second player attacked the boss again, with 50 damage
- * map.register(player3, BigInteger("400")) // Third player attacked the boss with 400 damage
+ * map.register(player2, BigInteger("250")) // Second player attacked the boss with 250 damage
+ * map.register(player3, BigInteger("50"))  // Third player attacked the boss again, with 50 damage
+ * map.register(player4, BigInteger("400")) // Fourth player attacked the boss with 400 damage
  * // After the sum of all values exceeds 1000, the onMax action will be called
  *
  * // Split 1000 coins between players
@@ -31,18 +34,19 @@ package dev.nikdekur.ndkore.map.spread
  *    player, value -> player.giveCoins(value)
  * }
  * // player1 will receive 500 coins
- * // player2 will receive 300 coins
- * // player3 will receive 200 coins, not 400, because the boss has only 1000 health
+ * // player2 will receive 250 coins
+ * // player3 will receive 50 coins
+ * // player4 will receive 200 coins
  * ```
  */
-public interface SpreadMap<K : Any, V : Any> : Map<K, V> {
+public interface SpreadMap<K : Any, V : CompOutAny, M : Any> : Map<K, V> {
 
     /**
      * Maximum value that could be stored in the map.
      *
      * If the sum of all values exceeds this value, the [onMax] action will be called.
      */
-    public val max: () -> V
+    public val max: V
 
     /**
      * Sum of all values in the map.
@@ -60,6 +64,8 @@ public interface SpreadMap<K : Any, V : Any> : Map<K, V> {
 
     /**
      * Action that will be called when the sum of all values exceeds the [max] value.
+     *
+     * @param K Key of the value that caused the overflow. In the game example above, it will be the last player that registered a value.
      */
     public val onMax: (K) -> Unit
 
@@ -73,14 +79,6 @@ public interface SpreadMap<K : Any, V : Any> : Map<K, V> {
      * @see getValue
      */
     public fun register(key: K, value: V)
-
-    /**
-     * Check if the map is full.
-     *
-     * @return true if the sum of all values is equal or greater than the [max] value
-     * @see max
-     */
-    public val isDone: Boolean
 
     /**
      * Clear all values from the map.
@@ -101,38 +99,36 @@ public interface SpreadMap<K : Any, V : Any> : Map<K, V> {
      *
      * Usually its getValue(key) / max
      */
-    public fun getValuePercent(key: K): Double
-
-    /**
-     * Get the value by the key as a percentage (0-1) of the [max] value.
-     *
-     * Usually its getValuePercent(key) / 100
-     */
     public fun getValueMultiplier(key: K): Double
-
-    /**
-     * Returns a map with keys and values as a percentage (0-100) of the [max] value.
-     */
-    public fun toPercent(): Map<K, Double>
 
     /**
      * Returns a map with keys and values as a multipliers (0-1) of the [max] value.
      */
-    public fun toMultiplier(): Map<K, Double>
+    public fun toMultiplierMap(): Map<K, Double>
 
     /**
      * Split the value between all keys in the map.
      *
      * The value will be split by the percentage of the [max] value.
      */
-    public fun split(value: V): Map<K, V>
+    public fun split(value: V): Map<K, M>
+}
 
-    /**
-     * Split the value between all keys in the map and call the action for each key.
-     *
-     * The value will be split by the percentage of the [max] value.
-     */
-    public fun split(value: V, action: (K, V) -> Unit) {
-        split(value).forEach { (key, value) -> action(key, value) }
-    }
+
+/**
+ * Check if the map is full.
+ *
+ * @return true if the sum of all values is equal or greater than the [max] value
+ * @see max
+ */
+public inline val <K : Any, V : CompAny, M : Any> SpreadMap<K, V, M>.isDone: Boolean
+    get() = filled >= max
+
+/**
+ * Split the value between all keys in the map and call the action for each key.
+ *
+ * The value will be split by the percentage of the [max] value.
+ */
+public inline fun <K : Any, V : CompAny, M : Any> SpreadMap<K, V, M>.split(value: V, action: (K, M) -> Unit) {
+    split(value).forEach { (key, value) -> action(key, value) }
 }

@@ -11,14 +11,17 @@ package dev.nikdekur.ndkore.map.spread
 import dev.nikdekur.ndkore.ext.map
 
 public open class SpreadDoubleMap<K : Any>(
-    override val max: () -> Double,
-    override val onMax: (K) -> Unit = {}
-) : AbstractSpreadMap<K, Double>() {
+    override val max: Double,
+    override val onMax: (K) -> Unit = {},
+    public val map: MutableMap<K, Double> = mutableMapOf()
+) : SpreadMap<K, Double, Double>, Map<K, Double> by map {
 
     override var filled: Double = 0.0
 
+    override val left: Double
+        get() = max - filled
+
     override fun register(key: K, value: Double) {
-        val max = max()
         if (filled >= max) return
         if (value + filled >= max) {
             registerInternal(key, max - filled)
@@ -29,9 +32,8 @@ public open class SpreadDoubleMap<K : Any>(
 
     private fun registerInternal(key: K, damage: Double) {
         if (damage <= 0.0) return
-        this[key] = getValue(key) + damage
+        map[key] = getValue(key) + damage
         filled += damage
-        val max = max()
         if (filled >= max) {
             onMax.invoke(key)
             filled = max
@@ -43,23 +45,14 @@ public open class SpreadDoubleMap<K : Any>(
     }
 
     override fun getValueMultiplier(key: K): Double {
-        return getValue(key) / max()
+        return getValue(key) / max
     }
 
-    override fun toMultiplier(): Map<K, Double> {
-        val max = max()
-        return map(
-            { it.key },
-            { it.value / max}
-        )
-    }
-
-    override fun toPercent(): Map<K, Double> {
-        val max = max()
-        return map(
-            { it.key },
-            { it.value / max * 100 }
-        )
+    override fun toMultiplierMap(): Map<K, Double> {
+        val max = max
+        return mapValues {
+            it.value / max
+        }
     }
 
     override fun split(value: Double): Map<K, Double> {
@@ -73,11 +66,7 @@ public open class SpreadDoubleMap<K : Any>(
     }
 
     override fun clear() {
-        super.clear()
+        map.clear()
         filled = 0.0
     }
-
-    override val left: Double
-        get() = max() - filled
-
 }

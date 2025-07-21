@@ -29,5 +29,11 @@ public inline fun <K, V> MutableSetsMap<K, V>.add(
 
 @Suppress("kotlin:S6524")
 public inline fun <K, V> MutableSetsMap<K, V>.remove(key: K, value: V): Boolean {
-    return get(key)?.remove(value) == true
+    val set = get(key) ?: return false
+    val removed = set.remove(value)
+    if (!removed) return false
+    if (set.isEmpty()) {
+        remove(key)
+    }
+    return true
 }

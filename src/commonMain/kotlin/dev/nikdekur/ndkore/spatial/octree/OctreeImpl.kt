@@ -10,6 +10,7 @@
 
 package dev.nikdekur.ndkore.spatial.octree
 
+import co.touchlab.stately.collections.ConcurrentMutableList
 import dev.nikdekur.ndkore.spatial.Point
 import dev.nikdekur.ndkore.spatial.Shape
 import dev.nikdekur.ndkore.spatial.middlePoint
@@ -134,7 +135,7 @@ public open class OctreeImpl<T : Shape>(
         get() = minX != null && minY != null && minZ != null && maxX != null && maxY != null && maxZ != null
 
 
-    public var data: MutableList<T> = ArrayList(capacity)
+    public var data: MutableList<T> = ConcurrentMutableList()
     public var children: Array<OctreeImpl<T>?> = arrayOfNulls(8)
 
     public fun isChildrenEmpty(): Boolean = children.all { it == null }

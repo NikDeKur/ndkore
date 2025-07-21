@@ -6,9 +6,14 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
+@file:OptIn(ExperimentalAtomicApi::class)
+
 package dev.nikdekur.ndkore.scheduler
 
-import co.touchlab.stately.concurrency.AtomicInt
+import co.touchlab.stately.collections.ConcurrentMutableMap
+import kotlin.concurrent.atomics.AtomicInt
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
+import kotlin.concurrent.atomics.incrementAndFetch
 
 /**
  * # AbstractScheduler
@@ -27,7 +32,7 @@ public abstract class AbstractScheduler : Scheduler {
     /**
      * A thread-safe map that holds all the registered tasks with their unique IDs.
      */
-    public val tasks: MutableMap<Int, SchedulerTask> = mutableMapOf<Int, SchedulerTask>()
+    public val tasks: MutableMap<Int, SchedulerTask> = ConcurrentMutableMap()
 
     // We assume that schedulers can use different threads to run tasks,
     // so we need to make thread-safe incrementation.
@@ -39,7 +44,7 @@ public abstract class AbstractScheduler : Scheduler {
      * @return The next unique task ID.
      */
     public fun nextId(): Int {
-        return tasksWas.incrementAndGet()
+        return tasksWas.incrementAndFetch()
     }
 
     /**

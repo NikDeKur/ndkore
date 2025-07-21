@@ -65,6 +65,7 @@ kotlin {
                 libs.kotlinx.io.core,
                 libs.kotlin.logging,
                 libs.stately.concurrency,
+                libs.stately.concurrent.collections,
                 libs.bignum,
                 libs.kaml,
                 libs.koin,

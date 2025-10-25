@@ -6,11 +6,14 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
+@file:OptIn(ExperimentalTime::class)
+
 package dev.nikdekur.ndkore.cooldown
 
-import kotlinx.datetime.Clock
 import kotlin.math.ln
+import kotlin.time.Clock
 import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
 public abstract class GrowPolicy {
 

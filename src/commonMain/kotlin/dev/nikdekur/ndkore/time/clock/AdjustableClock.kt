@@ -1,8 +1,11 @@
+@file:OptIn(ExperimentalTime::class)
+
 package dev.nikdekur.ndkore.time.clock
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlin.time.Clock
 import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 public class AdjustableClock(
     public val original: Clock,

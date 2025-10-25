@@ -58,3 +58,7 @@ public interface MutableOctree<T : Shape> : Octree<T> {
      */
     public fun clear()
 }
+
+public inline fun MutableOctree<*>.isEmpty(): Boolean {
+    return !iterator().hasNext()
+}

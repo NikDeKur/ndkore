@@ -2,7 +2,8 @@ package dev.nikdekur.ndkore.snowflake
 
 import co.touchlab.stately.concurrency.Lock
 import co.touchlab.stately.concurrency.withLock
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 /**
  * A thread-safe generator for SnowflakeV2 IDs.
@@ -17,6 +18,7 @@ import kotlinx.datetime.Clock
  * @property processId The process identifier for generated IDs (10 bits)
  * @property defaultIncrement The starting increment value for each millisecond (defaults to 0)
  */
+@OptIn(ExperimentalTime::class)
 public class SnowflakeGenerator(
     public val clock: Clock,
     public val version: ULong,

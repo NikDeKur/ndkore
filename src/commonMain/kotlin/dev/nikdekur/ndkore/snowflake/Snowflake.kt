@@ -3,8 +3,9 @@
 package dev.nikdekur.ndkore.snowflake
 
 import dev.nikdekur.ndkore.ext.readULong
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * A distributed unique ID generator based on the Snowflake algorithm.
@@ -31,6 +32,7 @@ import kotlinx.serialization.Serializable
  * @property data1 The first 64 bits of the snowflake ID
  * @property data2 The second 64 bits of the snowflake ID
  */
+@OptIn(ExperimentalTime::class)
 @Serializable
 public open class SnowflakeV2(
     public val data1: ULong,

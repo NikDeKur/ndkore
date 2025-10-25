@@ -10,8 +10,9 @@
 
 package dev.nikdekur.ndkore.service.manager
 
+import dev.nikdekur.ndkore.di.*
 import dev.nikdekur.ndkore.ext.forEachSafe
-import dev.nikdekur.ndkore.service.*
+import dev.nikdekur.ndkore.service.Service
 import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlin.reflect.KClass
@@ -24,32 +25,26 @@ import kotlin.reflect.KClass
  *
  * Doesn't handle services storing, it should be implemented in subclasses.
  *
- * Common implementations: [RuntimeServicesManager], [KoinServicesManager]
+ * Common implementations: [RuntimeDIContainer], [KoinServicesManager]
  *
  * @see ServicesManager
  */
-public abstract class AbstractServicesManager : ServicesManager {
-
-    public abstract val builder: ServicesManagerBuilder<*>
+public open class DIServicesManager(
+    public val diContainer: DIContainer
+) : ServicesManager {
 
     public val logger: KLogger = KotlinLogging.logger {}
 
     override var state: ServicesManager.State = ServicesManager.State.DISABLED
 
-    public val servicesCollection: MutableSet<ServiceDefinition<*>> = LinkedHashSet()
+    public val servicesCollection: MutableSet<ServiceDefinition> = LinkedHashSet()
 
     override val services: Collection<Service>
         get() = sortServices()
 
-    override suspend fun registerService(definition: Definition<*>) {
+    override suspend fun registerService(definition: ServiceDefinition) {
 
-        val service = definition.service
-        if (service !is Service) {
-            throw ClassIsNotServiceException(service::class)
-        }
-
-        @Suppress("UNCHECKED_CAST")
-        val definition = definition as Definition<Service>
+        val service = definition.obj
 
         val qualifier = definition.qualifier
         val bindTo = definition.bindTo
@@ -62,22 +57,27 @@ public abstract class AbstractServicesManager : ServicesManager {
             service.enable()
         }
 
-        servicesCollection.add(
-            ServiceDefinition(definition)
-        )
+        servicesCollection.add(definition)
+
+        diContainer.add(definition)
     }
 
+    public fun getServiceInternal(serviceClass: KClass<out Service>, qualifier: Qualifier): Service? {
+        return getServiceOrNull(serviceClass, qualifier)
+    }
 
-    public fun getServiceInternal(serviceClass: KClass<*>, qualifier: Qualifier): Service? {
-        val service = getServiceOrNull(serviceClass, qualifier) ?: return null
-        return service as? Service ?: throw ClassIsNotServiceException(serviceClass)
+    override fun <C : Service> getServiceOrNull(serviceClass: KClass<out C>, qualifier: Qualifier): C? {
+        return diContainer.getOrNull(serviceClass, qualifier)
+    }
+
+    override fun <C : Service> getService(serviceClass: KClass<out C>, qualifier: Qualifier): C {
+        return diContainer.get(serviceClass, qualifier)
     }
 
 
     public inline fun onEachService(operation: OnServiceOperation, block: (Service) -> Unit) {
         sortServices().forEachSafe({ exception, service ->
-            val context = OnErrorContext(this, service, operation, exception)
-            builder.onErrorFunc(context)
+            logger.error(exception) { "Error while `${operation.name.lowercase()}` service ${service::class.simpleName}" }
         }, block)
     }
 
@@ -134,16 +134,16 @@ public abstract class AbstractServicesManager : ServicesManager {
 
         // Инициализация графа зависимостей
         servicesCollection.forEach { ref ->
-            val service = ref.service
+            val service = ref.obj
 
             // Проверяем, помечен ли сервис как first или last
             when {
-                service.dependencies.first -> firstServices.add(service)
-                service.dependencies.last -> lastServices.add(service)
+                service.dependencies?.first == true -> firstServices.add(service)
+                service.dependencies?.last == true -> lastServices.add(service)
                 else -> regularServices.add(service)
             }
 
-            val dependencies = service.dependencies.dependsOn.mapNotNull {
+            val dependencies = service.dependencies?.dependsOn?.mapNotNull {
                 if (it.optional) return@mapNotNull null
 
                 val qualifier = it.qualifier
@@ -155,9 +155,9 @@ public abstract class AbstractServicesManager : ServicesManager {
                     clazz,
                     qualifier
                 )
-            }
+            } ?: emptyList()
 
-            graph[ref.service] = dependencies
+            graph[ref.obj] = dependencies
         }
 
 
@@ -187,28 +187,13 @@ public abstract class AbstractServicesManager : ServicesManager {
 
         return sorted
     }
-
-
-    public class ServiceDefinition<S : Service>(
-        public val delegate: Definition<S>,
-    ) : Definition<S> {
-
-        public inline fun isApplicable(clazz: KClass<out Any>, qualifier: Qualifier): Boolean {
-            return bindTo.contains(clazz) && this.qualifier == qualifier
-        }
-
-        override val service: S
-            get() = delegate.service
-        override val qualifier: Qualifier
-            get() = delegate.qualifier
-        override val bindTo: Iterable<KClass<*>>
-            get() = delegate.bindTo
-    }
 }
 
+public inline fun Definition<*>.isApplicable(clazz: KClass<out Any>, qualifier: Qualifier): Boolean {
+    return bindTo.contains(clazz) && this.qualifier == qualifier
+}
 
-
-public abstract class ServicesManagerBuilder<R : ServicesManager> {
+public abstract class DIContainerBuilder<R : DIContainer> {
 
     public var onErrorFunc: OnErrorContext.() -> Unit = {
         manager.logger.error(exception) { "Error while `${operation.name.lowercase()}` service ${service::class.simpleName}" }
@@ -222,4 +207,4 @@ public abstract class ServicesManagerBuilder<R : ServicesManager> {
 }
 
 
-public inline fun ServicesManagerBuilder<*>.throwOnError(): Unit = onError { throw exception }
+public inline fun DIContainerBuilder<*>.throwOnError(): Unit = onError { throw exception }

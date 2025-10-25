@@ -7,13 +7,11 @@
  */
 
 @file:Suppress("NOTHING_TO_INLINE")
+@file:OptIn(ExperimentalTime::class)
 
 package dev.nikdekur.ndkore.ext
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
-import kotlin.time.Duration
-import kotlin.time.DurationUnit
+import kotlin.time.*
 
 public inline fun Duration.toHoursPart(): Int {
     return (toLong(DurationUnit.HOURS) % 24).toInt()

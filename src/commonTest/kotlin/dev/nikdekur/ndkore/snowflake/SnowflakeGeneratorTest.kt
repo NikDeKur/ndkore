@@ -1,12 +1,15 @@
+@file:OptIn(ExperimentalTime::class)
+
 package dev.nikdekur.ndkore.snowflake
 
 import co.touchlab.stately.collections.ConcurrentMutableSet
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlin.test.*
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 
 class FakeClock(var currentMillis: Long) : Clock {

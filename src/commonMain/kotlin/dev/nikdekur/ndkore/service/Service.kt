@@ -27,7 +27,8 @@ public interface Service : ServicesComponent {
      * [dev.nikdekur.ndkore.service.manager.ServicesManager] will enable all dependencies in the order
      * to satisfy all dependencies of all services.
      */
-    public val dependencies: Dependencies
+    public val dependencies: Dependencies<out Service>?
+        get() = null
 
     /**
      * Enables the service.

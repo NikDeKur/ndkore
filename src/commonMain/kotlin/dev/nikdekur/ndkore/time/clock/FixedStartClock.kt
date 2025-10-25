@@ -4,10 +4,7 @@ package dev.nikdekur.ndkore.time.clock
 
 import dev.nikdekur.ndkore.time.mark.AcceleratedTimeMark
 import dev.nikdekur.ndkore.time.mark.FixedTimeMark
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
-import kotlin.time.TimeMark
-import kotlin.time.TimeSource
+import kotlin.time.*
 
 
 /**
@@ -37,6 +34,7 @@ import kotlin.time.TimeSource
  * @param timeMark The time mark to use for the clock. Defaults to [TimeSource.Monotonic.markNow].
  * @see [AcceleratedTimeMark]
  */
+@OptIn(ExperimentalTime::class)
 public class FixedStartClock(
     public val start: Instant,
     public val timeMark: TimeMark = TimeSource.Monotonic.markNow()

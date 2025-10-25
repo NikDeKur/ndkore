@@ -6,11 +6,14 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
+@file:OptIn(ExperimentalTime::class)
+
 package dev.nikdekur.ndkore.cooldown
 
-import kotlinx.datetime.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Cooldown manager with growing cooldowns.
@@ -29,7 +32,7 @@ public class GrowingCooldownManager<K>(
 
     private val steps = mutableMapOf<K, Int>()
     // Key to cooldown end time (ms)
-    public val cooldowns: MutableMap<K, Instant> = mutableMapOf<K, Instant>()
+    public val cooldowns: MutableMap<K, Instant> = mutableMapOf()
 
     private fun increaseStep(key: K): Int {
         var step = steps.getOrElse(key) { 0 } + 1

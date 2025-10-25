@@ -10,7 +10,7 @@ package dev.nikdekur.ndkore.service
 
 class ConfigurableService1Impl(
     override val app: App,
-    override val dependencies: Dependencies = Dependencies.none(),
+    override val dependencies: Dependencies<out Service> = Dependencies.none(),
     val onTestLoad: ConfigurableService1Impl.() -> Unit = {},
     val onTestUnload: ConfigurableService1Impl.() -> Unit = {}
 ) : MyService(), ConfigurableService {

@@ -8,7 +8,12 @@
 
 package dev.nikdekur.ndkore.service
 
+import dev.nikdekur.ndkore.di.CircularDependencyException
+import dev.nikdekur.ndkore.di.DependencyNotFoundException
+import dev.nikdekur.ndkore.di.Qualifier
+import dev.nikdekur.ndkore.di.bind
 import dev.nikdekur.ndkore.service.manager.ServicesManager
+import dev.nikdekur.ndkore.service.manager.registerService
 import kotlinx.coroutines.test.runTest
 import kotlin.test.*
 
@@ -376,7 +381,7 @@ abstract class ServicesManagerTest {
 
     @Test
     fun serviceNotFountTest() {
-        assertFailsWith<ServiceNotFoundException> {
+        assertFailsWith<DependencyNotFoundException> {
             manager.getService(SomeService1::class)
         }
     }

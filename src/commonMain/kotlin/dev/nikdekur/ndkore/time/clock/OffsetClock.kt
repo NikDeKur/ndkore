@@ -1,8 +1,9 @@
 package dev.nikdekur.ndkore.time.clock
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlin.time.Clock
 import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * # Offset Clock
@@ -24,6 +25,7 @@ import kotlin.time.Duration
  * @param offset The duration to offset the original clock by. Can be negative to go back in time.
  * @param original The original clock to offset. Defaults to [Clock.System].
  */
+@OptIn(ExperimentalTime::class)
 public class OffsetClock(
     public val offset: Duration,
     public val original: Clock = Clock.System

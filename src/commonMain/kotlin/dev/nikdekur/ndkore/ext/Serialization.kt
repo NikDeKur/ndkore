@@ -6,7 +6,7 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
-@file:OptIn(ExperimentalSerializationApi::class, ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalSerializationApi::class, ExperimentalUuidApi::class, ExperimentalTime::class)
 
 package dev.nikdekur.ndkore.ext
 
@@ -16,7 +16,6 @@ import dev.nikdekur.ndkore.memory.MemoryAmount
 import dev.nikdekur.ndkore.memory.MemoryUnit
 import dev.nikdekur.ndkore.memory.toBigInteger
 import dev.nikdekur.ndkore.serial.*
-import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.MissingFieldException
@@ -27,6 +26,8 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.*
 import kotlinx.serialization.modules.SerializersModule
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 

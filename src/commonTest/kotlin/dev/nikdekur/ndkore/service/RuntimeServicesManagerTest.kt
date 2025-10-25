@@ -8,16 +8,18 @@
 
 package dev.nikdekur.ndkore.service
 
-import dev.nikdekur.ndkore.service.manager.RuntimeServicesManager
+import dev.nikdekur.ndkore.di.RuntimeDIContainer
+import dev.nikdekur.ndkore.service.manager.DIServicesManager
 import kotlin.test.BeforeTest
 
-class RuntimeServicesManagerTest : ServicesManagerTest() {
+class DIServicesManagerTest : ServicesManagerTest() {
 
     override lateinit var app: App
 
     @BeforeTest
     fun setUp() {
-        val manager = RuntimeServicesManager {}
+        val dIContainer = RuntimeDIContainer {}
+        val manager = DIServicesManager(dIContainer)
         app = TestApp(manager, true)
     }
 }

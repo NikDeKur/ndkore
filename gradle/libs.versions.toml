@@ -1,8 +1,8 @@
 [versions]
-kotlin = "2.2.0"
+kotlin = "2.2.20"
 kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.8.1"
-kotlinx-datetime = "0.6.2"
+kotlinx-datetime = "0.7.1"
 kotlinx-io = "0.7.0"
 kotlin-logging = "7.0.7"
 stately = "2.1.0"

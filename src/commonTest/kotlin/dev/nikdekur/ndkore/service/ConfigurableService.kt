@@ -8,4 +8,4 @@
 
 package dev.nikdekur.ndkore.service
 
-interface ConfigurableService
+interface ConfigurableService : Service

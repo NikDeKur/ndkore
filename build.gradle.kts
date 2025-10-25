@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "dev.nikdekur"
-version = "1.6.1"
+version = "1.6.2"
 
 val authorId: String by project
 val authorName: String by project
@@ -21,7 +21,7 @@ kotlin {
     explicitApi()
     jvm {
         compilerOptions {
-            freeCompilerArgs.addAll("-Xno-param-assertions", "-Xno-call-assertions")
+            freeCompilerArgs.addAll("-Xno-param-assertions", "-Xno-call-assertions", "-Xno-receiver-assertions")
             jvmTarget = JvmTarget.JVM_1_8
         }
     }
@@ -107,7 +107,7 @@ tasks.withType<Test> {
 license {
     header(project.file("HEADER"))
     properties {
-        set("year", "2024-present")
+        set("year", "2025-present")
         set("name", authorName)
     }
 }
@@ -127,7 +127,7 @@ publishing {
     repositories {
         maven {
             name = "ndk-repo"
-            url = uri("https://repo.nikdekur.tech/releases")
+            url = uri("https://repo.nikdekur.uk/releases")
             credentials {
                 username = repoUsername
                 password = repoPassword

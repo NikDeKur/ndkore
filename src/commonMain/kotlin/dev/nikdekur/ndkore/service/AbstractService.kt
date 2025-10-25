@@ -29,10 +29,6 @@ public abstract class AbstractService : Service {
     public open val logger: KLogger = KotlinLogging.logger { }
     public override var state: State = State.Disabled
 
-
-    public override val dependencies: Dependencies
-        get() = Dependencies.none()
-
     /**
      * Function that will be called when the service is enabling.
      *

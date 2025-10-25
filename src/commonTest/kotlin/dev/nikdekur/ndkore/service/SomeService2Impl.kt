@@ -10,7 +10,7 @@ package dev.nikdekur.ndkore.service
 
 class SomeService2Impl(
     override val app: App,
-    override val dependencies: Dependencies = Dependencies.none()
+    override val dependencies: Dependencies<out Service> = Dependencies.none()
 ) : MyService(), SomeService2 {
 
     override suspend fun onEnable() {

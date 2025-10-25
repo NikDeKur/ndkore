@@ -11,6 +11,7 @@
 package dev.nikdekur.ndkore.service
 
 import dev.nikdekur.ndkore.annotation.NdkoreDSL
+import dev.nikdekur.ndkore.di.Qualifier
 import dev.nikdekur.ndkore.ext.toTArray
 import kotlin.jvm.JvmStatic
 import kotlin.reflect.KClass
@@ -27,15 +28,15 @@ import kotlin.reflect.KClass
  * but respecting other modules dependencies on it
  * @see AbstractService
  */
-public data class Dependencies(
-    val dependsOn: Array<out Dependency>,
+public data class Dependencies<T : Any>(
+    val dependsOn: Array<out Dependency<out T>>,
     val first: Boolean = false,
     val last: Boolean = false,
 ) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is Dependencies) return false
+        if (other !is Dependencies<*>) return false
 
         if (!dependsOn.contentDeepEquals(other.dependsOn)) return false
         if (first != other.first) return false
@@ -55,13 +56,13 @@ public data class Dependencies(
 
     public companion object {
         private val NONE by lazy {
-            Dependencies(emptyArray(), first = false, last = false)
+            Dependencies(emptyArray<Dependency<*>>(), first = false, last = false)
         }
         private val FIRST by lazy {
-            Dependencies(emptyArray(), first = true, last = false)
+            Dependencies(emptyArray<Dependency<*>>(), first = true, last = false)
         }
         private val LAST by lazy {
-            Dependencies(emptyArray(), first = false, last = true)
+            Dependencies(emptyArray<Dependency<*>>(), first = false, last = true)
         }
 
         /**
@@ -70,7 +71,7 @@ public data class Dependencies(
          * @return Empty instance of [Dependencies]
          */
         @JvmStatic
-        public fun none(): Dependencies = NONE
+        public fun <T : Any> none(): Dependencies<out T> = NONE as Dependencies<out T>
 
         /**
          * Returns an instance of [Dependencies] that should be loaded as first as possible by other dependencies.
@@ -78,7 +79,7 @@ public data class Dependencies(
          * @return Instance of [Dependencies] that should be loaded as first as possible by other dependencies
          */
         @JvmStatic
-        public fun first(): Dependencies = FIRST
+        public fun <T : Any> first(): Dependencies<out T> = FIRST as Dependencies<out T>
 
         /**
          * Returns an instance of [Dependencies] that should be loaded as last as possible by other dependencies.
@@ -86,12 +87,12 @@ public data class Dependencies(
          * @return Instance of [Dependencies] that should be loaded as last as possible by other dependencies
          */
         @JvmStatic
-        public fun last(): Dependencies = LAST
+        public fun <T : Any> last(): Dependencies<out T> = LAST as Dependencies<out T>
     }
 }
 
-public data class Dependency(
-    val service: KClass<out Any>,
+public data class Dependency<T : Any>(
+    val service: KClass<out T>,
     val qualifier: Qualifier,
     val optional: Boolean
 )
@@ -100,8 +101,8 @@ public data class Dependency(
 /**
  * Builder for [Dependencies].
  */
-public class DependenciesBuilder {
-    private val dependsOn = mutableListOf<Dependency>()
+public class DependenciesBuilder<T : Any> {
+    private val dependsOn = mutableListOf<Dependency<out T>>()
     private var first = false
     private var last = false
 
@@ -128,7 +129,7 @@ public class DependenciesBuilder {
      * @param optional True if the dependency is optional, false otherwise
      */
     public fun dependsOn(
-        service: KClass<out Any>,
+        service: KClass<out T>,
         qualifier: Qualifier = Qualifier.Empty,
         optional: Boolean = false
     ) {
@@ -143,7 +144,7 @@ public class DependenciesBuilder {
      *
      * @return [Dependencies] instance
      */
-    public fun build(): Dependencies = Dependencies(dependsOn.toTArray(), first, last)
+    public fun build(): Dependencies<out T> = Dependencies(dependsOn.toTArray(), first, last)
 
 
     /**
@@ -154,7 +155,7 @@ public class DependenciesBuilder {
      * @receiver Service's KClass to depend. optional parameter is set to false.
      */
     @NdkoreDSL
-    public inline operator fun KClass<out Any>.unaryPlus() {
+    public inline operator fun KClass<out T>.unaryPlus() {
         dependsOn(this, optional = false)
     }
 
@@ -166,7 +167,7 @@ public class DependenciesBuilder {
      * @receiver Service's KClass to depend. optional parameter is set to true.
      */
     @NdkoreDSL
-    public inline operator fun KClass<out Any>.unaryMinus() {
+    public inline operator fun KClass<out T>.unaryMinus() {
         dependsOn(this, optional = true)
     }
 }
@@ -187,8 +188,8 @@ public class DependenciesBuilder {
  * @return New instance of [Dependencies]
  */
 @NdkoreDSL
-public inline fun dependencies(block: DependenciesBuilder.() -> Unit): Dependencies {
-    val builder = DependenciesBuilder()
+public inline fun <T : Any> dependencies(block: DependenciesBuilder<T>.() -> Unit): Dependencies<out T> {
+    val builder = DependenciesBuilder<T>()
     builder.block()
     return builder.build()
 }

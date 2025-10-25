@@ -209,69 +209,94 @@ public fun <T : Number> Number.castTo(clazz: KClass<T>): T {
 
 
 /**
- * # Rounding Mode
+ * # Rounding Strategy
  *
- * Specifies different strategies for rounding floating-point numbers.
- * Used to determine the behavior when a number is exactly halfway between two possible rounded values.
+ * Interface representing a strategy for rounding floating-point numbers.
+ * Implementations define how numbers are rounded, particularly when they are
+ * exactly halfway between two possible rounded values.
  *
- * Used in the [round] function.
+ * @see RoundingStrategy.Companion
  */
-public enum class RoundingMode {
+public fun interface RoundingStrategy {
     /**
-     * Always rounds towards positive infinity.
-     * Example: 1.5 becomes 2.0, -1.5 becomes -1.0.
+     * Rounds a number according to the strategy.
+     *
+     * @param factor the scale factor to divide the rounded number by (used for decimal scaling)
+     * @param scaledNumber the number to round, already scaled by [factor] if necessary
+     * @return the rounded result
      */
-    UP,
+    public fun round(factor: Double, scaledNumber: Double): Double
 
-    /**
-     * Always rounds towards negative infinity.
-     * Example: 1.5 becomes 1.0, -1.5 becomes -2.0.
-     */
-    DOWN,
+    public companion object {
+        /**
+         * Always rounds towards positive infinity.
+         *
+         * Examples:
+         * ```
+         * 1.5 -> 2.0
+         * -1.5 -> -1.0
+         * ```
+         */
+        public val UP: RoundingStrategy = RoundingStrategy { factor, scaledNumber ->
+            ceil(scaledNumber) / factor
+        }
 
-    /**
-     * Rounds towards the nearest neighbor unless both neighbors are equidistant,
-     * in which case it rounds up. Commonly known as "round half up."
-     * Example: 1.5 becomes 2.0, 1.49 becomes 1.0.
-     */
-    HALF_UP,
+        /**
+         * Always rounds towards negative infinity.
+         *
+         * Examples:
+         * ```
+         * 1.5 -> 1.0
+         * -1.5 -> -2.0
+         * ```
+         */
+        public val DOWN: RoundingStrategy = RoundingStrategy { factor, scaledNumber ->
+            floor(scaledNumber) / factor
+        }
 
-    /**
-     * Rounds towards the nearest neighbor unless both neighbors are equidistant,
-     * in which case it rounds down. Known as "round half down."
-     * Example: 1.5 becomes 1.0, 1.51 becomes 2.0.
-     */
-    HALF_DOWN,
-
-    /**
-     * Rounds towards the nearest neighbor unless both neighbors are equidistant,
-     * in which case it rounds towards the nearest even number. Known as "bankers' rounding."
-     * Example: 1.5 becomes 2.0, 2.5 becomes 2.0.
-     */
-    HALF_EVEN
-}
-
-private fun roundImpl(
-    factor: Double,
-    scaledNumber: Double,
-    strategy: RoundingMode
-): Double {
-    return when (strategy) {
-        RoundingMode.UP -> ceil(scaledNumber) / factor
-        RoundingMode.DOWN -> floor(scaledNumber) / factor
-        RoundingMode.HALF_UP -> {
+        /**
+         * Rounds towards the nearest neighbour unless equidistant,
+         * then rounds up ("round half up").
+         *
+         * Examples:
+         * ```
+         * 1.5 -> 2.0
+         * 1.49 -> 1.0
+         * ```
+         */
+        public val HALF_UP: RoundingStrategy = RoundingStrategy { factor, scaledNumber ->
             if (scaledNumber % 1 >= 0.5) ceil(scaledNumber) / factor
             else floor(scaledNumber) / factor
         }
 
-        RoundingMode.HALF_DOWN -> {
+        /**
+         * Rounds towards the nearest neighbour unless equidistant,
+         * then rounds down ("round half down").
+         *
+         * Examples:
+         * ```
+         * 1.5 -> 1.0
+         * 1.51 -> 2.0
+         * ```
+         */
+        public val HALF_DOWN: RoundingStrategy = RoundingStrategy { factor, scaledNumber ->
             if (scaledNumber % 1 > 0.5) ceil(scaledNumber) / factor
             else floor(scaledNumber) / factor
         }
 
-        RoundingMode.HALF_EVEN -> {
+        /**
+         * Rounds towards the nearest neighbour unless equidistant,
+         * then rounds to the nearest even number ("bankers' rounding").
+         *
+         * Examples:
+         * ```
+         * 1.5 -> 2.0
+         * 2.5 -> 2.0
+         * ```
+         */
+        public val HALF_EVEN: RoundingStrategy = RoundingStrategy { factor, scaledNumber ->
             if (scaledNumber % 1 == 0.5) {
-                if ((scaledNumber.toLong() % 2) == 0L) floor(scaledNumber) / factor
+                if (scaledNumber.toLong() % 2 == 0L) floor(scaledNumber) / factor
                 else ceil(scaledNumber) / factor
             } else {
                 round(scaledNumber) / factor
@@ -282,27 +307,27 @@ private fun roundImpl(
 
 public fun Double.round(
     decimalPlaces: Int,
-    strategy: RoundingMode = RoundingMode.HALF_UP
+    strategy: RoundingStrategy = RoundingStrategy.HALF_UP
 ): Double {
     require(decimalPlaces >= 0) { "Decimal places must be positive." }
 
     val factor = 10.0.pow(decimalPlaces)
     val scaledNumber = this * factor
 
-    return roundImpl(factor, scaledNumber, strategy)
+    return strategy.round(factor, scaledNumber)
 }
 
 
 public fun Float.round(
     decimalPlaces: Int,
-    strategy: RoundingMode = RoundingMode.HALF_UP
+    strategy: RoundingStrategy = RoundingStrategy.HALF_UP
 ): Float {
     require(decimalPlaces >= 0) { "Decimal places must be positive." }
 
     val factor = 10.0.pow(decimalPlaces)
     val scaledNumber = this * factor
 
-    return roundImpl(factor, scaledNumber, strategy).toFloat()
+    return strategy.round(factor, scaledNumber).toFloat()
 }
 
 /**
@@ -314,7 +339,7 @@ public fun Float.round(
  */
 public fun Number.format(
     places: Int,
-    roundingMode: RoundingMode = RoundingMode.HALF_UP
+    roundingMode: RoundingStrategy = RoundingStrategy.HALF_UP
 ): String {
 
     return toDouble()
@@ -451,13 +476,13 @@ public val NUMBER_UNITS: Array<String> = arrayOf(
  * Converts this number to a human-readable string with units.
  *
  * @param rounding the number of decimal places.
- * @param roundingMode the rounding mode to apply..
+ * @param roundingMode the rounding mode to apply.
  * @param units the array of units to use.
  * @return the human-readable string representation of this number with units.
  */
 public fun Number.toBeautifulString(
     rounding: Int = 2,
-    roundingMode: RoundingMode = RoundingMode.HALF_UP,
+    roundingMode: RoundingStrategy = RoundingStrategy.HALF_UP,
     units: Array<String> = NUMBER_UNITS,
 ): String {
     var number = this.toDouble()
@@ -478,7 +503,10 @@ public fun Number.toBeautifulString(
  * @param units the array of units to use.
  * @return the double value represented by the string.
  */
-public fun fromBeautifulString(string: String, units: Array<String> = NUMBER_UNITS): Double {
+public fun fromBeautifulString(
+    string: String,
+    units: Array<String> = NUMBER_UNITS
+): Double {
     val number = string.replace(Patterns.NOT_DIGITS, "").toDouble()
     val unit = string.replace(Patterns.DIGITS, "")
 

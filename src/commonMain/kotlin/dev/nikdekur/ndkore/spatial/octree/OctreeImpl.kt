@@ -13,7 +13,6 @@ package dev.nikdekur.ndkore.spatial.octree
 import co.touchlab.stately.collections.ConcurrentMutableList
 import dev.nikdekur.ndkore.spatial.Point
 import dev.nikdekur.ndkore.spatial.Shape
-import dev.nikdekur.ndkore.spatial.middlePoint
 
 /**
  * # OctreeImpl Class
@@ -165,16 +164,11 @@ public open class OctreeImpl<T : Shape>(
         this.data.add(data)
 
         if (this.data.size > capacity && isChildrenEmpty()) {
-            // When a new child (that would be created after split) size is smaller than capacity, it will throw StackOverflowError
-            check(minX + capacity < maxX && minY + capacity < maxY && minZ + capacity < maxZ) {
-                "Capacity is too small for this octree. Increase capacity or decrease the size of the octree. | Capacity: $capacity"
-            }
-
             split()
             val iterator = this.data.iterator()
             while (iterator.hasNext()) {
                 val currentNodeData = iterator.next()
-                val index = getIndex(currentNodeData)
+                val index = getIndex(currentNodeData.min, currentNodeData.max)
                 if (index != -1) {
                     children[index]?.insert(currentNodeData)
                     iterator.remove()
@@ -185,7 +179,7 @@ public open class OctreeImpl<T : Shape>(
 
 
     override fun find(point: Point): Collection<T> {
-        val result = HashSet<T>()
+        val result = ArrayList<T>()
         val stack = ArrayDeque<OctreeImpl<T>>()
         stack.add(this)
 
@@ -277,15 +271,15 @@ public open class OctreeImpl<T : Shape>(
 
 
     public inline fun extractChildrenNodes(current: OctreeImpl<T>, stack: MutableList<OctreeImpl<T>>) {
-        if (current.children.isNotEmpty()) {
-            val index = current.getIndex(min, max)
-            if (index != -1) {
-                val child = current.children[index]
+        if (current.isChildrenEmpty()) return
+
+        val index = current.getIndex(min, max)
+        if (index != -1) {
+            val child = current.children[index]
+            if (child != null) stack.add(child)
+        } else {
+            for (child in current.children) {
                 if (child != null) stack.add(child)
-            } else {
-                for (child in current.children) {
-                    if (child != null) stack.add(child)
-                }
             }
         }
     }
@@ -335,23 +329,23 @@ public open class OctreeImpl<T : Shape>(
 
 
     public inline fun getIndex(point: Point): Int {
-        if (!isZoneProvided) return -1
-
-        val midX = centerX!!
-        val midY = centerY!!
-        val midZ = centerZ!!
-
-        val xBit = if (point.x >= midX) 0 else 1
-        val yBit = if (point.y >= midY) 0 else 1
-        val zBit = if (point.z >= midZ) 0 else 1
-
-        return (yBit shl 2) or (zBit shl 1) or xBit
+        require(isZoneProvided) { "Bounds are not set" }
+        val xBit = if (point.x >= centerX!!) 1 else 0
+        val yBit = if (point.y >= centerY!!) 1 else 0
+        val zBit = if (point.z >= centerZ!!) 1 else 0
+        return (zBit shl 2) or (yBit shl 1) or xBit
     }
 
     public inline fun getIndex(min: Point, max: Point): Int {
-        val point = min.middlePoint(max)
-        return getIndex(point)
+        val mx = centerX!!
+        val my = centerY!!
+        val mz = centerZ!!
+        val x = if (max.x < mx) 0 else if (min.x >= mx) 1 else return -1
+        val y = if (max.y < my) 0 else if (min.y >= my) 1 else return -1
+        val z = if (max.z < mz) 0 else if (min.z >= mz) 1 else return -1
+        return (z shl 2) or (y shl 1) or x
     }
+
 
     public inline fun getIndex(data: T): Int {
         return getIndex(data.center)
@@ -404,13 +398,17 @@ public open class OctreeImpl<T : Shape>(
         }
     }
 
-    public override fun clear() {
+    override fun clear() {
         data.clear()
-        for (index in children.indices) {
-            children[index]?.clear()
-            children[index] = null
+        for (i in children.indices) {
+            children[i]?.clear(); children[i] = null
         }
+        minX = null; minY = null; minZ = null
+        maxX = null; maxY = null; maxZ = null
+        centerX = null; centerY = null; centerZ = null
+        size = 0
     }
+
 
     override fun iterator(): Iterator<T> {
         return OctreeIterator(this)
@@ -450,18 +448,19 @@ public open class OctreeImpl<T : Shape>(
 
             override fun hasNext(): Boolean {
                 if (dataIterator?.hasNext() == true) return true
+                dataIterator = null
                 while (stack.isNotEmpty()) {
-                    val currentNode = stack.removeFirst()
-                    if (currentNode.data.isNotEmpty() && dataIterator == null) {
-                        dataIterator = currentNode.data.iterator()
-                        if (dataIterator?.hasNext() == true) return true
-                    }
-                    for (child in currentNode.children) {
-                        child?.let { stack.add(it) }
+                    val node = stack.removeFirst()
+                    node.children.forEach { it?.let(stack::add) }
+                    if (node.data.isNotEmpty()) {
+                        dataIterator = node.data.iterator()
+                        if (dataIterator!!.hasNext()) return true
+                        dataIterator = null
                     }
                 }
                 return false
             }
+
 
             public abstract fun result(data: T): I
 

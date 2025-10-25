@@ -8,6 +8,6 @@
 
 package dev.nikdekur.ndkore.service
 
-interface SomeService2 {
+interface SomeService2 : Service {
     val loaded: Boolean
 }

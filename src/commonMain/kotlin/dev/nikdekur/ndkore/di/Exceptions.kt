@@ -6,13 +6,15 @@
  * Copyright (c) 2024-present "Nik De Kur"
  */
 
-package dev.nikdekur.ndkore.service
+package dev.nikdekur.ndkore.di
 
+import dev.nikdekur.ndkore.service.Service
 import kotlin.reflect.KClass
 
-public class ClassIsNotServiceException(
-    public val clazz: KClass<*>
-) : RuntimeException("Class '${clazz}' is not a service!")
+public class DependencyNotFoundException(
+    public val serviceClass: KClass<*>,
+    public val qualifier: Qualifier
+) : RuntimeException("Service '${serviceClass}' with qualifier '$qualifier' not found!")
 
 /**
  * Indicates service not found in the services manager.
@@ -24,14 +26,6 @@ public class DependentServiceNotFoundException(
     public val serviceClass: KClass<*>,
     public val qualifier: Qualifier
 ) : RuntimeException("$source need service '${serviceClass}' with qualifier '$qualifier', which is not found!")
-
-
-public class ServiceNotFoundException(
-    public val serviceClass: KClass<*>,
-    public val qualifier: Qualifier
-) : RuntimeException("Service '${serviceClass}' with qualifier '$qualifier' not found!")
-
-
 
 /**
  * Indicates service circular dependency or self-dependency.

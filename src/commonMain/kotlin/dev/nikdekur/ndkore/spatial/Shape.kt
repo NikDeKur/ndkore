@@ -24,6 +24,8 @@ public interface Shape {
     public fun contains(point: Point): Boolean
     public fun distanceSquared(to: Point): Double
     public fun intersects(min: Point, max: Point): Boolean
+
+    public fun offset(point: Point): Shape
 }
 
 
@@ -77,31 +79,31 @@ public interface ExclusiveCuboidShape : Shape {
 }
 
 
-public interface CircleShape : Shape {
+public interface CylinderShape : Shape {
     public val height: Double
     public val radius: Double
-    abstract override val center: Point
+    public val downCenter: Point
 
     override val min: Point
-        get() = Point(center.x - radius, center.y, center.z - radius)
+        get() = Point(downCenter.x - radius, downCenter.y, downCenter.z - radius)
 
     override val max: Point
-        get() = Point(center.x + radius, center.y + height, center.z + radius)
+        get() = Point(downCenter.x + radius, downCenter.y + height, downCenter.z + radius)
 
     override fun contains(point: Point): Boolean {
-        val dx = center.x - point.x
-        val dz = center.z - point.z
-        return dx * dx + dz * dz <= radius.pow() && point.y in center.y..(center.y + height)
+        val dx = downCenter.x - point.x
+        val dz = downCenter.z - point.z
+        return dx * dx + dz * dz <= radius.pow() && point.y in downCenter.y..(downCenter.y + height)
     }
 
     override fun distanceSquared(to: Point): Double {
-        val dx = to.x - center.x
-        val dz = to.z - center.z
+        val dx = to.x - downCenter.x
+        val dz = to.z - downCenter.z
         val horizontalDistanceSquared = dx * dx + dz * dz
         val horizontalDistance = horizontalDistanceSquared.sqrt()
         val verticalDistance = when {
-            to.y < center.y -> center.y - to.y
-            to.y > center.y + height -> to.y - (center.y + height)
+            to.y < downCenter.y -> downCenter.y - to.y
+            to.y > downCenter.y + height -> to.y - (downCenter.y + height)
             else -> 0.0
         }
         val distSquared = verticalDistance.pow()
@@ -112,11 +114,11 @@ public interface CircleShape : Shape {
     }
 
     override fun intersects(min: Point, max: Point): Boolean {
-        val closestX = minOf(max.x, maxOf(min.x, center.x))
-        val closestZ = minOf(max.z, maxOf(min.z, center.z))
-        val dx = closestX - center.x
-        val dz = closestZ - center.z
-        return dx * dx + dz * dz <= radius.pow() && center.y + height >= min.y && center.y <= max.y
+        val closestX = minOf(max.x, maxOf(min.x, downCenter.x))
+        val closestZ = minOf(max.z, maxOf(min.z, downCenter.z))
+        val dx = closestX - downCenter.x
+        val dz = closestZ - downCenter.z
+        return dx * dx + dz * dz <= radius.pow() && downCenter.y + height >= min.y && downCenter.y <= max.y
     }
 }
 
@@ -162,16 +164,32 @@ public interface SphereShape : Shape {
 public data class CuboidShapeData(
     public override val min: Point,
     public override val max: Point,
-) : CuboidShape
+) : CuboidShape {
+    override fun offset(point: Point): Shape {
+        return CuboidShapeData(
+            min = Point(min.x + point.x, min.y + point.y, min.z + point.z),
+            max = Point(max.x + point.x, max.y + point.y, max.z + point.z)
+        )
+    }
+}
 
 
 @Serializable
-@SerialName("circle")
-public data class CircleShapeData(
-    public override val center: Point,
+@SerialName("cylinder")
+public data class CylinderShapeData(
+    @SerialName("center")
+    public override val downCenter: Point,
     public override val radius: Double,
     public override val height: Double,
-) : CircleShape
+) : CylinderShape {
+    override fun offset(point: Point): Shape {
+        return CylinderShapeData(
+            downCenter = Point(downCenter.x + point.x, downCenter.y + point.y, downCenter.z + point.z),
+            radius = radius,
+            height = height
+        )
+    }
+}
 
 
 @Serializable
@@ -179,4 +197,11 @@ public data class CircleShapeData(
 public data class SphereShapeData(
     public override val center: Point,
     public override val radius: Double,
-) : SphereShape
+) : SphereShape {
+    override fun offset(point: Point): Shape {
+        return SphereShapeData(
+            center = Point(center.x + point.x, center.y + point.y, center.z + point.z),
+            radius = radius
+        )
+    }
+}

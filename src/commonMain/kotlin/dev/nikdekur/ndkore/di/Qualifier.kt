@@ -1,7 +1,6 @@
 @file:Suppress("NOTHING_TO_INLINE")
 
-package dev.nikdekur.ndkore.service
-
+package dev.nikdekur.ndkore.di
 
 public typealias QualifierValue = String
 

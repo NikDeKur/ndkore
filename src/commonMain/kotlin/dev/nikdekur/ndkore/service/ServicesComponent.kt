@@ -8,6 +8,7 @@
 
 package dev.nikdekur.ndkore.service
 
+import dev.nikdekur.ndkore.di.Qualifier
 import dev.nikdekur.ndkore.service.manager.ServicesManager
 import kotlin.properties.ReadOnlyProperty
 
@@ -44,7 +45,7 @@ public interface ServicesComponent {
  * @param C The type of the service to retrieve.
  * @return The service instance, or null if not found.
  */
-public inline fun <reified C : Any> ServicesComponent.getOrNull(
+public inline fun <reified C : Service> ServicesComponent.getOrNull(
     qualifier: Qualifier = Qualifier.Empty
 ): C? = manager.getServiceOrNull(C::class, qualifier)
 
@@ -52,13 +53,13 @@ public inline fun <reified C : Any> ServicesComponent.getOrNull(
  * Retrieves a service by its class.
  *
  * This extension function simplifies the retrieval of services by using reified generics to infer the service class.
- * It will return the service instance if found, or throw a [DependentServiceNotFoundException] if not found.
+ * It will return the service instance if found, or throw a [dev.nikdekur.ndkore.di.DependentServiceNotFoundException] if not found.
  *
  * @param C The type of the service to retrieve.
  * @return The service instance.
- * @throws DependentServiceNotFoundException If the service is not found.
+ * @throws dev.nikdekur.ndkore.di.DependentServiceNotFoundException If the service is not found.
  */
-public inline fun <reified C : Any> ServicesComponent.get(
+public inline fun <reified C : Service> ServicesComponent.get(
     qualifier: Qualifier = Qualifier.Empty
 ): C = manager.getService(C::class, qualifier)
 
@@ -70,7 +71,7 @@ public inline fun <reified C : Any> ServicesComponent.get(
  * @param C The type of the service to inject.
  * @return A property delegate that provides the service instance, which might return null if no service found.
  */
-public inline fun <reified C : Any> ServicesComponent.injectOrNull(
+public inline fun <reified C : Service> ServicesComponent.injectOrNull(
     qualifier: Qualifier = Qualifier.Empty
 ): ReadOnlyProperty<Any?, C?> =
     ReadOnlyProperty { _, _ -> getOrNull(qualifier) }
@@ -82,10 +83,10 @@ public inline fun <reified C : Any> ServicesComponent.injectOrNull(
  *
  * @param C The type of the service to inject.
  * @return A property delegate that provides the service instance.
- * @throws DependentServiceNotFoundException If the service is not found.
+ * @throws dev.nikdekur.ndkore.di.DependentServiceNotFoundException If the service is not found.
  */
-public inline fun <reified C : Any> ServicesComponent.inject(
+public inline fun <reified C : Service> ServicesComponent.inject(
     qualifier: Qualifier = Qualifier.Empty
-): ReadOnlyProperty<Any?, C> = ReadOnlyProperty { _, _ -> get(qualifier) }
+): ReadOnlyProperty<Any?, C> = ReadOnlyProperty { _, _ -> get<C>(qualifier) }
 
 

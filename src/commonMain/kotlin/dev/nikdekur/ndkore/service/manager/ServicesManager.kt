@@ -8,7 +8,11 @@
 
 package dev.nikdekur.ndkore.service.manager
 
-import dev.nikdekur.ndkore.service.*
+import dev.nikdekur.ndkore.di.Definition
+import dev.nikdekur.ndkore.di.DependencyNotFoundException
+import dev.nikdekur.ndkore.di.Qualifier
+import dev.nikdekur.ndkore.service.Service
+import dev.nikdekur.ndkore.service.ServicesComponent
 import kotlin.reflect.KClass
 
 /**
@@ -56,7 +60,7 @@ public interface ServicesManager : ServicesComponent {
      *
      * @param definition The service definition to register.
      */
-    public suspend fun registerService(definition: Definition<*>)
+    public suspend fun registerService(definition: ServiceDefinition)
 
     /**
      * Retrieves a service by its class, or returns null if it is not found.
@@ -70,7 +74,7 @@ public interface ServicesManager : ServicesComponent {
      * @param serviceClass The KClass of the service to retrieve.
      * @return The service instance, or null if not found.
      */
-    public fun <C : Any> getServiceOrNull(
+    public fun <C : Service> getServiceOrNull(
         serviceClass: KClass<out C>,
         qualifier: Qualifier = Qualifier.Empty
     ): C?
@@ -84,9 +88,9 @@ public interface ServicesManager : ServicesComponent {
      * @param C The type of the service to retrieve.
      * @param serviceClass The KClass of the service to retrieve.
      * @return The service instance.
-     * @throws ServiceNotFoundException If the service is not found.
+     * @throws DependencyNotFoundException If the service is not found.
      */
-    public fun <C : Any> getService(
+    public fun <C : Service> getService(
         serviceClass: KClass<out C>,
         qualifier: Qualifier = Qualifier.Empty
     ): C
@@ -134,14 +138,31 @@ public interface ServicesManager : ServicesComponent {
     }
 }
 
+public typealias ServiceDefinition = Definition<out Service>
 
 public enum class OnServiceOperation {
     ENABLE, DISABLE, RELOAD
 }
 
 public data class OnErrorContext(
-    val manager: AbstractServicesManager,
+    val manager: DIServicesManager,
     val service: Service,
     val operation: OnServiceOperation,
     val exception: Throwable
 )
+
+public suspend inline fun ServicesManager.registerService(
+    service: Service,
+    qualifier: Qualifier = Qualifier.Empty
+) {
+    val definition = Definition(service, qualifier)
+    registerService(definition)
+}
+
+public suspend inline fun <S : Service> ServicesManager.registerService(
+    definition: Definition<S>,
+    qualifier: Qualifier = Qualifier.Empty
+) {
+    val definition = Definition(definition.obj, qualifier, definition.bindTo)
+    registerService(definition)
+}

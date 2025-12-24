@@ -39,7 +39,7 @@ public open class FlowEventBus(
         val type = event::class
 
         @Suppress("UNCHECKED_CAST")
-        val list = handlers[type] as? List<EventHandler<Any>> ?: return
+        val list = handlers[type] as? List<EventHandler<Event>> ?: return
 
         // Guarantees that all launched coroutines will complete before returning
         supervisorScope {

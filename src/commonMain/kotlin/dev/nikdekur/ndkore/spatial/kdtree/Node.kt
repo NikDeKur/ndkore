@@ -8,10 +8,10 @@
 
 package dev.nikdekur.ndkore.spatial.kdtree
 
-import dev.nikdekur.ndkore.spatial.Point
+import dev.nikdekur.ndkore.spatial.V3
 
 public data class Node<T>(
-    var point: Point,
+    var v3: V3,
     var value: T,
     var left: Node<T>? = null,
     var right: Node<T>? = null,

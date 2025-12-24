@@ -8,7 +8,7 @@
 
 package dev.nikdekur.ndkore.spatial.kdtree
 
-import dev.nikdekur.ndkore.spatial.Point
+import dev.nikdekur.ndkore.spatial.V3
 
 /**
  * A mutable k-d tree interface that extends the basic `KDTree` interface to include modification operations.
@@ -63,12 +63,12 @@ public interface MutableKDTree<T> : KDTree<T> {
      * The insertion operation involves traversing the tree to find the appropriate position for the new point, which is
      * then added to the tree while preserving the partitioning scheme of the k-d tree.
      *
-     * @param point The point to be inserted into the k-d tree. It represents a location in k-dimensional space.
+     * @param v3 The point to be inserted into the k-d tree. It represents a location in k-dimensional space.
      * @param value The value to be associated with the point. It can be any type defined by the type parameter `T`.
      *
      * @note Ensure that the tree is properly balanced after insertion to maintain efficient query performance.
      */
-    public fun insert(point: Point, value: T)
+    public fun insert(v3: V3, value: T)
 
     /**
      * Removes a point and its associated value from the k-d tree.
@@ -80,11 +80,11 @@ public interface MutableKDTree<T> : KDTree<T> {
      * The removal operation involves locating the node containing the point, handling various cases (e.g., leaf node,
      * node with one child, or node with two children), and updating the tree structure accordingly.
      *
-     * @param point The point to be removed from the k-d tree. It represents a location in k-dimensional space.
+     * @param v3 The point to be removed from the k-d tree. It represents a location in k-dimensional space.
      *
      * @note The removal process may require rebalancing the tree or restructuring it to maintain search efficiency.
      */
-    public fun remove(point: Point)
+    public fun remove(v3: V3)
 
     /**
      * Clears all elements from the k-d tree.

@@ -10,7 +10,7 @@
 
 package dev.nikdekur.ndkore.spatial.kdtree
 
-import dev.nikdekur.ndkore.spatial.Point
+import dev.nikdekur.ndkore.spatial.V3
 
 /**
  * A generic interface representing a k-d tree (k-dimensional tree) data structure.
@@ -68,30 +68,30 @@ public interface KDTree<T> {
     /**
      * Finds the nearest neighbor to the given point.
      *
-     * This method searches the k-d tree to find the point that is closest to the specified [point]. It performs
+     * This method searches the k-d tree to find the point that is closest to the specified [v3]. It performs
      * a search through the tree and returns the value associated with the closest point found.
      *
      * The search is performed using a traversal algorithm that minimizes the distance to the query point, efficiently
      * narrowing down the possible candidates for the nearest neighbor.
      *
-     * @param point The point for which to find the nearest neighbor. It represents the query point in k-dimensional space.
+     * @param v3 The point for which to find the nearest neighbor. It represents the query point in k-dimensional space.
      * @return The value associated with the nearest point, or `null` if the tree is empty or no nearest point is found.
      *
      * @note The accuracy of the result depends on the quality of the k-d tree implementation and how well the tree is balanced.
      */
-    public fun nearestNeighbor(point: Point): T?
+    public fun nearestNeighbor(v3: V3): T?
 
 
     /**
      * Finds the `n` nearest neighbors to the given point.
      *
-     * This method retrieves the `n` closest points to the specified [point] from the k-d tree. It returns a list of
+     * This method retrieves the `n` closest points to the specified [v3] from the k-d tree. It returns a list of
      * values associated with these nearest points. The search is performed using a priority queue or similar data structure
      * to maintain the closest neighbors found during the traversal of the k-d tree.
      *
      * The algorithm used ensures that the result list contains the `n` closest points to the query point, ordered by distance.
      *
-     * @param point The point for which to find the nearest neighbors. It represents the query point in k-dimensional space.
+     * @param v3 The point for which to find the nearest neighbors. It represents the query point in k-dimensional space.
      * @param n The number of nearest neighbors to retrieve. This must be a positive integer.
      * @return A list of `n` values associated with the closest points to the query point. If the tree has fewer than `n`
      *         points, the list will contain fewer elements.
@@ -99,7 +99,7 @@ public interface KDTree<T> {
      * @note Performance may vary based on the number of neighbors requested and the structure of the k-d tree. Ensure
      *       the tree is well-balanced for optimal search efficiency.
      */
-    public fun nearestNeighbors(point: Point, n: Int): List<T>
+    public fun nearestNeighbors(v3: V3, n: Int): List<T>
 
 
     /**
@@ -119,7 +119,7 @@ public interface KDTree<T> {
      * @note The efficiency of the range search depends on the size of the radius and the distribution of points in the k-d tree.
      *       Consider balancing the tree and optimizing the search strategy to improve performance.
      */
-    public fun rangeSearch(center: Point, radius: Double): List<T>
+    public fun rangeSearch(center: V3, radius: Double): List<T>
 
 
     /**
@@ -139,7 +139,7 @@ public interface KDTree<T> {
      * @note The performance of the range search may be influenced by the size of the box and the distribution of points in the k-d tree.
      *       Proper tree balancing and optimization strategies can enhance search efficiency.
      */
-    public fun rangeSearch(min: Point, max: Point): List<T>
+    public fun rangeSearch(min: V3, max: V3): List<T>
 }
 
 public inline fun KDTree<*>.isEmpty(): Boolean = size == 0

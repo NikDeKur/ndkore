@@ -10,7 +10,7 @@
 
 package dev.nikdekur.ndkore.spatial.kdtree
 
-import dev.nikdekur.ndkore.spatial.Point
+import dev.nikdekur.ndkore.spatial.V3
 import dev.nikdekur.ndkore.spatial.distanceSquared
 import kotlin.math.pow
 
@@ -76,21 +76,21 @@ public open class KDTreeImpl<T> : MutableKDTree<T> {
     override var size: Int = 0
         protected set
 
-    override fun insert(point: Point, value: T) {
+    override fun insert(v3: V3, value: T) {
         var node = root
         var depth = 0
         while (node != null) {
             val cd = depth % 3
-            if (comparePoint(point, node.point, cd) < 0) {
+            if (comparePoint(v3, node.v3, cd) < 0) {
                 if (node.left == null) {
-                    node.left = Node(point, value)
+                    node.left = Node(v3, value)
                     size++
                     return
                 }
                 node = node.left
             } else {
                 if (node.right == null) {
-                    node.right = Node(point, value)
+                    node.right = Node(v3, value)
                     size++
                     return
                 }
@@ -98,12 +98,12 @@ public open class KDTreeImpl<T> : MutableKDTree<T> {
             }
             depth++
         }
-        root = Node(point, value)
+        root = Node(v3, value)
         size++
     }
 
 
-    override fun remove(point: Point) {
+    override fun remove(v3: V3) {
         val stack = ArrayDeque<Pair<Node<T>?, Int>>()
         var node = root
         var parent: Node<T>? = null
@@ -114,11 +114,11 @@ public open class KDTreeImpl<T> : MutableKDTree<T> {
         while (node != null) {
             val cd = depth % 3
 
-            if (node.point == point) break
+            if (node.v3 == v3) break
 
             stack.addLast(node to depth)
             parent = node
-            direction = comparePoint(point, node.point, cd) < 0
+            direction = comparePoint(v3, node.v3, cd) < 0
             node = if (direction == true) node.left else node.right
             depth++
         }
@@ -150,9 +150,9 @@ public open class KDTreeImpl<T> : MutableKDTree<T> {
         // Replace the node with the minimum node in the subtree
         fun replaceWithMinNode() {
             val min = findMin(node.right!!, (depth + 1) % 3, depth + 1)
-            node.point = min!!.point
+            node.v3 = min!!.v3
             node.value = min.value
-            node.right = remove(node.right, min.point)
+            node.right = remove(node.right, min.v3)
         }
 
         // Determine which removal case applies
@@ -166,11 +166,11 @@ public open class KDTreeImpl<T> : MutableKDTree<T> {
     }
 
 
-    private fun remove(node: Node<T>?, point: Point): Node<T>? {
+    private fun remove(node: Node<T>?, v3: V3): Node<T>? {
         if (node == null) return null
 
-        val stack = ArrayDeque<Triple<Node<T>?, Point, Int>>()
-        stack.add(Triple(node, point, 0))
+        val stack = ArrayDeque<Triple<Node<T>?, V3, Int>>()
+        stack.add(Triple(node, v3, 0))
         var parent: Node<T>? = null
         var isLeftChild = false
 
@@ -179,12 +179,12 @@ public open class KDTreeImpl<T> : MutableKDTree<T> {
             if (currentNode == null) continue
             val cd = depth % 3
 
-            if (currentNode.point == targetPoint) {
+            if (currentNode.v3 == targetPoint) {
                 return if (currentNode.left != null || currentNode.right != null) {
                     val replacement = findMin(currentNode.right ?: currentNode.left, cd, depth + 1)!!
-                    currentNode.point = replacement.point
+                    currentNode.v3 = replacement.v3
                     currentNode.value = replacement.value
-                    stack.add(Triple(currentNode.right ?: currentNode.left, replacement.point, depth + 1))
+                    stack.add(Triple(currentNode.right ?: currentNode.left, replacement.v3, depth + 1))
                     currentNode.right = currentNode.left?.also { currentNode.left = null }
                     parent?.let { if (isLeftChild) it.left = currentNode else it.right = currentNode }
                     currentNode
@@ -194,7 +194,7 @@ public open class KDTreeImpl<T> : MutableKDTree<T> {
                 }
             } else {
                 parent = currentNode
-                if (comparePoint(targetPoint, currentNode.point, cd) < 0) {
+                if (comparePoint(targetPoint, currentNode.v3, cd) < 0) {
                     stack.add(Triple(currentNode.left, targetPoint, depth + 1))
                     isLeftChild = true
                 } else {
@@ -212,7 +212,7 @@ public open class KDTreeImpl<T> : MutableKDTree<T> {
         var min = node
         var current = node
         while (current != null) {
-            if (comparePoint(current.point, min!!.point, dim) < 0) {
+            if (comparePoint(current.v3, min!!.v3, dim) < 0) {
                 min = current
             }
             current = if (dim == depth % 3) current.left else current.right
@@ -221,7 +221,7 @@ public open class KDTreeImpl<T> : MutableKDTree<T> {
         return min
     }
 
-    private inline fun comparePoint(a: Point, b: Point, cd: Int): Int {
+    private inline fun comparePoint(a: V3, b: V3, cd: Int): Int {
         return when (cd) {
             0 -> a.x.compareTo(b.x)
             1 -> a.y.compareTo(b.y)
@@ -229,7 +229,7 @@ public open class KDTreeImpl<T> : MutableKDTree<T> {
         }
     }
 
-    override fun nearestNeighbor(point: Point): T? {
+    override fun nearestNeighbor(v3: V3): T? {
         var best: Node<T>? = null
         var node = root
         var depth = 0
@@ -237,10 +237,10 @@ public open class KDTreeImpl<T> : MutableKDTree<T> {
         while (node != null || stack.isNotEmpty()) {
             if (node != null) {
                 val cd = depth % 3
-                val nextBranch = if (comparePoint(point, node.point, cd) < 0) node.left else node.right
+                val nextBranch = if (comparePoint(v3, node.v3, cd) < 0) node.left else node.right
                 val otherBranch = if (nextBranch == node.left) node.right else node.left
 
-                best = closerDistance(point, best, node)
+                best = closerDistance(v3, best, node)
                 if (nextBranch != null) {
                     stack.add(Triple(otherBranch, depth + 1, 0))
                     node = nextBranch
@@ -259,7 +259,7 @@ public open class KDTreeImpl<T> : MutableKDTree<T> {
     }
 
 
-    private inline fun distanceToSquared(p: Point, n: Point, cd: Int): Double {
+    private inline fun distanceToSquared(p: V3, n: V3, cd: Int): Double {
         return when (cd) {
             0 -> (p.x - n.x).pow(2)
             1 -> (p.y - n.y).pow(2)
@@ -267,17 +267,17 @@ public open class KDTreeImpl<T> : MutableKDTree<T> {
         }
     }
 
-    private inline fun closerDistance(p: Point, n1: Node<T>?, n2: Node<T>?): Node<T>? {
+    private inline fun closerDistance(p: V3, n1: Node<T>?, n2: Node<T>?): Node<T>? {
         if (n1 == null) return n2
         if (n2 == null) return n1
 
-        val d1 = p.distanceSquared(n1.point)
-        val d2 = p.distanceSquared(n2.point)
+        val d1 = p.distanceSquared(n1.v3)
+        val d2 = p.distanceSquared(n2.v3)
 
         return if (d1 < d2) n1 else n2
     }
 
-    override fun nearestNeighbors(point: Point, n: Int): List<T> {
+    override fun nearestNeighbors(v3: V3, n: Int): List<T> {
         val neighbors = mutableListOf<Node<T>>()
         val stack = ArrayDeque<Triple<Node<T>?, Int, Int>>()
         stack.add(Triple(root, 0, 0))
@@ -286,20 +286,20 @@ public open class KDTreeImpl<T> : MutableKDTree<T> {
             if (node == null) continue
 
             val cd = depth % 3
-            val nextBranch = if (comparePoint(point, node.point, cd) < 0) node.left else node.right
+            val nextBranch = if (comparePoint(v3, node.v3, cd) < 0) node.left else node.right
             val otherBranch = if (nextBranch == node.left) node.right else node.left
 
             if (neighbors.size < n) {
                 neighbors.add(node)
-                neighbors.sortBy { it.point.distanceSquared(point) }
-            } else if (node.point.distanceSquared(point) < neighbors.last().point.distanceSquared(point)) {
+                neighbors.sortBy { it.v3.distanceSquared(v3) }
+            } else if (node.v3.distanceSquared(v3) < neighbors.last().v3.distanceSquared(v3)) {
                 neighbors[neighbors.size - 1] = node
-                neighbors.sortBy { it.point.distanceSquared(point) }
+                neighbors.sortBy { it.v3.distanceSquared(v3) }
             }
 
             stack.add(Triple(nextBranch, depth + 1, 0))
-            if (neighbors.size < n || distanceToSquared(point, node.point, cd) < neighbors.last().point.distanceSquared(
-                    point
+            if (neighbors.size < n || distanceToSquared(v3, node.v3, cd) < neighbors.last().v3.distanceSquared(
+                    v3
                 )
             ) {
                 stack.add(Triple(otherBranch, depth + 1, 0))
@@ -310,7 +310,7 @@ public open class KDTreeImpl<T> : MutableKDTree<T> {
     }
 
 
-    override fun rangeSearch(center: Point, radius: Double): List<T> {
+    override fun rangeSearch(center: V3, radius: Double): List<T> {
         val result = mutableListOf<T>()
         val stack = ArrayDeque<Pair<Node<T>?, Int>>()
         stack.add(root to 0)
@@ -318,16 +318,16 @@ public open class KDTreeImpl<T> : MutableKDTree<T> {
             val (node, depth) = stack.removeLast()
             if (node == null) continue
 
-            if (node.point.distanceSquared(center) <= radius.pow(2)) {
+            if (node.v3.distanceSquared(center) <= radius.pow(2)) {
                 result.add(node.value)
             }
 
             val cd = depth % 3
-            if (distanceToSquared(center, node.point, cd) <= radius.pow(2)) {
+            if (distanceToSquared(center, node.v3, cd) <= radius.pow(2)) {
                 stack.add(node.left to depth + 1)
                 stack.add(node.right to depth + 1)
             } else {
-                val nextBranch = if (comparePoint(center, node.point, cd) < 0) node.left else node.right
+                val nextBranch = if (comparePoint(center, node.v3, cd) < 0) node.left else node.right
                 stack.add(nextBranch to depth + 1)
             }
         }
@@ -335,7 +335,7 @@ public open class KDTreeImpl<T> : MutableKDTree<T> {
         return result
     }
 
-    override fun rangeSearch(min: Point, max: Point): List<T> {
+    override fun rangeSearch(min: V3, max: V3): List<T> {
         val result = mutableListOf<T>()
         val stack = ArrayDeque<Pair<Node<T>?, Int>>()
 
@@ -344,15 +344,15 @@ public open class KDTreeImpl<T> : MutableKDTree<T> {
             val (node, depth) = stack.removeLast()
             if (node == null) continue
 
-            if (isInBox(node.point, min, max)) {
+            if (isInBox(node.v3, min, max)) {
                 result.add(node.value)
             }
 
             val cd = depth % 3
-            if (comparePoint(min, node.point, cd) <= 0) {
+            if (comparePoint(min, node.v3, cd) <= 0) {
                 stack.add(node.left to depth + 1)
             }
-            if (comparePoint(max, node.point, cd) >= 0) {
+            if (comparePoint(max, node.v3, cd) >= 0) {
                 stack.add(node.right to depth + 1)
             }
         }
@@ -361,7 +361,7 @@ public open class KDTreeImpl<T> : MutableKDTree<T> {
     }
 
 
-    private inline fun isInBox(p: Point, min: Point, max: Point): Boolean {
+    private inline fun isInBox(p: V3, min: V3, max: V3): Boolean {
         return p in min..max
     }
 

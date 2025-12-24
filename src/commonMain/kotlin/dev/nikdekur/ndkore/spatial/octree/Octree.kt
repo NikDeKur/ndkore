@@ -8,8 +8,8 @@
 
 package dev.nikdekur.ndkore.spatial.octree
 
-import dev.nikdekur.ndkore.spatial.Point
 import dev.nikdekur.ndkore.spatial.Shape
+import dev.nikdekur.ndkore.spatial.V3
 
 /**
  * # Octree Interface
@@ -39,17 +39,17 @@ public interface Octree<T : Shape> : Iterable<T> {
     /**
      * The minimum point (corner) of the Octree.
      */
-    public val min: Point
+    public val min: V3
 
     /**
      * The maximum point (corner) of the Octree.
      */
-    public val max: Point
+    public val max: V3
 
     /**
      * The center point of the Octree.
      */
-    public val center: Point
+    public val center: V3
 
     /**
      * Finds all elements that contain the given point.
@@ -57,10 +57,10 @@ public interface Octree<T : Shape> : Iterable<T> {
      * This method searches through the Octree to find all elements that
      * include the specified point within their bounds.
      *
-     * @param point The point to search for.
+     * @param v3 The point to search for.
      * @return A collection of elements that contain the given point.
      */
-    public fun find(point: Point): Collection<T>
+    public fun find(v3: V3): Collection<T>
 
     /**
      * Finds all node data objects that contain the given point.
@@ -68,10 +68,10 @@ public interface Octree<T : Shape> : Iterable<T> {
      * This method searches through the Octree to find all node data objects
      * that include the specified point within their bounds.
      *
-     * @param point The point to search for.
+     * @param v3 The point to search for.
      * @return A collection of node data objects that contain the given point.
      */
-    public fun findNodes(point: Point): Collection<T>
+    public fun findNodes(v3: V3): Collection<T>
 
     /**
      * Finds all elements within the specified radius from the given point.
@@ -79,11 +79,11 @@ public interface Octree<T : Shape> : Iterable<T> {
      * This method searches through the Octree to find all elements that are
      * within the specified radius from the given point.
      *
-     * @param point The point to search from.
+     * @param v3 The point to search from.
      * @param radius The radius within which to search for elements.
      * @return A collection of elements within the specified radius from the given point.
      */
-    public fun findNearby(point: Point, radius: Double): Collection<T>
+    public fun findNearby(v3: V3, radius: Double): Collection<T>
 
     /**
      * Finds all node data objects within the specified radius from the given point.
@@ -91,11 +91,11 @@ public interface Octree<T : Shape> : Iterable<T> {
      * This method searches through the Octree to find all node data objects that are
      * within the specified radius from the given point.
      *
-     * @param point The point to search from.
+     * @param v3 The point to search from.
      * @param radius The radius within which to search for node data objects.
      * @return A collection of node data objects within the specified radius from the given point.
      */
-    public fun findNodesNearby(point: Point, radius: Double): Collection<T>
+    public fun findNodesNearby(v3: V3, radius: Double): Collection<T>
 
     /**
      * Finds all elements within the specified region defined by the min and max points.
@@ -107,7 +107,7 @@ public interface Octree<T : Shape> : Iterable<T> {
      * @param max The maximum point defining the region.
      * @return A collection of elements within the specified region.
      */
-    public fun findInRegion(min: Point, max: Point): Collection<T>
+    public fun findInRegion(min: V3, max: V3): Collection<T>
 
     /**
      * Finds all node data objects within the specified region defined by the min and max points.
@@ -119,5 +119,5 @@ public interface Octree<T : Shape> : Iterable<T> {
      * @param max The maximum point defining the region.
      * @return A collection of node data objects within the specified region.
      */
-    public fun findNodesInRegion(min: Point, max: Point): Collection<T>
+    public fun findNodesInRegion(min: V3, max: V3): Collection<T>
 }

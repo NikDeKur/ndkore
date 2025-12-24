@@ -11,8 +11,8 @@
 package dev.nikdekur.ndkore.spatial.octree
 
 import co.touchlab.stately.collections.ConcurrentMutableList
-import dev.nikdekur.ndkore.spatial.Point
 import dev.nikdekur.ndkore.spatial.Shape
+import dev.nikdekur.ndkore.spatial.V3
 
 /**
  * # OctreeImpl Class
@@ -99,31 +99,31 @@ public open class OctreeImpl<T : Shape>(
     public var centerY: Double? = null
     public var centerZ: Double? = null
 
-    override val min: Point
-        get() = Point(minX!!, minY!!, minZ!!)
+    override val min: V3
+        get() = V3(minX!!, minY!!, minZ!!)
 
-    override val max: Point
-        get() = Point(maxX!!, maxY!!, maxZ!!)
+    override val max: V3
+        get() = V3(maxX!!, maxY!!, maxZ!!)
 
-    override val center: Point
-        get() = Point(centerX!!, centerY!!, centerZ!!)
+    override val center: V3
+        get() = V3(centerX!!, centerY!!, centerZ!!)
 
     public var size: Int = 0
         private set
 
-    public constructor(minPoint: Point, maxPoint: Point, capacity: Int = DEFAULT_CAPACITY) : this(capacity) {
-        setBounds(minPoint, maxPoint)
+    public constructor(minV3: V3, maxV3: V3, capacity: Int = DEFAULT_CAPACITY) : this(capacity) {
+        setBounds(minV3, maxV3)
     }
 
 
-    public fun setBounds(minPoint: Point, maxPoint: Point) {
-        minX = minPoint.x
-        minY = minPoint.y
-        minZ = minPoint.z
+    public fun setBounds(minV3: V3, maxV3: V3) {
+        minX = minV3.x
+        minY = minV3.y
+        minZ = minV3.z
 
-        maxX = maxPoint.x
-        maxY = maxPoint.y
-        maxZ = maxPoint.z
+        maxX = maxV3.x
+        maxY = maxV3.y
+        maxZ = maxV3.z
 
         centerX = (minX!! + maxX!!) / 2
         centerY = (minY!! + maxY!!) / 2
@@ -151,7 +151,7 @@ public open class OctreeImpl<T : Shape>(
         val maxX = maxOf(maxX ?: nodeDataMax.x, nodeDataMax.x)
         val maxY = maxOf(maxY ?: nodeDataMax.y, nodeDataMax.y)
         val maxZ = maxOf(maxZ ?: nodeDataMax.z, nodeDataMax.z)
-        setBounds(Point(minX, minY, minZ), Point(maxX, maxY, maxZ))
+        setBounds(V3(minX, minY, minZ), V3(maxX, maxY, maxZ))
 
         if (isChildrenNotEmpty()) {
             val index = getIndex(data)
@@ -178,7 +178,7 @@ public open class OctreeImpl<T : Shape>(
     }
 
 
-    override fun find(point: Point): Collection<T> {
+    override fun find(v3: V3): Collection<T> {
         val result = ArrayList<T>()
         val stack = ArrayDeque<OctreeImpl<T>>()
         stack.add(this)
@@ -190,7 +190,7 @@ public open class OctreeImpl<T : Shape>(
 
             if (current.data.isNotEmpty()) {
                 for (data in current.data) {
-                    if (data.contains(point))
+                    if (data.contains(v3))
                         result.add(data)
                 }
             }
@@ -199,7 +199,7 @@ public open class OctreeImpl<T : Shape>(
         return result
     }
 
-    override fun findNodes(point: Point): Collection<T> {
+    override fun findNodes(v3: V3): Collection<T> {
         val result = HashSet<T>()
         val stack = ArrayDeque<OctreeImpl<T>>()
         stack.add(this)
@@ -208,7 +208,7 @@ public open class OctreeImpl<T : Shape>(
             val currentNode = stack.removeFirst()
 
             if (currentNode.children.isNotEmpty()) {
-                val index = currentNode.getIndex(point)
+                val index = currentNode.getIndex(v3)
                 if (index != -1) {
                     currentNode.children[index]?.let { stack.add(it) }
                 } else {
@@ -220,7 +220,7 @@ public open class OctreeImpl<T : Shape>(
 
             if (currentNode.data.isNotEmpty())
                 currentNode.data.filterTo(result) {
-                    it.contains(point)
+                    it.contains(v3)
                 }
         }
 
@@ -228,7 +228,7 @@ public open class OctreeImpl<T : Shape>(
     }
 
 
-    override fun findNearby(point: Point, radius: Double): Collection<T> {
+    override fun findNearby(v3: V3, radius: Double): Collection<T> {
         val stack = ArrayDeque<OctreeImpl<T>>()
         val result = HashSet<T>()
         val radiusSquared = radius * radius
@@ -241,7 +241,7 @@ public open class OctreeImpl<T : Shape>(
 
             if (current.data.isNotEmpty()) {
                 for (data in current.data) {
-                    if (data.distanceSquared(point) <= radiusSquared)
+                    if (data.distanceSquared(v3) <= radiusSquared)
                         result.add(data)
                 }
             }
@@ -249,7 +249,7 @@ public open class OctreeImpl<T : Shape>(
         return result
     }
 
-    override fun findNodesNearby(point: Point, radius: Double): Collection<T> {
+    override fun findNodesNearby(v3: V3, radius: Double): Collection<T> {
         val stack = ArrayDeque<OctreeImpl<T>>()
         val result = HashSet<T>()
         val radiusSquared = radius * radius
@@ -262,7 +262,7 @@ public open class OctreeImpl<T : Shape>(
 
             if (current.data.isNotEmpty()) {
                 current.data.filterTo(result) {
-                    it.distanceSquared(point) <= radiusSquared
+                    it.distanceSquared(v3) <= radiusSquared
                 }
             }
         }
@@ -285,7 +285,7 @@ public open class OctreeImpl<T : Shape>(
     }
 
 
-    override fun findInRegion(min: Point, max: Point): Collection<T> {
+    override fun findInRegion(min: V3, max: V3): Collection<T> {
         val result = HashSet<T>()
         val stack = ArrayDeque<OctreeImpl<T>>()
         stack.add(this)
@@ -307,7 +307,7 @@ public open class OctreeImpl<T : Shape>(
         return result
     }
 
-    override fun findNodesInRegion(min: Point, max: Point): HashSet<T> {
+    override fun findNodesInRegion(min: V3, max: V3): HashSet<T> {
         val result = HashSet<T>()
         val stack = ArrayDeque<OctreeImpl<T>>()
         stack.add(this)
@@ -328,15 +328,15 @@ public open class OctreeImpl<T : Shape>(
     }
 
 
-    public inline fun getIndex(point: Point): Int {
+    public inline fun getIndex(v3: V3): Int {
         require(isZoneProvided) { "Bounds are not set" }
-        val xBit = if (point.x >= centerX!!) 1 else 0
-        val yBit = if (point.y >= centerY!!) 1 else 0
-        val zBit = if (point.z >= centerZ!!) 1 else 0
+        val xBit = if (v3.x >= centerX!!) 1 else 0
+        val yBit = if (v3.y >= centerY!!) 1 else 0
+        val zBit = if (v3.z >= centerZ!!) 1 else 0
         return (zBit shl 2) or (yBit shl 1) or xBit
     }
 
-    public inline fun getIndex(min: Point, max: Point): Int {
+    public inline fun getIndex(min: V3, max: V3): Int {
         val mx = centerX!!
         val my = centerY!!
         val mz = centerZ!!
@@ -356,15 +356,15 @@ public open class OctreeImpl<T : Shape>(
         val midY = centerY!!
         val midZ = centerZ!!
 
-        children[0] = newChild(Point(midX, minY!!, midZ), Point(maxX!!, midY, maxZ!!))
-        children[1] = newChild(Point(minX!!, minY!!, midZ), Point(midX, midY, maxZ!!))
-        children[2] = newChild(Point(midX, midY, minZ!!), Point(maxX!!, maxY!!, midZ))
-        children[3] = newChild(Point(minX!!, midY, minZ!!), Point(midX, maxY!!, midZ))
+        children[0] = newChild(V3(midX, minY!!, midZ), V3(maxX!!, midY, maxZ!!))
+        children[1] = newChild(V3(minX!!, minY!!, midZ), V3(midX, midY, maxZ!!))
+        children[2] = newChild(V3(midX, midY, minZ!!), V3(maxX!!, maxY!!, midZ))
+        children[3] = newChild(V3(minX!!, midY, minZ!!), V3(midX, maxY!!, midZ))
 
-        children[4] = newChild(Point(midX, minY!!, minZ!!), Point(maxX!!, midY, midZ))
-        children[5] = newChild(Point(minX!!, minY!!, minZ!!), Point(midX, midY, midZ))
-        children[6] = newChild(Point(midX, midY, midZ), Point(maxX!!, maxY!!, maxZ!!))
-        children[7] = newChild(Point(minX!!, midY, midZ), Point(midX, maxY!!, maxZ!!))
+        children[4] = newChild(V3(midX, minY!!, minZ!!), V3(maxX!!, midY, midZ))
+        children[5] = newChild(V3(minX!!, minY!!, minZ!!), V3(midX, midY, midZ))
+        children[6] = newChild(V3(midX, midY, midZ), V3(maxX!!, maxY!!, maxZ!!))
+        children[7] = newChild(V3(minX!!, midY, midZ), V3(midX, maxY!!, maxZ!!))
     }
 
     override fun remove(data: T) {
@@ -427,9 +427,9 @@ public open class OctreeImpl<T : Shape>(
     }
 
 
-    public inline fun newChild(minPoint: Point, maxPoint: Point): OctreeImpl<T> {
+    public inline fun newChild(minV3: V3, maxV3: V3): OctreeImpl<T> {
         return OctreeImpl<T>(capacity).apply {
-            setBounds(minPoint, maxPoint)
+            setBounds(minV3, maxV3)
         }
     }
 

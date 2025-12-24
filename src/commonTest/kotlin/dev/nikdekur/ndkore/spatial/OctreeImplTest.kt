@@ -18,26 +18,26 @@ import kotlin.time.measureTime
 class OctreeImplTest {
 
     companion object {
-        private val ORIGIN = Point(0.0, 0.0, 0.0)
-        private val UNIT_POINT = Point(1.0, 1.0, 1.0)
-        private val NEGATIVE_POINT = Point(-1.0, -1.0, -1.0)
-        private val LARGE_POINT = Point(100.0, 100.0, 100.0)
+        private val ORIGIN = V3(0.0, 0.0, 0.0)
+        private val UNIT_V3 = V3(1.0, 1.0, 1.0)
+        private val NEGATIVE_V3 = V3(-1.0, -1.0, -1.0)
+        private val LARGE_V3 = V3(100.0, 100.0, 100.0)
 
         // Test shapes for various scenarios
         private fun createTestCuboid(
             minX: Double, minY: Double, minZ: Double,
             maxX: Double, maxY: Double, maxZ: Double
         ) =
-            CuboidShapeData(Point(minX, minY, minZ), Point(maxX, maxY, maxZ))
+            CuboidShape(V3(minX, minY, minZ), V3(maxX, maxY, maxZ))
 
         private fun createTestSphere(centerX: Double, centerY: Double, centerZ: Double, radius: Double) =
-            SphereShapeData(Point(centerX, centerY, centerZ), radius)
+            SphereShape(V3(centerX, centerY, centerZ), radius)
 
         private fun createTestCylinder(
             centerX: Double, centerY: Double, centerZ: Double,
             radius: Double, height: Double
         ) =
-            CylinderShapeData(Point(centerX, centerY, centerZ), radius, height)
+            CylinderShape(V3(centerX, centerY, centerZ), radius, height)
     }
 
     // ========== CONSTRUCTOR TESTS ==========
@@ -58,13 +58,13 @@ class OctreeImplTest {
 
     @Test
     fun `should create octree with predefined bounds`() {
-        val minPoint = Point(-10.0, -10.0, -10.0)
-        val maxPoint = Point(10.0, 10.0, 10.0)
-        val octree = OctreeImpl<Shape>(minPoint, maxPoint, capacity = 8)
+        val minV3 = V3(-10.0, -10.0, -10.0)
+        val maxV3 = V3(10.0, 10.0, 10.0)
+        val octree = OctreeImpl<Shape>(minV3, maxV3, capacity = 8)
 
-        assertEquals(minPoint, octree.min)
-        assertEquals(maxPoint, octree.max)
-        assertEquals(Point(0.0, 0.0, 0.0), octree.center)
+        assertEquals(minV3, octree.min)
+        assertEquals(maxV3, octree.max)
+        assertEquals(V3(0.0, 0.0, 0.0), octree.center)
         assertTrue(octree.isEmpty())
     }
 
@@ -95,7 +95,7 @@ class OctreeImplTest {
 
     @Test
     fun `should expand bounds when inserting shapes outside current bounds`() {
-        val initialBounds = Point(-5.0, -5.0, -5.0) to Point(5.0, 5.0, 5.0)
+        val initialBounds = V3(-5.0, -5.0, -5.0) to V3(5.0, 5.0, 5.0)
         val octree = OctreeImpl<Shape>(initialBounds.first, initialBounds.second)
 
         // Insert shape outside bounds
@@ -122,8 +122,8 @@ class OctreeImplTest {
         assertTrue(octree.contains(cuboid))
 
         // Test point containment
-        val insidePoint = Point(1.0, 1.0, 1.0)
-        val found = octree.find(insidePoint)
+        val insideV3 = V3(1.0, 1.0, 1.0)
+        val found = octree.find(insideV3)
         assertTrue(found.contains(cuboid))
     }
 
@@ -154,13 +154,13 @@ class OctreeImplTest {
         assertTrue(octree.contains(sphere))
 
         // Test point inside sphere
-        val insidePoint = Point(1.0, 1.0, 0.0)
-        val found = octree.find(insidePoint)
+        val insideV3 = V3(1.0, 1.0, 0.0)
+        val found = octree.find(insideV3)
         assertTrue(found.contains(sphere))
 
         // Test point outside sphere
-        val outsidePoint = Point(3.0, 3.0, 3.0)
-        val notFound = octree.find(outsidePoint)
+        val outsideV3 = V3(3.0, 3.0, 3.0)
+        val notFound = octree.find(outsideV3)
         assertFalse(notFound.contains(sphere))
     }
 
@@ -191,8 +191,8 @@ class OctreeImplTest {
         assertTrue(octree.contains(cylinder))
 
         // Test point inside cylinder
-        val insidePoint = Point(1.0, 2.0, 0.0)
-        val found = octree.find(insidePoint)
+        val insideV3 = V3(1.0, 2.0, 0.0)
+        val found = octree.find(insideV3)
         assertTrue(found.contains(cylinder))
     }
 
@@ -215,15 +215,15 @@ class OctreeImplTest {
         assertTrue(octree.contains(cylinder))
 
         // Verify each shape can be found at appropriate points
-        assertTrue(octree.find(Point(1.0, 1.0, 1.0)).contains(cuboid))
-        assertTrue(octree.find(Point(3.0, 3.0, 3.0)).contains(sphere))
-        assertTrue(octree.find(Point(6.0, 1.0, 6.0)).contains(cylinder))
+        assertTrue(octree.find(V3(1.0, 1.0, 1.0)).contains(cuboid))
+        assertTrue(octree.find(V3(3.0, 3.0, 3.0)).contains(sphere))
+        assertTrue(octree.find(V3(6.0, 1.0, 6.0)).contains(cylinder))
     }
 
     @Test
     fun `should handle overlapping mixed shapes`() {
         val octree = OctreeImpl<Shape>()
-        val centerPoint = Point(0.0, 0.0, 0.0)
+        val centerV3 = V3(0.0, 0.0, 0.0)
 
         val cuboid = createTestCuboid(-2.0, -2.0, -2.0, 2.0, 2.0, 2.0)
         val sphere = createTestSphere(0.0, 0.0, 0.0, 3.0)
@@ -234,7 +234,7 @@ class OctreeImplTest {
         octree.insert(cylinder)
 
         // Point at origin should be found in all shapes
-        val foundAtOrigin = octree.find(centerPoint)
+        val foundAtOrigin = octree.find(centerV3)
         assertEquals(3, foundAtOrigin.size)
         assertTrue(foundAtOrigin.contains(cuboid))
         assertTrue(foundAtOrigin.contains(sphere))
@@ -254,7 +254,7 @@ class OctreeImplTest {
         // Should contain the shape multiple times
         assertEquals(2, octree.count())
 
-        val found = octree.find(Point(0.5, 0.5, 0.5))
+        val found = octree.find(V3(0.5, 0.5, 0.5))
         assertEquals(2, found.size)
         assertEquals(2, found.count { it == shape })
     }
@@ -272,7 +272,7 @@ class OctreeImplTest {
         assertTrue(octree.contains(shape1))
         assertTrue(octree.contains(shape2))
 
-        val found = octree.find(Point(0.5, 0.5, 0.5))
+        val found = octree.find(V3(0.5, 0.5, 0.5))
         assertEquals(2, found.size)
     }
 
@@ -287,7 +287,7 @@ class OctreeImplTest {
         }
 
         assertEquals(duplicateCount, octree.count())
-        val found = octree.find(Point(0.0, 0.0, 0.0))
+        val found = octree.find(V3(0.0, 0.0, 0.0))
         assertEquals(duplicateCount, found.size)
     }
 
@@ -295,8 +295,8 @@ class OctreeImplTest {
 
     @Test
     fun `should handle shapes at octree boundaries`() {
-        val minBound = Point(-10.0, -10.0, -10.0)
-        val maxBound = Point(10.0, 10.0, 10.0)
+        val minBound = V3(-10.0, -10.0, -10.0)
+        val maxBound = V3(10.0, 10.0, 10.0)
         val octree = OctreeImpl<Shape>(minBound, maxBound)
 
         // Shapes exactly at boundaries
@@ -309,9 +309,9 @@ class OctreeImplTest {
         octree.insert(centerShape)
 
         assertEquals(3, octree.count())
-        assertTrue(octree.find(Point(-9.5, -9.5, -9.5)).contains(minCornerShape))
-        assertTrue(octree.find(Point(9.5, 9.5, 9.5)).contains(maxCornerShape))
-        assertTrue(octree.find(Point(0.0, 0.0, 0.0)).contains(centerShape))
+        assertTrue(octree.find(V3(-9.5, -9.5, -9.5)).contains(minCornerShape))
+        assertTrue(octree.find(V3(9.5, 9.5, 9.5)).contains(maxCornerShape))
+        assertTrue(octree.find(V3(0.0, 0.0, 0.0)).contains(centerShape))
     }
 
     @Test
@@ -322,7 +322,7 @@ class OctreeImplTest {
         octree.insert(tinyShape)
 
         assertTrue(octree.contains(tinyShape))
-        assertTrue(octree.find(Point(0.0005, 0.0005, 0.0005)).contains(tinyShape))
+        assertTrue(octree.find(V3(0.0005, 0.0005, 0.0005)).contains(tinyShape))
     }
 
     @Test
@@ -333,8 +333,8 @@ class OctreeImplTest {
         octree.insert(largeShape)
 
         assertTrue(octree.contains(largeShape))
-        assertTrue(octree.find(Point(0.0, 0.0, 0.0)).contains(largeShape))
-        assertTrue(octree.find(Point(500.0, 500.0, 500.0)).contains(largeShape))
+        assertTrue(octree.find(V3(0.0, 0.0, 0.0)).contains(largeShape))
+        assertTrue(octree.find(V3(500.0, 500.0, 500.0)).contains(largeShape))
     }
 
     // ========== FIND OPERATION TESTS ==========
@@ -345,14 +345,14 @@ class OctreeImplTest {
         val shape = createTestCuboid(0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
         octree.insert(shape)
 
-        val found = octree.find(Point(10.0, 10.0, 10.0))
+        val found = octree.find(V3(10.0, 10.0, 10.0))
         assertTrue(found.isEmpty())
     }
 
     @Test
     fun `find should return all shapes containing the point`() {
         val octree = OctreeImpl<Shape>()
-        val testPoint = Point(1.0, 1.0, 1.0)
+        val testV3 = V3(1.0, 1.0, 1.0)
 
         val containingCuboid = createTestCuboid(0.0, 0.0, 0.0, 2.0, 2.0, 2.0)
         val containingSphere = createTestSphere(1.0, 1.0, 1.0, 1.0)
@@ -362,7 +362,7 @@ class OctreeImplTest {
         octree.insert(containingSphere)
         octree.insert(nonContainingShape)
 
-        val found = octree.find(testPoint)
+        val found = octree.find(testV3)
         assertEquals(2, found.size)
         assertTrue(found.contains(containingCuboid))
         assertTrue(found.contains(containingSphere))
@@ -374,7 +374,7 @@ class OctreeImplTest {
     @Test
     fun `findNearby should return shapes within radius`() {
         val octree = OctreeImpl<Shape>()
-        val centerPoint = Point(0.0, 0.0, 0.0)
+        val centerV3 = V3(0.0, 0.0, 0.0)
 
         val nearShape = createTestCuboid(1.0, 1.0, 1.0, 2.0, 2.0, 2.0) // Distance ~1.73
         val farShape = createTestCuboid(5.0, 5.0, 5.0, 6.0, 6.0, 6.0) // Distance ~8.66
@@ -384,20 +384,20 @@ class OctreeImplTest {
         octree.insert(farShape)
         octree.insert(veryNearShape)
 
-        val foundWithin3 = octree.findNearby(centerPoint, 3.0)
+        val foundWithin3 = octree.findNearby(centerV3, 3.0)
         assertEquals(2, foundWithin3.size)
         assertTrue(foundWithin3.contains(nearShape))
         assertTrue(foundWithin3.contains(veryNearShape))
         assertFalse(foundWithin3.contains(farShape))
 
-        val foundWithin10 = octree.findNearby(centerPoint, 10.0)
+        val foundWithin10 = octree.findNearby(centerV3, 10.0)
         assertEquals(3, foundWithin10.size)
     }
 
     @Test
     fun `findNearby should handle zero radius correctly`() {
         val octree = OctreeImpl<Shape>()
-        val point = Point(1.0, 1.0, 1.0)
+        val v3 = V3(1.0, 1.0, 1.0)
 
         val containingShape = createTestCuboid(0.0, 0.0, 0.0, 2.0, 2.0, 2.0)
         val touchingShape = createTestSphere(1.0, 1.0, 1.0, 0.5)
@@ -407,7 +407,7 @@ class OctreeImplTest {
         octree.insert(touchingShape)
         octree.insert(nonTouchingShape)
 
-        val found = octree.findNearby(point, 0.0)
+        val found = octree.findNearby(v3, 0.0)
         assertEquals(2, found.size) // Only shapes that contain the point
         assertTrue(found.contains(containingShape))
         assertTrue(found.contains(touchingShape))
@@ -429,8 +429,8 @@ class OctreeImplTest {
         octree.insert(outsideShape)
         octree.insert(containingShape)
 
-        val regionMin = Point(0.0, 0.0, 0.0)
-        val regionMax = Point(3.0, 3.0, 3.0)
+        val regionMin = V3(0.0, 0.0, 0.0)
+        val regionMax = V3(3.0, 3.0, 3.0)
 
         val found = octree.findInRegion(regionMin, regionMax)
         assertEquals(3, found.size)
@@ -443,7 +443,7 @@ class OctreeImplTest {
     @Test
     fun `findInRegion should handle point region (min equals max)`() {
         val octree = OctreeImpl<Shape>()
-        val point = Point(1.0, 1.0, 1.0)
+        val v3 = V3(1.0, 1.0, 1.0)
 
         val containingShape = createTestCuboid(0.0, 0.0, 0.0, 2.0, 2.0, 2.0)
         val nonContainingShape = createTestCuboid(3.0, 3.0, 3.0, 4.0, 4.0, 4.0)
@@ -451,7 +451,7 @@ class OctreeImplTest {
         octree.insert(containingShape)
         octree.insert(nonContainingShape)
 
-        val found = octree.findInRegion(point, point)
+        val found = octree.findInRegion(v3, v3)
         assertEquals(1, found.size)
         assertTrue(found.contains(containingShape))
     }
@@ -674,7 +674,7 @@ class OctreeImplTest {
     @Test
     fun `should handle high density of overlapping shapes`() {
         val octree = OctreeImpl<Shape>()
-        val centerPoint = Point(0.0, 0.0, 0.0)
+        val centerV3 = V3(0.0, 0.0, 0.0)
         val overlappingShapes = mutableListOf<Shape>()
 
         // Create many overlapping shapes at the same location
@@ -688,7 +688,7 @@ class OctreeImplTest {
         assertEquals(50, octree.count())
 
         // All shapes should be found at center point
-        val foundAtCenter = octree.find(centerPoint)
+        val foundAtCenter = octree.find(centerV3)
         assertEquals(50, foundAtCenter.size)
         overlappingShapes.forEach { shape ->
             assertTrue(foundAtCenter.contains(shape))
@@ -742,7 +742,7 @@ class OctreeImplTest {
         negativeShapes.forEach { assertTrue(octree.contains(it)) }
 
         // Test finding in negative space
-        val foundNegative = octree.find(Point(-3.0, -3.0, -3.0))
+        val foundNegative = octree.find(V3(-3.0, -3.0, -3.0))
         assertTrue(foundNegative.isNotEmpty())
     }
 
@@ -759,9 +759,9 @@ class OctreeImplTest {
 
         shapes.forEach { octree.insert(it) }
 
-        val testPoint = Point(1.0, 1.0, 1.0)
-        val foundShapes = octree.find(testPoint)
-        val foundNodes = octree.findNodes(testPoint)
+        val testV3 = V3(1.0, 1.0, 1.0)
+        val foundShapes = octree.find(testV3)
+        val foundNodes = octree.findNodes(testV3)
 
         assertEquals(foundShapes.size, foundNodes.size)
         foundShapes.forEach { shape ->
@@ -772,7 +772,7 @@ class OctreeImplTest {
     @Test
     fun `findNodesNearby should work correctly`() {
         val octree = OctreeImpl<Shape>()
-        val centerPoint = Point(0.0, 0.0, 0.0)
+        val centerV3 = V3(0.0, 0.0, 0.0)
 
         val nearShape = createTestCuboid(1.0, 1.0, 1.0, 2.0, 2.0, 2.0)
         val farShape = createTestCuboid(10.0, 10.0, 10.0, 11.0, 11.0, 11.0)
@@ -780,8 +780,8 @@ class OctreeImplTest {
         octree.insert(nearShape)
         octree.insert(farShape)
 
-        val foundNear = octree.findNodesNearby(centerPoint, 5.0)
-        val foundFar = octree.findNodesNearby(centerPoint, 17.4) // 10 * root of 3
+        val foundNear = octree.findNodesNearby(centerV3, 5.0)
+        val foundFar = octree.findNodesNearby(centerV3, 17.4) // 10 * root of 3
 
         assertTrue(foundNear.contains(nearShape))
         assertFalse(foundNear.contains(farShape))
@@ -802,8 +802,8 @@ class OctreeImplTest {
         octree.insert(outsideShape)
         octree.insert(intersectingShape)
 
-        val regionMin = Point(0.0, 0.0, 0.0)
-        val regionMax = Point(3.0, 3.0, 3.0)
+        val regionMin = V3(0.0, 0.0, 0.0)
+        val regionMax = V3(3.0, 3.0, 3.0)
 
         val foundInRegion = octree.findNodesInRegion(regionMin, regionMax)
 
@@ -858,9 +858,9 @@ class OctreeImplTest {
 
         repeat(10) { iteration ->
             // Query operations
-            val queryPoint = Point(iteration.toDouble(), iteration.toDouble(), iteration.toDouble())
-            val found = octree.find(queryPoint)
-            val foundNearby = octree.findNearby(queryPoint, 2.0)
+            val queryV3 = V3(iteration.toDouble(), iteration.toDouble(), iteration.toDouble())
+            val found = octree.find(queryV3)
+            val foundNearby = octree.findNearby(queryV3, 2.0)
 
             // These operations should not throw exceptions
             found.size
@@ -899,7 +899,7 @@ class OctreeImplTest {
         assertFalse(octree.contains(modifiedShape))
 
         // The octree should still find the original shape correctly
-        val found = octree.find(Point(0.5, 0.5, 0.5))
+        val found = octree.find(V3(0.5, 0.5, 0.5))
         assertTrue(found.contains(originalShape))
     }
 
@@ -913,16 +913,16 @@ class OctreeImplTest {
         octree.insert(cylinder)
 
         // Point inside cylinder radius and height
-        assertTrue(octree.find(Point(1.0, 2.0, 0.0)).contains(cylinder))
+        assertTrue(octree.find(V3(1.0, 2.0, 0.0)).contains(cylinder))
 
         // Point outside cylinder radius but within height
-        assertFalse(octree.find(Point(3.0, 2.0, 0.0)).contains(cylinder))
+        assertFalse(octree.find(V3(3.0, 2.0, 0.0)).contains(cylinder))
 
         // Point inside radius but outside height
-        assertFalse(octree.find(Point(1.0, 6.0, 0.0)).contains(cylinder))
+        assertFalse(octree.find(V3(1.0, 6.0, 0.0)).contains(cylinder))
 
         // Point at exact boundary
-        assertTrue(octree.find(Point(2.0, 0.0, 0.0)).contains(cylinder))
+        assertTrue(octree.find(V3(2.0, 0.0, 0.0)).contains(cylinder))
     }
 
     @Test
@@ -933,17 +933,17 @@ class OctreeImplTest {
         octree.insert(sphere)
 
         // Point at center
-        assertTrue(octree.find(Point(0.0, 0.0, 0.0)).contains(sphere))
+        assertTrue(octree.find(V3(0.0, 0.0, 0.0)).contains(sphere))
 
         // Point on surface (within radius)
-        assertTrue(octree.find(Point(2.0, 0.0, 0.0)).contains(sphere))
+        assertTrue(octree.find(V3(2.0, 0.0, 0.0)).contains(sphere))
 
         // Point just outside sphere
-        assertFalse(octree.find(Point(2.1, 0.0, 0.0)).contains(sphere))
+        assertFalse(octree.find(V3(2.1, 0.0, 0.0)).contains(sphere))
 
         // Point at diagonal within sphere
         sqrt(3.0) // ~1.73, which is < 2.0
-        assertTrue(octree.find(Point(1.0, 1.0, 1.0)).contains(sphere))
+        assertTrue(octree.find(V3(1.0, 1.0, 1.0)).contains(sphere))
     }
 
     @Test
@@ -956,9 +956,9 @@ class OctreeImplTest {
         octree.insert(cuboid)
 
         // Regular cuboid includes boundaries
-        assertTrue(octree.find(Point(0.0, 0.0, 0.0)).contains(cuboid)) // Min boundary
-        assertTrue(octree.find(Point(1.0, 1.0, 1.0)).contains(cuboid)) // Max boundary
-        assertTrue(octree.find(Point(0.5, 0.5, 0.5)).contains(cuboid)) // Inside
+        assertTrue(octree.find(V3(0.0, 0.0, 0.0)).contains(cuboid)) // Min boundary
+        assertTrue(octree.find(V3(1.0, 1.0, 1.0)).contains(cuboid)) // Max boundary
+        assertTrue(octree.find(V3(0.5, 0.5, 0.5)).contains(cuboid)) // Inside
     }
 
     // ========== INTEGRATION TESTS ==========
@@ -992,13 +992,14 @@ class OctreeImplTest {
         assertEquals(9, octree.count())
 
         // Test various queries
-        val groundLevel = octree.find(Point(5.0, 0.5, 2.0))
+        val groundLevel = octree.find(V3(5.0, 0.5, 2.0))
         assertTrue(groundLevel.isNotEmpty()) // Should find building 1
 
-        val airSpace = octree.findNearby(Point(5.0, 25.0, 2.0), 3.0)
+        val airSpace = octree.findNearby(V3(5.0, 25.0, 2.0), 3.0)
         assertTrue(airSpace.contains(sphericalObjects[0])) // Should find balloon
 
-        val searchRegion = octree.findInRegion(Point(-15.0, 0.0, -10.0), Point(30.0, 30.0, 15.0))
+        val searchRegion = octree.findInRegion(V3(-15.0, 0.0, -10.0), V3(30.0, 30.0, 15.0))
+        println(searchRegion)
         assertEquals(9, searchRegion.size) // Should find all objects in this large region
 
         // Test removal of specific object types
@@ -1014,8 +1015,8 @@ class OctreeImplTest {
     @Test
     fun `should maintain performance with deep octree subdivision`() {
         val octree = OctreeImpl<Shape>(
-            minPoint = Point(0.0, 0.0, 0.0),
-            maxPoint = Point(10000.0, 10000.0, 10000.0),
+            minV3 = V3(0.0, 0.0, 0.0),
+            maxV3 = V3(10000.0, 10000.0, 10000.0),
             capacity = 1
         ) // Force deep subdivision
 
@@ -1039,8 +1040,8 @@ class OctreeImplTest {
         // Test that queries still work efficiently
         val queryTime = measureTime {
             repeat(100) { i ->
-                val queryPoint = Point(i / 10.0, i / 10.0, i / 10.0)
-                val found = octree.find(queryPoint)
+                val queryV3 = V3(i / 10.0, i / 10.0, i / 10.0)
+                val found = octree.find(queryV3)
                 // Each query should find at most a few shapes
                 assertTrue(found.size <= 8) // At most the shapes in adjacent cells
             }

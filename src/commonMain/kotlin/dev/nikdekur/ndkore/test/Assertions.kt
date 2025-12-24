@@ -6,39 +6,37 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
-public inline fun assertEmpty(iterable: Iterable<*>) {
+public inline fun assertEmpty(iterable: Iterable<*>, message: String? = null) {
     if (iterable is Collection<*>)
-        assertEquals(0, iterable.size)
+        assertEquals(0, iterable.size, message)
+
     val hasNext = iterable.iterator().hasNext()
-    assertTrue(!hasNext)
+    assertTrue(!hasNext, message)
 }
 
-public inline fun assertEmpty(map: Map<*, *>) {
-    assertEquals(0, map.size)
+public inline fun assertEmpty(map: Map<*, *>, message: String? = null) {
+    assertEquals(0, map.size, message)
 }
 
-
-public inline fun assertNotEmpty(iterable: Iterable<*>) {
+public inline fun assertNotEmpty(iterable: Iterable<*>, message: String? = null) {
     if (iterable is Collection<*>)
-        assertNotEquals(0, iterable.size)
+        assertNotEquals(0, iterable.size, message)
+
     val hasNext = iterable.iterator().hasNext()
-    assertTrue(hasNext)
+    assertTrue(hasNext, message)
 }
 
-public inline fun assertNotEmpty(map: Map<*, *>) {
-    assertNotEquals(0, map.size)
+public inline fun assertNotEmpty(map: Map<*, *>, message: String? = null) {
+    assertNotEquals(0, map.size, message)
 }
 
-
-public inline fun assertSize(iterable: Iterable<*>, expected: Int) {
+public inline fun assertSize(iterable: Iterable<*>, expected: Int, message: String? = null) {
     if (iterable is Collection<*>)
-        assertEquals(expected, iterable.size)
+        assertEquals(expected, iterable.size, message)
 
-    assertEquals(expected, iterable.count())
+    assertEquals(expected, iterable.count(), message)
 }
 
-public inline fun assertSize(map: Map<*, *>, expected: Int) {
-    assertEquals(expected, map.size)
+public inline fun assertSize(map: Map<*, *>, expected: Int, message: String? = null) {
+    assertEquals(expected, map.size, message)
 }
-
-

@@ -89,3 +89,55 @@ public inline fun ByteArray.toHEX(): String {
 public inline fun String.fromHEX(): ByteArray {
     return hexToByteArray(HexFormat.Default)
 }
+
+/**
+ * Returns a sequence where the given [separator] is interspersed between elements of the original sequence.
+ *
+ * @param separator A function that takes the index of the preceding element and returns the separator element.
+ * @return A sequence with the separator interspersed between elements.
+ */
+public fun <T> Sequence<T>.intersperse(separator: (index: Int) -> T): Sequence<T> = sequence {
+    var first = true
+    var i = 0
+    this@intersperse.forEach { element ->
+        if (!first) {
+            yield(separator(i - 1))
+        }
+        yield(element)
+        first = false
+        i++
+    }
+}
+
+
+/**
+ * Groups strings from the sequence into a list of strings, each not exceeding the specified size limit.
+ *
+ * @param sizeLimit The maximum size of each grouped string.
+ * Strings that exceed this limit will be added as separate entries.
+ * @return A list of grouped strings.
+ */
+public fun Sequence<String>.groupStrings(sizeLimit: Int): List<String> {
+    val result = mutableListOf<String>()
+    val current = StringBuilder()
+
+    forEach { text ->
+        if (current.isNotEmpty() && current.length + text.length > sizeLimit) {
+            result += current.toString()
+            current.setLength(0)
+        }
+
+        if (text.length > sizeLimit) {
+            result += text
+            return@forEach
+        }
+
+        current.append(text)
+    }
+
+    if (current.isNotEmpty()) {
+        result += current.toString()
+    }
+
+    return result
+}

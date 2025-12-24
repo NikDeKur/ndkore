@@ -1,18 +1,18 @@
 [versions]
-kotlin = "2.2.20"
+kotlin = "2.3.0"
 kotlinx-coroutines = "1.10.2"
-kotlinx-serialization = "1.8.1"
+kotlinx-serialization = "1.9.0"
 kotlinx-datetime = "0.7.1"
-kotlinx-io = "0.7.0"
-kotlin-logging = "7.0.7"
+kotlinx-io = "0.8.2"
+kotlin-logging = "7.0.13"
 stately = "2.1.0"
 bignum = "0.3.10"
-google-guava = "33.4.8-jre"
+google-guava = "33.5.0-jre"
 slf4j = "2.0.17"
 licenser = "0.6.1"
-kaml = "0.65.0"
-koin = "4.1.0"
-lz4 = "1.8.0"
+kaml = "0.104.0"
+koin = "4.1.1"
+lz4 = "1.10.2"
 
 [libraries]
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
@@ -31,7 +31,7 @@ slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
 kaml = { module = "com.charleskorn.kaml:kaml", version.ref = "kaml" }
 koin = { module = "io.insert-koin:koin-core", version.ref = "koin" }
-lz4 = { module = "org.lz4:lz4-java", version.ref = "lz4" }
+lz4 = { module = "at.yawk.lz4:lz4-java", version.ref = "lz4" }
 
 [plugins]
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

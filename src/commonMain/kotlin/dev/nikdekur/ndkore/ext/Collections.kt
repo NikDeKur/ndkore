@@ -10,9 +10,19 @@
 
 package dev.nikdekur.ndkore.ext
 
-import dev.nikdekur.ndkore.`interface`.Prioritizable
 import kotlin.random.Random
 import kotlin.reflect.KClass
+
+/**
+ * Enum to define the position to insert an item in a collection.
+ *
+ * @see FIRST
+ * @see LAST
+ */
+public enum class InsertPosition {
+    FIRST,
+    LAST
+}
 
 
 @Suppress("UNCHECKED_CAST")
@@ -162,21 +172,6 @@ public inline fun <T> T.toSingletonSet(): Set<T> = setOf(this)
  * @return a list containing only this element.
  */
 public inline fun <T> T.toSingletonList(): List<T> = listOf(this)
-
-
-
-/**
- * A method to sort a list of [Prioritizable] objects by their priority.
- *
- * The method will sort the list in descending order. Objects with higher [Prioritizable.priority] will be placed first.
- *
- * @return A sorted list (copy) of [Prioritizable] objects
- * @see Prioritizable
- * @see sortedByDescending
- */
-public inline fun <T> List<T>.sortByPriority(): List<T> where T : Prioritizable {
-    return sortedByDescending { it.priority }
-}
 
 
 /**

@@ -13,8 +13,6 @@ package dev.nikdekur.ndkore.map
 public typealias ListsMap<K, V> = Map<K, List<V>>
 public typealias MutableListsMap<K, V> = MutableMap<K, MutableList<V>>
 
-
-@Suppress("UNCHECKED_CAST", "kotlin:S6524")
 public inline fun <K, V> MutableListsMap<K, V>.add(
     key: K,
     value: V,
@@ -22,4 +20,13 @@ public inline fun <K, V> MutableListsMap<K, V>.add(
 ) {
     val list = getOrPut(key, listGen)
     list.add(value)
+}
+
+public inline fun <K, V> MutableListsMap<K, V>.addAll(
+    key: K,
+    values: Collection<V>,
+    listGen: () -> MutableList<V> = ::mutableListOf
+) {
+    val list = getOrPut(key, listGen)
+    list.addAll(values)
 }

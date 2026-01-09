@@ -37,7 +37,7 @@ package dev.nikdekur.ndkore.placeholder
  *
  * ### Example 2: Parsing a String with Multiple Placeholders
  * ```kotlin
- * val parser = PatternPlaceholderParser.PROCENT
+ * val parser = PatternPlaceholderParser.PERCENT
  * val result = parser.parse("Hello, %name%! Your balance is %balance%.", mapOf("name" to "Jane", "balance" to "100"))
  * println(result) // Output: Hello, Jane! Your balance is 100.
  * ```

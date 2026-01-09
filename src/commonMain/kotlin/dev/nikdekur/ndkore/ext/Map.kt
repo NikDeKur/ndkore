@@ -191,7 +191,7 @@ public fun <K, V> Map<K, V>.removeEmpty(
 
 
 /**
- * Applicable to MutableMap, where value is Snowflake of a type same as a key
+ * Applicable to MutableMap, where value is Unique of a type same as a key
  * Add value to map by its id
  *
  * @param obj value to add
@@ -202,7 +202,7 @@ public inline fun <IdT, V : Unique<IdT>> MutableMap<IdT, V>.addById(obj: V): V? 
 }
 
 /**
- * Applicable to MutableMap, where value is Snowflake of a type same as a key
+ * Applicable to MutableMap, where value is Unique of a type same as a key
  * Add all values to map by their ids
  *
  * @param objs values to add
@@ -214,7 +214,7 @@ public inline fun <IdT, V : Unique<IdT>> MutableMap<IdT, V>.addAllById(objs: Ite
 }
 
 /**
- * Applicable to MutableMap, where value is Snowflake of a type same as a key
+ * Applicable to MutableMap, where value is Unique of a type same as a key
  * Remove value from map by its id
  *
  * @param obj value to remove
@@ -229,7 +229,7 @@ public inline fun <IdT, V : Unique<IdT>> MutableMap<IdT, V>.removeById(obj: V): 
  * Checks if this map contains the specified object by its ID.
  *
  * This method looks up the key in the map using the ID of the provided object.
- * It is useful when you have objects implementing the Snowflake interface, which provides an ID,
+ * It is useful when you have objects implementing the Unique interface, which provides an ID,
  * and you want to check for their presence in a map by their IDs.
  *
  * @param obj the object whose ID is used to check for presence in the map.

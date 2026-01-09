@@ -32,7 +32,7 @@ import dev.nikdekur.ndkore.reflect.ReflectMethod.NotFound
  *   - Initializes the parser with the same symbol for both the start and end of placeholders (e.g., `%`).
  *
  * ## Companion Object
- * - `HASH`, `PROCENT`, `CURLY_BRACKET`
+ * - `HASH`, `PERCENT`, `CURLY_BRACKET`
  *   - Predefined instances of `PatternPlaceholderParser` with common placeholder formats: `#`, `%`, and `{}`.
  * - `findValue(obj: Any, valueName: String): Any?`
  *   - Utility function to find a value within an object based on a specified name using reflection or direct lookup.

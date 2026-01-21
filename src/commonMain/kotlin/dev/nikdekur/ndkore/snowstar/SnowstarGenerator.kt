@@ -1,4 +1,4 @@
-package dev.nikdekur.ndkore.snowflake
+package dev.nikdekur.ndkore.snowstar
 
 import co.touchlab.stately.concurrency.Lock
 import co.touchlab.stately.concurrency.withLock
@@ -6,7 +6,7 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 /**
- * A thread-safe generator for SnowflakeV2 IDs.
+ * A thread-safe generator for Snowstar IDs.
  *
  * This class handles the generation of unique IDs with automatic increment management
  * and timestamp tracking. It includes protection against clock drift and increment overflows.
@@ -19,7 +19,7 @@ import kotlin.time.ExperimentalTime
  * @property defaultIncrement The starting increment value for each millisecond (defaults to 0)
  */
 @OptIn(ExperimentalTime::class)
-public class SnowflakeGenerator(
+public class SnowstarGenerator(
     public val clock: Clock,
     public val version: ULong,
     public val datacenterId: ULong,
@@ -43,7 +43,7 @@ public class SnowflakeGenerator(
     public var lastTimestamp: ULong? = null
 
     /**
-     * Generates a new unique SnowflakeV2 ID.
+     * Generates a new unique Snowstar ID.
      *
      * This method is thread-safe and handles:
      * - Incrementing the sequence number for IDs generated within the same millisecond
@@ -51,20 +51,20 @@ public class SnowflakeGenerator(
      * - Detecting backwards clock movement (throws an exception)
      * - Detecting increment overflow (throws an exception)
      *
-     * @return A new unique SnowflakeV2 ID
+     * @return A new unique Snowstar ID
      * @throws IllegalStateException If the system clock moves backwards or if the increment overflows
      */
-    public fun generate(): SnowflakeV2 = lock.withLock {
+    public fun generate(): Snowstar = lock.withLock {
         val timeStamp = clock.now().toEpochMilliseconds().toULong()
 
         val lastTS = lastTimestamp
 
         if (lastTS != null && timeStamp < lastTS) {
-            throw IllegalStateException("Clock moved backwards. Refusing to generate id for ${lastTS - timeStamp} milliseconds")
+            error("Clock moved backwards. Refusing to generate id for ${lastTS - timeStamp} milliseconds")
         }
 
-        if (increment >= SnowflakeV2.MAX_INCREMENT) {
-            throw IllegalStateException("Increment overflow. Refusing to generate id for ${increment - SnowflakeV2.MAX_INCREMENT} increments")
+        if (increment >= Snowstar.MAX_INCREMENT) {
+            error("Increment overflow. Refusing to generate id for ${increment - Snowstar.MAX_INCREMENT} increments")
         }
 
         increment = if (lastTS == timeStamp) {
@@ -75,7 +75,7 @@ public class SnowflakeGenerator(
 
         lastTimestamp = timeStamp
 
-        val snowflake = SnowflakeV2(
+        val snowstar = Snowstar(
             version = version,
             timestamp = timeStamp,
             datacenterId = datacenterId,
@@ -84,6 +84,6 @@ public class SnowflakeGenerator(
             increment = increment,
         )
 
-        return snowflake
+        return snowstar
     }
 }

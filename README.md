@@ -23,15 +23,18 @@ for more information, please refer to KDocs.
 
 - Services System to organize your code based on SOLID principles
 - Placeholder system for parsing placeholders in strings
-- Extension functions for huge number of classes
 - Reflection utilities, Class Finder [JVM only]
 - Scheduler system for scheduling tasks
+- Event system for creating and handling events
 - MultiMap, ListsMap, SetsMap and SpreadMap to simplify your code
 - Spatial data structures, ex: Octree, KDTree
 - Memory calculation module
 - Test utilities, assertions
-- Utility interfaces, ex Snowflake
+- Utility interfaces for unified code structure
 - [Koin](https://insert-koin.io/) extensions and SimpleKoinContext
+- Text API to build independent text components
+- Unique ID format - Snowstar (modification of Snowflake)
+- Many utility and extension functions for huge number of classes
 
 ### Java and Kotlin
 

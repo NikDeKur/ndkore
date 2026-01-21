@@ -1,18 +1,21 @@
 @file:Suppress("NOTHING_TO_INLINE")
+@file:OptIn(ExperimentalUuidApi::class)
 
-package dev.nikdekur.ndkore.snowflake
+package dev.nikdekur.ndkore.snowstar
 
 import dev.nikdekur.ndkore.ext.readULong
 import kotlinx.serialization.Serializable
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 /**
- * A distributed unique ID generator based on the Snowflake algorithm.
+ * A distributed unique ID generator based on the Discord's Snowflake algorithm.
  *
- * SnowflakeV2 represents a 128-bit ID composed of two ULong values with the following structure:
- * - 4 bits: Version identifier
+ * Snowstar (v1) represents a 128-bit ID composed of two ULong values with the following structure:
  * - 64 bits: Timestamp (milliseconds since epoch)
+ * - 4 bits: Version identifier
  * - 10 bits: Datacenter ID
  * - 10 bits: Worker ID
  * - 10 bits: Process ID
@@ -20,21 +23,20 @@ import kotlin.time.Instant
  *
  * The bits are split across two ULong values:
  * - data1:
- *   - 4 bits: Version
- *   - 60 bits: Timestamp (least significant bits)
+ *   - 64 bits: Timestamp
  * - data2:
- *   - 4 bits: Timestamp (most significant bits)
+ *   - 4 bits: Version
  *   - 10 bits: Datacenter ID
  *   - 10 bits: Worker ID
  *   - 10 bits: Process ID
  *   - 30 bits: Increment
  *
- * @property data1 The first 64 bits of the snowflake ID
- * @property data2 The second 64 bits of the snowflake ID
+ * @property data1 The first ULong of Snowstar.
+ * @property data2 The second ULong of Snowstar.
  */
 @OptIn(ExperimentalTime::class)
 @Serializable
-public open class SnowflakeV2(
+public open class Snowstar(
     public val data1: ULong,
     public val data2: ULong,
 ) {
@@ -47,26 +49,20 @@ public open class SnowflakeV2(
      * Used to distinguish between different ID generation schemes or versions.
      */
     public val version: Int
-        get() = (data1 shr 60).toInt()
+        get() = ((data2 shr 60) and 0xFu).toInt()
 
-    /**
-     * The timestamp component of the ID (64 bits).
-     *
-     * Represents the number of milliseconds since the Unix epoch,
-     * allowing for approximately 584,942 years of timestamp values.
-     */
+
     public val timestampMs: ULong
-        get() = ((data1 and 0x0FFFFFFFFFFFFFFF.toULong()) shl 4) or (data2 shr 60)
-
+        get() = data1
 
     /**
      * The timestamp component as an [Instant].
      *
      * Represents the number of milliseconds since the Unix epoch,
-     * allowing for approximately 584,942 years of timestamp values.
+     * allowing for approximately 584 554 531 years of timestamp values.
      */
     public val timestamp: Instant
-        get() = Instant.fromEpochMilliseconds(timestampMs.toLong())
+        get() = Instant.fromEpochMilliseconds(data1.toLong())
 
 
     /**
@@ -102,17 +98,17 @@ public open class SnowflakeV2(
         get() = data2 and 0x3FFFFFFFu
 
     /**
-     * Returns a string representation of the SnowflakeV2 with all component values.
+     * Returns a string representation of the Snowstar with all component values.
      *
      * @return A string containing the values of all ID components.
      */
     override fun toString(): String {
-        return "SnowflakeV2(version=$version, timestamp=$timestampMs, datacenterId=$datacenterId, workerId=$workerId, processId=$processId, increment=$increment)"
+        return "Snowstar(version=$version, timestamp=$data1, datacenterId=$datacenterId, workerId=$workerId, processId=$processId, increment=$increment)"
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is SnowflakeV2) return false
+        if (other !is Snowstar) return false
 
         if (data1 != other.data1) return false
         if (data2 != other.data2) return false
@@ -128,13 +124,13 @@ public open class SnowflakeV2(
 
 
     /**
-     * Companion object containing maximum values for each component of the Snowflake ID.
+     * Companion object containing maximum values for each component of the Snowstar ID.
      */
     public companion object {
         /**
          * Maximum value for the timestamp component (64 bits).
          */
-        public val MAX_TIMESTAMP: ULong = 0x0FFFFFFFFFFFFFFFu
+        public val MAX_TIMESTAMP: ULong = 0x0FFFFFFFFFFFFFFFFu
 
         /**
          * Maximum value for the version component (4 bits).
@@ -164,10 +160,10 @@ public open class SnowflakeV2(
 }
 
 /**
- * Creates a SnowflakeV2 instance with the specified component values.
+ * Creates a Snowstar (v1) instance with the specified component values.
  *
  * This function encodes the provided components into the correct bit positions
- * within the two ULong values that make up a SnowflakeV2 ID.
+ * within the two ULong values that make up a Snowstar ID.
  *
  * @param version The version component (4 bits)
  * @param timestamp The timestamp component (64 bits)
@@ -175,97 +171,118 @@ public open class SnowflakeV2(
  * @param workerId The worker ID component (10 bits)
  * @param processId The process ID component (10 bits)
  * @param increment The increment component (30 bits)
- * @return A new SnowflakeV2 instance with the encoded component values
+ * @return A new Snowstar instance with the encoded component values
  */
-public inline fun SnowflakeV2(
+public inline fun Snowstar(
     version: ULong,
     timestamp: ULong,
     datacenterId: ULong,
     workerId: ULong,
     processId: ULong,
     increment: ULong,
-): SnowflakeV2 {
-    val data1 = (version shl 60) or (timestamp shr 4)
+): Snowstar {
     val data2 =
-        (timestamp shl 60) or
-                (datacenterId shl 50) or
-                (workerId shl 40) or
-                (processId shl 30) or
-                (increment)
+        ((version and 0xFu) shl 60) or
+                ((datacenterId and 0x3FFu) shl 50) or
+                ((workerId and 0x3FFu) shl 40) or
+                ((processId and 0x3FFu) shl 30) or
+                (increment and 0x3FFFFFFFu)
 
-    return SnowflakeV2(data1, data2)
+    return Snowstar(timestamp, data2)
 }
 
 
 /**
- * Creates a SnowflakeV2 instance from a byte array representation.
+ * Creates a Snowstar instance from a byte array representation.
  *
  * The byte array must be exactly 16 bytes long, where:
  * - First 8 bytes represent the first ULong (data1)
  * - Last 8 bytes represent the second ULong (data2)
  *
- * @param data The byte array containing the binary representation of the SnowflakeV2 ID
- * @return A new SnowflakeV2 instance
+ * @param data The byte array containing the Big Endian binary representation of the Snowstar ID
+ * @return A new Snowstar instance
  * @throws IllegalArgumentException if the byte array is not 16 bytes long
  */
-public inline fun SnowflakeV2(data: ByteArray): SnowflakeV2 {
+public inline fun Snowstar(data: ByteArray): Snowstar {
     require(data.size == 16) { "Byte array must be 16 bytes long (2 * Long)" }
 
     val data1 = data.readULong(0)
     val data2 = data.readULong(8)
 
-    return SnowflakeV2(data1, data2)
+    return Snowstar(data1, data2)
+}
+
+/**
+ * Creates a Snowstar instance from a [Uuid].
+ *
+ * The [Uuid] is interpreted as two ULong values to form the Snowstar ID.
+ *
+ * @param uuid The [Uuid] representing the Snowstar ID
+ * @return A new Snowstar instance
+ */
+public inline fun Snowstar(uuid: Uuid): Snowstar {
+    return uuid.toULongs { msb, lsb -> Snowstar(msb, lsb) }
 }
 
 
 /**
- * Converts the SnowflakeV2 instance to a numeric string representation.
+ * Converts the Snowstar instance to a numeric string representation.
  *
  * The string is structured as follows:
  * - First 20 characters represent the first ULong (data1)
  * - Last 20 characters represent the second ULong (data2)
  *
- * @receiver this The SnowflakeV2 instance
- * @return A string containing the numeric representation of the SnowflakeV2 ID
+ * @receiver this The Snowstar instance
+ * @return A string containing the numeric representation of the Snowstar ID
  */
-public inline fun SnowflakeV2.asString(): String {
+public fun Snowstar.asString(): String {
     val data1 = data1.toString().padStart(20, '0')
     val data2 = data2.toString().padStart(20, '0')
     return "$data1$data2"
 }
 
 /**
- * Converts the SnowflakeV2 string representation to a SnowflakeV2 instance.
+ * Converts the Snowstar string representation to a Snowstar instance.
  *
- * The string must be a 40-character numeric representation of the SnowflakeV2 ID,
+ * The string must be a 40-character numeric representation of the Snowstar ID,
  * where:
  * - First 20 characters represent the first ULong (data1)
  * - Last 20 characters represent the second ULong (data2)
  *
- * @receiver this The string representation of the SnowflakeV2 ID
- * @return A new SnowflakeV2 instance
- * @throws IllegalArgumentException if the string is not 32 characters long
+ * @receiver this The string representation of the Snowstar ID
+ * @return A new Snowstar instance
+ * @throws IllegalArgumentException if the string is not 40 characters long (2 * ULong)
  * @throws NumberFormatException if the string contains non-numeric characters
  */
-public inline fun String.toSnowflake(): SnowflakeV2 {
+public fun String.toSnowstar(): Snowstar {
     require(length == 40) { "String must be exactly 40 characters long (2 * ULong)" }
 
-    val data1 = this.substring(0, 20).toULong()
-    val data2 = this.substring(20, 40).toULong()
+    val data1 = substring(0, 20).toULongOrNull() ?: error("data1 is not a valid ULong")
+    val data2 = substring(20, 40).toULongOrNull() ?: error("data2 is not a valid ULong")
 
-    return SnowflakeV2(data1, data2)
+    return Snowstar(data1, data2)
+}
+
+
+public fun String.toSnowstarOrNull(): Snowstar? {
+    if (length != 40) return null
+
+    val data1 = substring(0, 20).toULongOrNull() ?: return null
+    val data2 = substring(20, 40).toULongOrNull() ?: return null
+
+    return Snowstar(data1, data2)
 }
 
 /**
- * Converts the SnowflakeV2 instance to a byte array representation.
+ * Converts the Snowstar instance to a byte array representation.
  *
  * The byte array is structured as follows:
  * - First 8 bytes represent the first ULong (data1)
  * - Last 8 bytes represent the second ULong (data2)
  *
- * @return A byte array containing the binary representation of the SnowflakeV2 ID
+ * @return A byte array containing the Big Endian binary representation of the Snowstar ID
  */
-public inline fun SnowflakeV2.toByteArray(): ByteArray {
+public fun Snowstar.toByteArray(): ByteArray {
     val byteArray = ByteArray(16)
     byteArray[0] = (data1 shr 56).toByte()
     byteArray[1] = (data1 shr 48).toByte()
@@ -286,4 +303,17 @@ public inline fun SnowflakeV2.toByteArray(): ByteArray {
     byteArray[15] = data2.toByte()
 
     return byteArray
+}
+
+/**
+ * Converts the Snowstar instance to a [Uuid] representation.
+ *
+ * The [Uuid] is constructed using the two ULong values of the Snowstar ID.
+ *
+ * The resulted [Uuid] is not meant to be interpreted as a proper UUID of any version.
+ *
+ * @return A [Uuid] representing the Snowstar ID
+ */
+public fun Snowstar.toUUID(): Uuid {
+    return Uuid.fromULongs(data1, data2)
 }

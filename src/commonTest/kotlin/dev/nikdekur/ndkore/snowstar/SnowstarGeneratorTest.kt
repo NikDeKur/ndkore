@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalTime::class)
 
-package dev.nikdekur.ndkore.snowflake
+package dev.nikdekur.ndkore.snowstar
 
 import co.touchlab.stately.collections.ConcurrentMutableSet
 import kotlinx.coroutines.coroutineScope
@@ -16,12 +16,12 @@ class FakeClock(var currentMillis: Long) : Clock {
     override fun now(): Instant = Instant.fromEpochMilliseconds(currentMillis)
 }
 
-class SnowflakeGeneratorTest {
+class SnowstarGeneratorTest {
 
     @Test
-    fun happyPathGeneratesValidSnowflake() {
+    fun happyPathGeneratesValidSnowstar() {
         val fakeClock: Clock = FakeClock(1000)
-        val generator = SnowflakeGenerator(
+        val generator = SnowstarGenerator(
             clock = fakeClock,
             version = 1u,
             datacenterId = 2u,
@@ -29,19 +29,19 @@ class SnowflakeGeneratorTest {
             processId = 4u,
             defaultIncrement = 0u
         )
-        val snowflake = generator.generate()
-        assertEquals(1, snowflake.version)
-        assertEquals(1000u, snowflake.timestampMs)
-        assertEquals(2u, snowflake.datacenterId)
-        assertEquals(3u, snowflake.workerId)
-        assertEquals(4u, snowflake.processId)
-        assertEquals(0u, snowflake.increment)
+        val snowstar = generator.generate()
+        assertEquals(1, snowstar.version)
+        assertEquals(1000u, snowstar.data1)
+        assertEquals(2u, snowstar.datacenterId)
+        assertEquals(3u, snowstar.workerId)
+        assertEquals(4u, snowstar.processId)
+        assertEquals(0u, snowstar.increment)
     }
 
     @Test
     fun sameTimestampIncreasesIncrement() {
         val fakeClock = FakeClock(2000)
-        val generator = SnowflakeGenerator(
+        val generator = SnowstarGenerator(
             clock = fakeClock,
             version = 1u,
             datacenterId = 10u,
@@ -51,14 +51,14 @@ class SnowflakeGeneratorTest {
         )
         val first = generator.generate()
         val second = generator.generate()
-        assertEquals(first.timestampMs, second.timestampMs)
+        assertEquals(first.data1, second.data1)
         assertEquals(first.increment + 1u, second.increment)
     }
 
     @Test
     fun clockMovingBackwardRaisesException() {
         val fakeClock = FakeClock(3000)
-        val generator = SnowflakeGenerator(
+        val generator = SnowstarGenerator(
             clock = fakeClock,
             version = 1u,
             datacenterId = 10u,
@@ -77,13 +77,13 @@ class SnowflakeGeneratorTest {
     @Test
     fun incrementOverflowRaisesException() {
         val fakeClock: Clock = FakeClock(4000)
-        val generator = SnowflakeGenerator(
+        val generator = SnowstarGenerator(
             clock = fakeClock,
             version = 1u,
             datacenterId = 10u,
             workerId = 20u,
             processId = 30u,
-            defaultIncrement = SnowflakeV2.MAX_INCREMENT
+            defaultIncrement = Snowstar.MAX_INCREMENT
         )
         val exception = assertFailsWith<IllegalStateException> {
             generator.generate()
@@ -96,7 +96,7 @@ class SnowflakeGeneratorTest {
     @Test
     fun timestampAdvancesResetsIncrement() {
         val fakeClock = FakeClock(5000)
-        val generator = SnowflakeGenerator(
+        val generator = SnowstarGenerator(
             clock = fakeClock,
             version = 1u,
             datacenterId = 10u,
@@ -113,37 +113,37 @@ class SnowflakeGeneratorTest {
         fakeClock.currentMillis = 5001
         val second = generator.generate()
 
-        assertEquals(5000u, last.timestampMs)
-        assertEquals(5001u, second.timestampMs)
+        assertEquals(5000u, last.data1)
+        assertEquals(5001u, second.data1)
         assertEquals(0u, second.increment)
     }
 
     @Test
     fun boundaryValues() {
         val fakeClock = FakeClock(10000)
-        val generator = SnowflakeGenerator(
+        val generator = SnowstarGenerator(
             clock = fakeClock,
-            version = SnowflakeV2.MAX_VERSION,
-            datacenterId = SnowflakeV2.MAX_DATACENTER_ID,
-            workerId = SnowflakeV2.MAX_WORKER_ID,
-            processId = SnowflakeV2.MAX_PROCESS_ID,
-            defaultIncrement = SnowflakeV2.MAX_INCREMENT - 1u
+            version = Snowstar.MAX_VERSION,
+            datacenterId = Snowstar.MAX_DATACENTER_ID,
+            workerId = Snowstar.MAX_WORKER_ID,
+            processId = Snowstar.MAX_PROCESS_ID,
+            defaultIncrement = Snowstar.MAX_INCREMENT - 1u
         )
 
-        val snowflake = generator.generate()
+        val snowstar = generator.generate()
 
-        assertEquals(SnowflakeV2.MAX_VERSION.toInt(), snowflake.version)
-        assertEquals(10000u, snowflake.timestampMs)
-        assertEquals(SnowflakeV2.MAX_DATACENTER_ID, snowflake.datacenterId)
-        assertEquals(SnowflakeV2.MAX_WORKER_ID, snowflake.workerId)
-        assertEquals(SnowflakeV2.MAX_PROCESS_ID, snowflake.processId)
-        assertEquals(SnowflakeV2.MAX_INCREMENT - 1u, snowflake.increment)
+        assertEquals(Snowstar.MAX_VERSION.toInt(), snowstar.version)
+        assertEquals(10000u, snowstar.data1)
+        assertEquals(Snowstar.MAX_DATACENTER_ID, snowstar.datacenterId)
+        assertEquals(Snowstar.MAX_WORKER_ID, snowstar.workerId)
+        assertEquals(Snowstar.MAX_PROCESS_ID, snowstar.processId)
+        assertEquals(Snowstar.MAX_INCREMENT - 1u, snowstar.increment)
     }
 
     @Test
     fun serializedAndDeserializedPreservesAllValues() {
         val fakeClock = FakeClock(15000)
-        val generator = SnowflakeGenerator(
+        val generator = SnowstarGenerator(
             clock = fakeClock,
             version = 5u,
             datacenterId = 123u,
@@ -158,10 +158,10 @@ class SnowflakeGeneratorTest {
         val data2 = original.data2
 
         // Create new instance from raw data
-        val deserialized = SnowflakeV2(data1, data2)
+        val deserialized = Snowstar(data1, data2)
 
         assertEquals(original.version, deserialized.version)
-        assertEquals(original.timestampMs, deserialized.timestampMs)
+        assertEquals(original.data1, deserialized.data1)
         assertEquals(original.datacenterId, deserialized.datacenterId)
         assertEquals(original.workerId, deserialized.workerId)
         assertEquals(original.processId, deserialized.processId)
@@ -172,7 +172,7 @@ class SnowflakeGeneratorTest {
     fun uniquenessAcrossInstances() {
         val fakeClock = FakeClock(20000)
 
-        val generator1 = SnowflakeGenerator(
+        val generator1 = SnowstarGenerator(
             clock = fakeClock,
             version = 1u,
             datacenterId = 1u,
@@ -181,7 +181,7 @@ class SnowflakeGeneratorTest {
             defaultIncrement = 0u
         )
 
-        val generator2 = SnowflakeGenerator(
+        val generator2 = SnowstarGenerator(
             clock = fakeClock,
             version = 1u,
             datacenterId = 1u,
@@ -194,7 +194,7 @@ class SnowflakeGeneratorTest {
         val id2 = generator2.generate()
 
         assertNotEquals(id1, id2)
-        assertEquals(id1.timestampMs, id2.timestampMs)
+        assertEquals(id1.data1, id2.data1)
         assertEquals(id1.datacenterId, id2.datacenterId)
         assertNotEquals(id1.workerId, id2.workerId)
         assertEquals(id1.processId, id2.processId)
@@ -203,7 +203,7 @@ class SnowflakeGeneratorTest {
     @Test
     fun stressTestSameTimestamp() {
         val fakeClock = FakeClock(30000)
-        val generator = SnowflakeGenerator(
+        val generator = SnowstarGenerator(
             clock = fakeClock,
             version = 1u,
             datacenterId = 5u,
@@ -212,13 +212,13 @@ class SnowflakeGeneratorTest {
             defaultIncrement = 0u
         )
 
-        val ids = mutableSetOf<SnowflakeV2>()
+        val ids = mutableSetOf<Snowstar>()
         val count = 1000 // Generate 1000 IDs with the same timestamp
 
         repeat(count) {
             val id = generator.generate()
             assertTrue(ids.add(id), "Generated ID should be unique")
-            assertEquals(30000u, id.timestampMs)
+            assertEquals(30000u, id.data1)
             assertEquals(it.toULong(), id.increment)
         }
 
@@ -228,7 +228,7 @@ class SnowflakeGeneratorTest {
     @Test
     fun stressTestIncrementingTimestamp() {
         val fakeClock = FakeClock(40000)
-        val generator = SnowflakeGenerator(
+        val generator = SnowstarGenerator(
             clock = fakeClock,
             version = 2u,
             datacenterId = 5u,
@@ -237,14 +237,14 @@ class SnowflakeGeneratorTest {
             defaultIncrement = 0u
         )
 
-        val ids = mutableSetOf<SnowflakeV2>()
+        val ids = mutableSetOf<Snowstar>()
         val count = 1000
 
         repeat(count) {
             fakeClock.currentMillis = 40000L + it
             val id = generator.generate()
             assertTrue(ids.add(id), "Generated ID should be unique")
-            assertEquals((40000 + it).toULong(), id.timestampMs)
+            assertEquals((40000 + it).toULong(), id.data1)
             assertEquals(0u, id.increment)
         }
 
@@ -254,7 +254,7 @@ class SnowflakeGeneratorTest {
     @Test
     fun mixedTimestampAndIncrementStressTest() {
         val fakeClock = FakeClock(50000)
-        val generator = SnowflakeGenerator(
+        val generator = SnowstarGenerator(
             clock = fakeClock,
             version = 3u,
             datacenterId = 7u,
@@ -263,7 +263,7 @@ class SnowflakeGeneratorTest {
             defaultIncrement = 0u
         )
 
-        val ids = mutableSetOf<SnowflakeV2>()
+        val ids = mutableSetOf<Snowstar>()
         val count = 2000
 
         repeat(count) {
@@ -285,7 +285,7 @@ class SnowflakeGeneratorTest {
         val fakeClock = FakeClock(70000)
 
         // These should not throw exceptions
-        SnowflakeGenerator(
+        SnowstarGenerator(
             clock = fakeClock,
             version = 0u,
             datacenterId = 0u,
@@ -294,13 +294,13 @@ class SnowflakeGeneratorTest {
             defaultIncrement = 0u
         )
 
-        SnowflakeGenerator(
+        SnowstarGenerator(
             clock = fakeClock,
-            version = SnowflakeV2.MAX_VERSION,
-            datacenterId = SnowflakeV2.MAX_DATACENTER_ID,
-            workerId = SnowflakeV2.MAX_WORKER_ID,
-            processId = SnowflakeV2.MAX_PROCESS_ID,
-            defaultIncrement = SnowflakeV2.MAX_INCREMENT - 1u
+            version = Snowstar.MAX_VERSION,
+            datacenterId = Snowstar.MAX_DATACENTER_ID,
+            workerId = Snowstar.MAX_WORKER_ID,
+            processId = Snowstar.MAX_PROCESS_ID,
+            defaultIncrement = Snowstar.MAX_INCREMENT - 1u
         )
     }
 
@@ -314,7 +314,7 @@ class SnowflakeGeneratorTest {
         val processId: ULong = 0x155u // 01010101 pattern (10 bits)
         val increment: ULong = 0x3FFFFFFFu // All 30 bits set
 
-        val snowflake = SnowflakeV2(
+        val snowstar = Snowstar(
             version = version,
             timestamp = timestamp,
             datacenterId = datacenterId,
@@ -323,18 +323,18 @@ class SnowflakeGeneratorTest {
             increment = increment
         )
 
-        assertEquals(version.toInt(), snowflake.version)
-        assertEquals(timestamp, snowflake.timestampMs)
-        assertEquals(datacenterId, snowflake.datacenterId)
-        assertEquals(workerId, snowflake.workerId)
-        assertEquals(processId, snowflake.processId)
-        assertEquals(increment, snowflake.increment)
+        assertEquals(version.toInt(), snowstar.version)
+        assertEquals(timestamp, snowstar.data1)
+        assertEquals(datacenterId, snowstar.datacenterId)
+        assertEquals(workerId, snowstar.workerId)
+        assertEquals(processId, snowstar.processId)
+        assertEquals(increment, snowstar.increment)
     }
 
     @Test
     fun parallelGenerationTest() = runTest {
         val fakeClock = FakeClock(90000)
-        val generator = SnowflakeGenerator(
+        val generator = SnowstarGenerator(
             clock = fakeClock,
             version = 1u,
             datacenterId = 1u,
@@ -343,7 +343,7 @@ class SnowflakeGeneratorTest {
             defaultIncrement = 0u
         )
 
-        val ids = ConcurrentMutableSet<SnowflakeV2>()
+        val ids = ConcurrentMutableSet<Snowstar>()
         val count = 1000
         val coroutines = 10
 

@@ -10,6 +10,7 @@
 
 package dev.nikdekur.ndkore.memory
 
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.integer.BigInteger
 import com.ionspin.kotlin.bignum.integer.toBigInteger
 import dev.nikdekur.ndkore.ext.BigIntegerSerializer
@@ -181,6 +182,16 @@ public fun MemoryAmount.toBigInteger(unit: MemoryUnit = MemoryUnit.Byte): BigInt
 }
 
 /**
+ * Converts this memory amount to the specified memory unit and returns the result as a `BigDecimal`.
+ *
+ * @param unit The memory unit to convert to.
+ * @return BigDecimal The memory amount in the specified memory unit.
+ */
+public fun MemoryAmount.toBigDecimal(unit: MemoryUnit = MemoryUnit.Byte): BigDecimal {
+    return BigDecimal.fromBigInteger(bytes) / BigDecimal.fromBigInteger(unit.bytes)
+}
+
+/**
  * Converts this memory amount to the specified memory unit and returns the result as a `Long`.
  *
  * @param unit The memory unit to convert to.
@@ -224,6 +235,16 @@ public fun MemoryAmount.toUInt(unit: MemoryUnit = MemoryUnit.Byte): UInt {
     return toBigInteger(unit).uintValue(true)
 }
 
+
+/**
+ * Converts this memory amount to the specified memory unit and returns the result as a `Double`.
+ *
+ * @param unit The memory unit to convert to.
+ * @return Double The memory amount in the specified memory unit.
+ */
+public fun MemoryAmount.toDouble(unit: MemoryUnit = MemoryUnit.Byte): Double {
+    return toBigDecimal(unit).toStringExpanded().toDouble()
+}
 
 public val MemoryAmount.bitsLong: Long
     get() = bytes.longValue(true) * 8L

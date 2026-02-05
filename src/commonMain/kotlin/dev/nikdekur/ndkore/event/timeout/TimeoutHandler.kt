@@ -10,4 +10,10 @@ import dev.nikdekur.ndkore.event.Event
  */
 public interface TimeoutHandler {
     public suspend fun withTimeout(event: Event, block: suspend () -> Unit)
+
+    public companion object None : TimeoutHandler {
+        override suspend fun withTimeout(event: Event, block: suspend () -> Unit) {
+            block()
+        }
+    }
 }

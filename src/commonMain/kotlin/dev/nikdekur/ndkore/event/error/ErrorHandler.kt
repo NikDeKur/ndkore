@@ -12,5 +12,5 @@ public interface ErrorHandler {
 
     public suspend fun onTimeout(bus: EventBus, event: Event)
 
-    public suspend fun onException(bus: EventBus, event: Event, exception: Exception)
+    public suspend fun onException(bus: EventBus, event: Event, throwable: Throwable)
 }

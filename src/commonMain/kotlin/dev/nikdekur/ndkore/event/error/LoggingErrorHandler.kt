@@ -12,7 +12,7 @@ public class LoggingErrorHandler : ErrorHandler {
         logger.warn { "Handler for ${event::class.simpleName} timed out in EventBus `${bus.id}`" }
     }
 
-    override suspend fun onException(bus: EventBus, event: Event, exception: Exception) {
-        logger.error(exception) { "Handler for ${event::class.simpleName} threw an exception in EventBus `${bus.id}`" }
+    override suspend fun onException(bus: EventBus, event: Event, throwable: Throwable) {
+        logger.error(throwable) { "Handler for ${event::class.simpleName} threw an exception in EventBus `${bus.id}`" }
     }
 }
